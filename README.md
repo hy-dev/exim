@@ -23,7 +23,8 @@ also
 
 ## also todo
 
-add copyrights for everything i've copied
+* add copyrights for everything i've copied
+* maybe rename global var to Tpaste, Toothpaste == too long
 
 ## how to
 
