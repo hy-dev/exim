@@ -1,0 +1,39 @@
+{
+  "name": "toothpaste",
+  "version": "0.1.0",
+  "authors": [
+    "Paul Miller <paul@paulmillr.com>"
+  ],
+  "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
+  "main": "toothpaste.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "tooth",
+    "paste",
+    "toothpaste",
+    "teeth",
+    "brush",
+    "clean",
+    "framework",
+    "library",
+    "architecture",
+    "flux",
+    "facebook",
+    "html5",
+    "react",
+    "reactive"
+  ],
+  "license": "MIT",
+  "homepage": "http://toothpastejs.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
