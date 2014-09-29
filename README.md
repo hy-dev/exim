@@ -1,5 +1,8 @@
-# wat
-WIP, public release target: 1 Oct
+# Toothpaste.js
+
+An architecture for HTML5 apps using Facebook's Flux.js library.
+
+WIP, public release target: 1 Oct.
 
 ## What's in
 
@@ -18,6 +21,9 @@ also
 - grunt / gulp / broccoli skeletols
 - bower, npm, amd, common.js
 
+## also todo
+
+add copyrights for everything i've copied
 
 ## how to
 
