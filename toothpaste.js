@@ -1,6 +1,6 @@
 (function(root, factory) {
   "use strict";
-  // Set up Toothpaste appropriately for the environment.
+  // Set up Fluxy appropriately for the environment.
   if (typeof define === 'function' && define.amd) {
     define(['exports'], function(exports) {
       return factory(root, exports);
@@ -8,11 +8,16 @@
   } else if (typeof exports !== 'undefined') {
     factory(root, exports);
   } else {
-    root.Toothpaste = factory(root, {});
+    root.Fluxy = factory(root, {});
   }
-})(this, function(root, Toothpaste) {
+})(this, function(root, Fluxy) {
   "use strict";
 
+  if (!React) {
+    throw("React required")
+  } else if (!ReactRouter) {
+    throw("ReactRouter required")
+  }
 var utils = {}
 
 utils.inherits = function(ctor, parent) {
@@ -45,11 +50,11 @@ var constructArgs = function (serviceName, args) {
   return arrArgs;
 };
 
-var Action = function () {
+var EximAction = function () {
  this._configureServiceActions();
 };
 
-Action.prototype = utils.extend(Action.prototype, {
+EximAction.prototype = utils.extend(EximAction.prototype, {
   actions: {},
   serviceActions: {},
   mount: function (flux) {
@@ -81,11 +86,11 @@ Action.prototype = utils.extend(Action.prototype, {
   },
 });
 
-Action.extend = function (ChildProto) {
+EximAction.extend = function (ChildProto) {
   var ChildFn = function () {
-    Action.call(this);
+    EximAction.call(this);
   };
-  util.inherits(ChildFn, Action);
+  utils.inherits(ChildFn, EximAction);
   ChildFn.prototype = utils.extend(ChildFn.prototype, ChildProto);
   return ChildFn;
 };
@@ -124,9 +129,15 @@ var ConstantsFactory = function (constants) {
   }
 
   var result = {};
+  var enums = [];
   Object.keys(values).forEach(function(key, index) {
-    result[key] = index;
+    result[key] = {
+      key: key,
+      value: values[key]
+    }
+    enums.push(result[key])
   });
+  result.enums = enums;
   return result;
 };
 /**
@@ -246,7 +257,7 @@ var getActionKeyForName = function (actionName) {
   if (name.value) {
     name = name.value;
   }
-  name = convertName(name);
+  name = utils.convertName(name);
   name = name.charAt(0).toUpperCase() + name.substr(1, name.length);
   return 'handle'+name;
 };
@@ -258,9 +269,16 @@ var toArray = function (val) {
   return val;
 };
 
-var Store = function () {};
+var updateKeys = function(coll, key, val) {
+  var newColl = {};
+  utils.extend(newColl, coll);
+  newColl[key] = val;
+  return newColl;
+};
 
-Store.prototype = utils.extend(Store.prototype, {
+var EximStore = function () {};
+
+EximStore.prototype = utils.extend(EximStore.prototype, {
   _getFlux: function () {
     if (!this.flux) {
       throw new Error("Flux instance not defined. Did you call Flux.start()?");
@@ -403,113 +421,113 @@ Store.prototype = utils.extend(Store.prototype, {
   }
 });
 
-Store.extend = function (ChildFn, ChildProto) {
-  utils.inherits(ChildFn, Store);
+EximStore.extend = function (ChildFn, ChildProto) {
+  utils.inherits(ChildFn, EximStore);
   if (ChildProto) {
     ChildFn.prototype = utils.extend(ChildFn.prototype, ChildProto);
   }
   //TODO: iterate over specific FN names
   return ChildFn;
 };
-var stores = [];
-  var actions = [];
+var stores  = [];
+var actions = [];
 
-  var assignDataToStore = function(initialData, Store) {
-    if (Store.name && initialData) {
-      var state = initialData[Store.name];
-      if (state) {
-        Store.replaceState(state);
-      }
+var assignDataToStore = function(initialData, Store) {
+  if (Store.name && initialData) {
+    var state = initialData[Store.name];
+    if (state) {
+      Store.replaceState(state);
     }
-  };
+  }
+};
 
-  var safeStringify = function (obj) {
-    return JSON.stringify(obj).replace(/<\//g, '<\\\\/').replace(/<\!--/g, '<\\\\!--');
-  };
-
-
-  var Fluxy = function () {
-    this._dispatcher = new Dispatcher();
-  };
-
-  Fluxy.createStore = function (proto) {
-    var Store = FluxStore.extend(function () {
-      FluxStore.call(this);
-    }, proto);
-    var store = new Store();
-    stores.push(store);
-    return store;
-  };
-
-  Fluxy.createActions = function (proto) {
-    var Action = FluxActions.extend(proto);
-    var action = new Action();
-    actions.push(action);
-    return action;
-  };
-
-  Fluxy.createConstants = function (values) {
-    return FluxConstants(values);
-  };
-
-  Fluxy.start = function (initialData) {
-    var flux = new Fluxy();
-    stores.forEach(function (store) {
-      store.mount(flux);
-      assignDataToStore(initialData, store);
-    });
-    actions.forEach(function (action) {
-      action.mount(flux);
-    });
-    return flux;
-  };
-
-  Fluxy.bootstrap = function (key, context) {
-    var initialData;
-    if (!context && window) {
-      context = window;
-    }
-
-    if (context && context[key]) {
-      initialData = context[key];
-    }
-
-    Fluxy.start(initialData);
-  };
-
-  Fluxy.renderStateToString = function (serializer) {
-    var state = {};
-    serializer = serializer || safeStringify;
-    stores.forEach(function (store) {
-      if (store.name) {
-        state[store.name] = store.toJS(store.state);
-      }
-    });
-
-    return serializer(state);
-  };
-
-  Fluxy.reset = function () {
-    stores = [];
-    actions = [];
-  };
+var safeStringify = function (obj) {
+  return JSON.stringify(obj).replace(/<\//g, '<\\\\/').replace(/<\!--/g, '<\\\\!--');
+};
 
 
-  Fluxy.prototype = utils.extend(Fluxy.prototype, {
-    //dispatcher delegation
-    registerAction: function () {
-      return this._dispatcher.registerAction.apply(this._dispatcher, arguments);
-    },
-    registerDeferedAction: function () {
-      return this._dispatcher.registerDeferedAction.apply(this._dispatcher, arguments);
-    },
-    dispatchAction: function () {
-      return this._dispatcher.dispatchAction.apply(this._dispatcher, arguments);
-    },
+var Fluxy = function () {
+  this._dispatcher = new Dispatcher();
+};
+
+Fluxy.createStore = function (proto) {
+  var Store = EximStore.extend(function () {
+    EximStore.call(this);
+  }, proto);
+  var store = new Store();
+  stores.push(store);
+  return store;
+};
+
+Fluxy.createActions = function (proto) {
+  var Action = EximAction.extend(proto);
+  var action = new Action();
+  actions.push(action);
+  return action;
+};
+
+Fluxy.createConstants = function (values) {
+  return ConstantsFactory(values);
+};
+
+Fluxy.start = function (initialData) {
+  var flux = new Fluxy();
+  stores.forEach(function (store) {
+    store.mount(flux);
+    assignDataToStore(initialData, store);
   });
-  Toothpaste = Fluxy;
+  actions.forEach(function (action) {
+    action.mount(flux);
+  });
+  return flux;
+};
 
-  Toothpaste.cx = function (classNames) {
+Fluxy.bootstrap = function (key, context) {
+  var initialData;
+  if (!context && window) {
+    context = window;
+  }
+
+  if (context && context[key]) {
+    initialData = context[key];
+  }
+
+  Fluxy.start(initialData);
+};
+
+Fluxy.renderStateToString = function (serializer) {
+  var state = {};
+  serializer = serializer || safeStringify;
+  stores.forEach(function (store) {
+    if (store.name) {
+      state[store.name] = store.toJS(store.state);
+    }
+  });
+
+  return serializer(state);
+};
+
+Fluxy.reset = function () {
+  stores = [];
+  actions = [];
+};
+
+
+Fluxy.prototype = utils.extend(Fluxy.prototype, {
+  //dispatcher delegation
+  registerAction: function () {
+    return this._dispatcher.registerAction.apply(this._dispatcher, arguments);
+  },
+  registerDeferedAction: function () {
+    return this._dispatcher.registerDeferedAction.apply(this._dispatcher, arguments);
+  },
+  dispatchAction: function () {
+    return this._dispatcher.dispatchAction.apply(this._dispatcher, arguments);
+  },
+});
+  Fluxy = Fluxy;
+
+  Fluxy.cx = function (classNames) {
     if (typeof classNames == 'object') {
       return Object.keys(classNames).filter(function(className) {
         return classNames[className];
@@ -537,7 +555,7 @@ var stores = [];
     domHelpers[tagName] = tag.bind(this, tagName);
   });
 
-  Toothpaste.DOM = domHelpers;
+  Fluxy.DOM = domHelpers;
 
-  return Toothpaste;
+  return Fluxy;
 });
