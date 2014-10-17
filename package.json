@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "devDependencies": {
+    "phantomjs": "~1.9.2"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:hellyeahllc/toothpaste.git"
