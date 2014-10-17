@@ -464,7 +464,8 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
   replaceState: function (state) {
     this.state = state;
     this.states = [this.state];
-  }
+  },
+  request: ajax
 });
 
 EximStore.extend = function (ChildFn, ChildProto) {
