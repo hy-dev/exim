@@ -13,13 +13,12 @@
 })(this, function(root, Toothpaste) {
   "use strict";
 
-  // Flux
   // Fluxy
   // Router
   // Data fetcher
   // stuff for global data access (https://github.com/dustingetz/react-cursor)
   // conventions
-  // coffee DOM helpers / addons
+  // utils (with React.DOM helpers)
 
 
   // Brunch first-class support
@@ -81,6 +80,15 @@ utils.convertName = function (name) {
   });
   return res;
 };
+
+utils.bindTags = function (tags, scope) {
+  if (!scope) {
+    scope = this;
+  }
+  tags.forEach(function (tag) {
+    scope[tag] = React.DOM[tag];
+  })
+}
 var ajax = {
   get: function (url, query) {
     return this.ajax({
@@ -5225,6 +5233,7 @@ Fluxy.reset = function () {
   actions = [];
 };
 
+Fluxy.utils = utils;
 
 Fluxy.prototype = utils.extend(Fluxy.prototype, {
   //dispatcher delegation

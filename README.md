@@ -6,14 +6,12 @@ WIP, public release target: 1 Oct.
 
 ## What's in
 
-1. Flux
-2. Fluxy
-3. Flux-based Router
-4. Data fetcher
-5. Maybe stuff for global data access (https://github.com/dustingetz/react-cursor)
-6. conventions
-7. coffee DOM helpers / addons like in GH
-
+1. Fluxy
+2. Flux-based Router
+3. Data fetcher
+4. Maybe stuff for global data access (https://github.com/dustingetz/react-cursor)
+5. conventions
+6. utils (with React.DOM helpers)
 
 also
 
