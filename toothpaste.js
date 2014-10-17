@@ -52,9 +52,9 @@
    * will remain to ensure logic does not differ in production.
   **/
 
-  if (!React) {
+  if (typeof React === 'undefined') {
     throw("React required")
-  } else if (!ReactRouter) {
+  } else if (typeof ReactRouter === 'undefined') {
     throw("ReactRouter required")
   }
 var utils = {}

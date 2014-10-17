@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "devDependencies": {
+    "phantomjs": "~1.9.2"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:hellyeahllc/toothpaste.git"
@@ -31,11 +34,5 @@
   "bugs": {
     "url": "https://github.com/hellyeahllc/toothpaste/issues"
   },
-  "homepage": "https://github.com/hellyeahllc/toothpaste",
-  "dependencies": {
-    "react": "~0.11.1",
-    "eventEmitter": "~4.2.7",
-    "react-router": "~0.7.0",
-    "bluebird": "~2.3.6"
-  }
+  "homepage": "https://github.com/hellyeahllc/toothpaste"
 }
