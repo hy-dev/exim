@@ -123,11 +123,11 @@ var constructArgs = function (serviceName, args) {
   return arrArgs;
 };
 
-var EximAction = function () {
+var ToothpasteAction = function () {
  this._configureServiceActions();
 };
 
-EximAction.prototype = utils.extend(EximAction.prototype, {
+ToothpasteAction.prototype = utils.extend(ToothpasteAction.prototype, {
   actions: {},
   serviceActions: {},
   mount: function (flux) {
@@ -159,19 +159,18 @@ EximAction.prototype = utils.extend(EximAction.prototype, {
   },
 });
 
-EximAction.extend = function (ChildProto) {
+ToothpasteAction.extend = function (ChildProto) {
   var ChildFn = function () {
-    EximAction.call(this);
+    ToothpasteAction.call(this);
   };
-  utils.inherits(ChildFn, EximAction);
+  utils.inherits(ChildFn, ToothpasteAction);
   ChildFn.prototype = utils.extend(ChildFn.prototype, ChildProto);
   return ChildFn;
 };
 /**
- * An Enum factory
  * @param {object} constants - a hash of constant values
  *
- * Creates a new Enum for the provided constants. There are three types of constants:
+ * Creates a new Object for the provided constants. There are three types of constants:
  *  * serviceMessages: automatically have complimented COMPLETED and FAILED messages created
  *  * messages: a string constant, where the value is the same as the key
  *  * values: a string -> constant value lookup
@@ -352,9 +351,9 @@ var updateKeys = function(coll, key, val) {
   return newColl;
 };
 
-var EximStore = function () {};
+var ToothpasteStore = function () {};
 
-EximStore.prototype = utils.extend(EximStore.prototype, {
+ToothpasteStore.prototype = utils.extend(ToothpasteStore.prototype, {
   _getFlux: function () {
     if (!this.flux) {
       throw new Error("Flux instance not defined. Did you call Flux.start()?");
@@ -502,8 +501,8 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
   request: ajax
 });
 
-EximStore.extend = function (ChildFn, ChildProto) {
-  utils.inherits(ChildFn, EximStore);
+ToothpasteStore.extend = function (ChildFn, ChildProto) {
+  utils.inherits(ChildFn, ToothpasteStore);
   if (ChildProto) {
     ChildFn.prototype = utils.extend(ChildFn.prototype, ChildProto);
   }
@@ -532,8 +531,8 @@ var Fluxy = function () {
 };
 
 Fluxy.createStore = function (proto) {
-  var Store = EximStore.extend(function () {
-    EximStore.call(this);
+  var Store = ToothpasteStore.extend(function () {
+    ToothpasteStore.call(this);
   }, proto);
   var store = new Store();
   stores.push(store);
@@ -541,7 +540,7 @@ Fluxy.createStore = function (proto) {
 };
 
 Fluxy.createActions = function (proto) {
-  var Action = EximAction.extend(proto);
+  var Action = ToothpasteAction.extend(proto);
   var action = new Action();
   actions.push(action);
   return action;
