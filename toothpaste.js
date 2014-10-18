@@ -5829,23 +5829,44 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
 
   var domHelpers = {};
 
-  var tag = function(name) {
+  var tag = function() {
+    var args, attributes, name, _ref, _ref1;
+    var name = arguments[0]
+    var args = 2 <= arguments.length ? [].slice.call(arguments, 1) : [];
+
     var args, attributes;
-    args = [].slice.call(arguments, 1);
-    var first = args[0] && args[0].constructor;
-    if (first === Object) {
-      attributes = args.shift();
-    } else {
-      attributes = {};
+      args = [].slice.call(arguments, 1);
+      var first = args[0] && args[0].constructor;
+      if (first === Object) {
+        attributes = args.shift();
+      } else {
+        attributes = {};
     }
-    return React.DOM[name].apply(React.DOM, attributes.concat(args));
+    return React.DOM[name].apply(React.DOM, [attributes].concat(args))
+    //return (_ref1 = React.DOM)[name].apply(_ref1, [attributes].concat(args));
   };
 
-  Object.keys(React.DOM).forEach(function (tagName) {
-    domHelpers[tagName] = tag.bind(this, tagName);
-  });
+  var bindTag = function(tagName) {
+    return domHelpers[tagName] = tag.bind(this, tagName);
+  };
+
+  for (var tagName in React.DOM) {
+    bindTag(tagName);
+  }
+
+  domHelpers['space'] = function() {
+    return React.DOM.span({
+      dangerouslySetInnerHTML: {
+        __html: '&nbsp;'
+      }
+    });
+  };
 
   Toothpaste.DOM = domHelpers;
+
+  Toothpaste.addTag = function (name, tag) {
+    this.DOM[name] = tag
+  }
 
   return Toothpaste;
 });
