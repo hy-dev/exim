@@ -8,8 +8,6 @@
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
   "main": "toothpaste.js",
   "dependencies": {
-    "jquery": "~1.11.1",
-    "react": "~0.11.1",
     "bluebird": "~2.3.6"
   },
   "devDependencies": {
