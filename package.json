@@ -1,8 +1,8 @@
 {
-  "name": "toothpaste",
+  "name": "exim",
   "version": "0.1.0",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
-  "main": "toothpaste.js",
+  "main": "exim.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,14 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:hellyeahllc/toothpaste.git"
+    "url": "git@github.com:hellyeahllc/exim.git"
   },
   "keywords": [
-    "tooth",
-    "paste",
-    "toothpaste",
-    "teeth",
-    "brush",
+    "exim",
     "clean",
     "framework",
     "library",
@@ -32,7 +28,7 @@
   "author": "Paul Miller",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hellyeahllc/toothpaste/issues"
+    "url": "https://github.com/hellyeahllc/exim/issues"
   },
-  "homepage": "https://github.com/hellyeahllc/toothpaste"
+  "homepage": "https://github.com/hellyeahllc/exim"
 }
