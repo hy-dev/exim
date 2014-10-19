@@ -1,7 +1,7 @@
 (function() {
 
   var actions,
-  constants = Toothpaste.createConstants({
+  constants = Exim.createConstants({
     serviceMessages: ['TEST_SERVICE'],
     messages: ['TEST_SIMPLE']
   })
@@ -9,7 +9,7 @@
   module("Action", {
 
     setup: function() {
-      actions = Toothpaste.createActions({
+      actions = Exim.createActions({
         serviceActions: {
           testService: [constants.TEST_SERVICE, function() {
             return new Promise(function(r){return r(true)})
