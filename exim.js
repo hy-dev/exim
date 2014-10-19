@@ -89,6 +89,7 @@ utils.bindTags = function (tags, scope) {
     scope[tag] = React.DOM[tag];
   })
 };
+<<<<<<< HEAD:exim.js
 // Copyright (c) 2014 GitHub, Inc.
 
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -348,6 +349,8 @@ utils.bindTags = function (tags, scope) {
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+=======
+>>>>>>> 46147e9d4f820905c847a9982886d918cfbc362c:toothpaste.js
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactRouter=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 var LocationDispatcher = _dereq_('../dispatchers/LocationDispatcher');
 var makePath = _dereq_('../utils/makePath');
@@ -5505,6 +5508,17 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
   for (var tagName in React.DOM) {
     bindTag(tagName);
   }
+<<<<<<< HEAD:exim.js
+=======
+
+  domHelpers['space'] = function() {
+    return React.DOM.span({
+      dangerouslySetInnerHTML: {
+        __html: '&nbsp;'
+      }
+    });
+  };
+>>>>>>> 46147e9d4f820905c847a9982886d918cfbc362c:toothpaste.js
 
   domHelpers['space'] = function() {
     return React.DOM.span({
@@ -5520,5 +5534,13 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
     this.DOM[name] = tag
   }
 
+<<<<<<< HEAD:exim.js
   return Exim;
+=======
+  Toothpaste.addTag = function (name, tag) {
+    this.DOM[name] = tag
+  }
+
+  return Toothpaste;
+>>>>>>> 46147e9d4f820905c847a9982886d918cfbc362c:toothpaste.js
 });

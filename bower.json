@@ -8,7 +8,8 @@
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
   "main": "exim.js",
   "dependencies": {
-    "bluebird": "~2.3.6"
+    "bluebird": "~2.3.6",
+    "fetch": "~0.2.1"
   },
   "devDependencies": {
     "qunit": "~1"
@@ -20,7 +21,6 @@
   ],
   "keywords": [
     "exim",
-    "clean",
     "framework",
     "library",
     "architecture",
