@@ -1,6 +1,6 @@
-OUTPUT ?= toothpaste.js
+OUTPUT ?= exim.js
 
-toothpaste:
+exim:
 	cat lib/{header,utils,fetch,Router,Action,Constants,Dispatcher,Store,Fluxy,footer}.js > $(OUTPUT)
 
 test:

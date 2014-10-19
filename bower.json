@@ -1,12 +1,12 @@
 {
-  "name": "toothpaste",
+  "name": "exim",
   "version": "0.1.0",
   "authors": [
     "Paul Miller <paul@paulmillr.com>",
     "Artem Yavorsky <aqson@me.com>"
   ],
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
-  "main": "toothpaste.js",
+  "main": "exim.js",
   "dependencies": {
     "bluebird": "~2.3.6"
   },
@@ -19,11 +19,7 @@
     "node"
   ],
   "keywords": [
-    "tooth",
-    "paste",
-    "toothpaste",
-    "teeth",
-    "brush",
+    "exim",
     "clean",
     "framework",
     "library",
@@ -35,7 +31,7 @@
     "reactive"
   ],
   "license": "MIT",
-  "homepage": "http://toothpastejs.com",
+  "homepage": "http://eximjs.com",
   "ignore": [
     "**/.*",
     "node_modules",

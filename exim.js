@@ -1,6 +1,6 @@
 (function(root, factory) {
   "use strict";
-  // Set up Toothpaste appropriately for the environment.
+  // Set up Exim appropriately for the environment.
   if (typeof define === 'function' && define.amd) {
     define(['exports'], function(exports) {
       return factory(root, exports);
@@ -8,9 +8,9 @@
   } else if (typeof exports !== 'undefined') {
     factory(root, exports);
   } else {
-    root.Toothpaste = factory(root, {});
+    root.Exim = factory(root, {});
   }
-})(this, function(root, Toothpaste) {
+})(this, function(root, Exim) {
   "use strict";
 
   // Fluxy
@@ -23,7 +23,7 @@
 
   // Brunch first-class support
   // grunt / gulp / broccoli skeletols
-  // git@github.com:hellyeahllc/toothpaste.git
+  // git@github.com:hellyeahllc/Exim.git
 
 
 
@@ -89,7 +89,29 @@ utils.bindTags = function (tags, scope) {
     scope[tag] = React.DOM[tag];
   })
 };
-  (function () {
+// Copyright (c) 2014 GitHub, Inc.
+
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+(function() {
+  'use strict';
 
   if (window.fetch) {
     return
@@ -305,7 +327,27 @@ utils.bindTags = function (tags, scope) {
   window.fetch = function (url, options) {
     return new Request(url, options).fetch()
   }
-})()
+})();
+// Copyright (c) 2014 Ryan Florence, Michael Jackson
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+// of the Software, and to permit persons to whom the Software is furnished to do
+// so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactRouter=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 var LocationDispatcher = _dereq_('../dispatchers/LocationDispatcher');
 var makePath = _dereq_('../utils/makePath');
@@ -4947,11 +4989,11 @@ var constructArgs = function (serviceName, args) {
   return arrArgs;
 };
 
-var ToothpasteAction = function () {
+var EximAction = function () {
  this._configureServiceActions();
 };
 
-ToothpasteAction.prototype = utils.extend(ToothpasteAction.prototype, {
+EximAction.prototype = utils.extend(EximAction.prototype, {
   actions: {},
   serviceActions: {},
   mount: function (flux) {
@@ -4983,11 +5025,11 @@ ToothpasteAction.prototype = utils.extend(ToothpasteAction.prototype, {
   },
 });
 
-ToothpasteAction.extend = function (ChildProto) {
+EximAction.extend = function (ChildProto) {
   var ChildFn = function () {
-    ToothpasteAction.call(this);
+    EximAction.call(this);
   };
-  utils.inherits(ChildFn, ToothpasteAction);
+  utils.inherits(ChildFn, EximAction);
   ChildFn.prototype = utils.extend(ChildFn.prototype, ChildProto);
   return ChildFn;
 };
@@ -5037,7 +5079,6 @@ var ConstantsFactory = function (constants) {
   return result;
 };
 /**
- * Copyright 2014 Justin Reidy
  *
  * Dispatcher
  *
@@ -5175,9 +5216,9 @@ var updateKeys = function(coll, key, val) {
   return newColl;
 };
 
-var ToothpasteStore = function () {};
+var EximStore = function () {};
 
-ToothpasteStore.prototype = utils.extend(ToothpasteStore.prototype, {
+EximStore.prototype = utils.extend(EximStore.prototype, {
   _getFlux: function () {
     if (!this.flux) {
       throw new Error("Flux instance not defined. Did you call Flux.start()?");
@@ -5324,14 +5365,16 @@ ToothpasteStore.prototype = utils.extend(ToothpasteStore.prototype, {
   }
 });
 
-ToothpasteStore.extend = function (ChildFn, ChildProto) {
-  utils.inherits(ChildFn, ToothpasteStore);
+EximStore.extend = function (ChildFn, ChildProto) {
+  utils.inherits(ChildFn, EximStore);
   if (ChildProto) {
     ChildFn.prototype = utils.extend(ChildFn.prototype, ChildProto);
   }
   //TODO: iterate over specific FN names
   return ChildFn;
 };
+//Copyright 2014 Justin Reidy
+
 var stores  = [];
 var actions = [];
 
@@ -5354,8 +5397,8 @@ var Fluxy = function () {
 };
 
 Fluxy.createStore = function (proto) {
-  var Store = ToothpasteStore.extend(function () {
-    ToothpasteStore.call(this);
+  var Store = EximStore.extend(function () {
+    EximStore.call(this);
   }, proto);
   var store = new Store();
   stores.push(store);
@@ -5363,7 +5406,7 @@ Fluxy.createStore = function (proto) {
 };
 
 Fluxy.createActions = function (proto) {
-  var Action = ToothpasteAction.extend(proto);
+  var Action = EximAction.extend(proto);
   var action = new Action();
   actions.push(action);
   return action;
@@ -5429,9 +5472,9 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
     return this._dispatcher.dispatchAction.apply(this._dispatcher, arguments);
   },
 });
-  Toothpaste = Fluxy;
+  Exim = Fluxy;
 
-  Toothpaste.cx = function (classNames) {
+  Exim.cx = function (classNames) {
     if (typeof classNames == 'object') {
       return Object.keys(classNames).filter(function(className) {
         return classNames[className];
@@ -5471,11 +5514,11 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
     });
   };
 
-  Toothpaste.DOM = domHelpers;
+  Exim.DOM = domHelpers;
 
-  Toothpaste.addTag = function (name, tag) {
+  Exim.addTag = function (name, tag) {
     this.DOM[name] = tag
   }
 
-  return Toothpaste;
+  return Exim;
 });
