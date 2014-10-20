@@ -1,4 +1,4 @@
-# Toothpaste.js
+# Exim.js
 
 An architecture for HTML5 apps using Facebook's Flux.js library.
 
@@ -22,13 +22,12 @@ also
 ## also todo
 
 * add copyrights for everything i've copied
-* maybe rename global var to Tpaste, Toothpaste == too long
 
 ## how to
 
 1. include bluebird promises
 2. include react.js
-3. include toothpaste
+3. include Exim
 
 
 ## License
