@@ -1,6 +1,6 @@
 {
   "name": "exim",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [
     "Paul Miller <paul@paulmillr.com>",
     "Artem Yavorsky <aqson@me.com>"
@@ -9,7 +9,8 @@
   "main": "exim.js",
   "dependencies": {
     "bluebird": "~2.3.6",
-    "fetch": "~0.2.1"
+    "fetch": "~0.2.1",
+    "react": "~0.11.2"
   },
   "devDependencies": {
     "qunit": "~1"
