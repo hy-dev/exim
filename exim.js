@@ -81,6 +81,12 @@ utils.convertName = function (name) {
   return res;
 };
 
+utils.transform = function (constants, mappings) {
+  return Object.keys(mappings).map(function (k) {
+    return [constants[k], mappings[k]];
+  })
+};
+
 utils.bindTags = function (tags, scope) {
   if (!scope) {
     scope = this;
