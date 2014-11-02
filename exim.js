@@ -5319,7 +5319,11 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
     },
     defaultTo: function(View) {
       return ReactRouter.DefaultRoute({handler: View});
-    }
+    },
+    Link: ReactRouter.Link,
+    transitionTo: ReactRouter.transitionTo,
+    goBack: ReactRouter.goBack,
+    replaceWith: ReactRouter.replaceWith
   };
 
   return Exim;
