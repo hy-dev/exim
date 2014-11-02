@@ -44,7 +44,7 @@ TwoPane = React.createClass
 {startHistory, match} = Exim.Router
 routes = startHistory
   match 'app', App, path: '/',
-    match 'feedback', FeedbackPage  # Each route handler is React view
+    match 'feedback', FeedbackPage  # Each route handler is a React view
     match 'terms', TermsPage        # @props.activeRouteHandler()
     match 'privacy', PrivacyPage    # is passed to each view.
 
