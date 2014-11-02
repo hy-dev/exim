@@ -26,6 +26,41 @@ Dependencies are specified in `bower.json`. They are:
 - fetch - polyfill for in-browser AJAX `fetch()` API
 - React - great library by Facebook
 
+## Documentation
+
+Still a big TODO. Some code:
+
+```coffeescript
+# 1. Define your React components.
+App = ...
+TwoPane = React.createClass
+  render: ->
+    div className: 'layout',
+      Sidebar()
+      @props.activeRouteHandler()
+
+
+# 2. Define your routes.
+routes = startHistory match 'app', App, path: '/',
+  match 'feedback', FeedbackPage  # Each route handler is React view
+  match 'terms', TermsPage        # @props.activeRouteHandler()
+  match 'privacy', PrivacyPage    # is passed to each view.
+
+  match TwoPane,
+    match 'calendar', Calendar
+    MessagesRoutes  # Easy nesting!
+
+MessagesRoutes = [
+  match 'messages', Messages,
+    match 'new', Compose, path: 'new'
+    match 'conversation', Conversation, path: ':conversationId'
+]
+
+# 3. Launch your app.
+React.render(routes, document.body)
+
+```
+
 ## License
 
 The MIT License (MIT)
