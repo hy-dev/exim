@@ -2,33 +2,29 @@
 
 An architecture for HTML5 apps using Facebook's Flux.js library.
 
-WIP, public release target: 1 Oct.
+## Why Exim
 
-## What's in
+1. React.js
+2. Flux.js
+3. Super easy React-based Router
+4. Simplicity
+5. First-class js & coffee with short-syntax.
+6. Lightweight, no big deps
+7. Brunch, Grunt, Gulp boilerplates. Bower, NPM, AMD & Common.js support
+8. Conventions.
 
-1. Fluxy
-2. Flux-based Router
-3. Data fetcher
-4. Maybe stuff for global data access (https://github.com/dustingetz/react-cursor)
-5. conventions
-6. utils (with React.DOM helpers)
+## Future vision
 
-also
+- Data fetcher
+- Explicit state (https://github.com/dustingetz/react-cursor)
 
-- Brunch first-class support
-- grunt / gulp / broccoli skeletols
-- bower, npm, amd, common.js
+## Dependencies
 
-## also todo
+Dependencies are specified in `bower.json`. They are:
 
-* add copyrights for everything i've copied
-
-## how to
-
-1. include bluebird promises
-2. include react.js
-3. include Exim
-
+- Bluebird - ultra-fast promises
+- fetch - polyfill for in-browser AJAX `fetch()` API
+- React - great library by Facebook
 
 ## License
 
