@@ -69,7 +69,11 @@ utils.inherits = function(ctor, parent) {
   };
 
 utils.extend = function(obj, item) {
-  for (var key in item) obj[key] = item[key];
+  var reduceFn = function (prev, next) {
+    for (var key in next) prev[key] = next[key];
+    return prev;
+  };
+  var obj = [].reduce.call(arguments, reduceFn)
   return obj;
 };
 
@@ -5140,10 +5144,57 @@ EximStore.extend = function (ChildFn, ChildProto) {
   //TODO: iterate over specific FN names
   return ChildFn;
 };
+var Listener = function (args) {
+  var getState;
+  var stores = [];
+
+  if (args.store) {
+    stores.push(store);
+  } else if (args.stores) {
+    stores = args.stores;
+  } else {
+    throw new Error('Store is missing!');
+  }
+
+  if (typeof args.getState === 'function') {
+    getState = args.getState
+  } else if (typeof args.getState === 'object') {
+    getState = function () {return args.getState};
+  } else {
+    throw new Error('getState is missing!');
+  }
+
+  this.stores = stores;
+  this.getState = getState;
+};
+
+Listener.prototype.getInitialState = function () {
+  return this.getState();
+};
+
+Listener.prototype.componentDidMount = function () {
+  var self = this;
+  this.stores.map(function (store) {
+    store.addWatch(self._onChange);
+  });
+};
+
+Listener.prototype.componentWillUnmount = function () {
+  var self = this;
+  this.stores.map(function (store) {
+    store.removeWatch(self._onChange);
+  })
+};
+
+Listener.prototype._onChange = function () {
+  this.setState(this.getState());
+};
+
 //Copyright 2014 Justin Reidy
 
 var stores  = [];
 var actions = [];
+window.actions = actions;
 
 var assignDataToStore = function(initialData, Store) {
   if (Store.name && initialData) {
@@ -5159,11 +5210,11 @@ var safeStringify = function (obj) {
 };
 
 
-var Fluxy = function () {
+var Exim = function () {
   this._dispatcher = new Dispatcher();
 };
 
-Fluxy.createStore = function (proto) {
+Exim.createStore = function (proto) {
   var Store = EximStore.extend(function () {
     EximStore.call(this);
   }, proto);
@@ -5172,19 +5223,19 @@ Fluxy.createStore = function (proto) {
   return store;
 };
 
-Fluxy.createActions = function (proto) {
+Exim.createActions = function (proto) {
   var Action = EximAction.extend(proto);
   var action = new Action();
   actions.push(action);
   return action;
 };
 
-Fluxy.createConstants = function (values) {
+Exim.createConstants = function (values) {
   return ConstantsFactory(values);
 };
 
-Fluxy.start = function (initialData) {
-  var flux = new Fluxy();
+Exim.start = function (initialData) {
+  var flux = new Exim();
   stores.forEach(function (store) {
     store.mount(flux);
     assignDataToStore(initialData, store);
@@ -5195,7 +5246,7 @@ Fluxy.start = function (initialData) {
   return flux;
 };
 
-Fluxy.bootstrap = function (key, context) {
+Exim.bootstrap = function (key, context) {
   var initialData;
   if (!context && window) {
     context = window;
@@ -5205,10 +5256,10 @@ Fluxy.bootstrap = function (key, context) {
     initialData = context[key];
   }
 
-  Fluxy.start(initialData);
+  Exim.start(initialData);
 };
 
-Fluxy.renderStateToString = function (serializer) {
+Exim.renderStateToString = function (serializer) {
   var state = {};
   serializer = serializer || safeStringify;
   stores.forEach(function (store) {
@@ -5220,14 +5271,14 @@ Fluxy.renderStateToString = function (serializer) {
   return serializer(state);
 };
 
-Fluxy.reset = function () {
+Exim.reset = function () {
   stores = [];
   actions = [];
 };
 
-Fluxy.utils = utils;
+Exim.utils = utils;
 
-Fluxy.prototype = utils.extend(Fluxy.prototype, {
+Exim.prototype = utils.extend(Exim.prototype, {
   //dispatcher delegation
   registerAction: function () {
     return this._dispatcher.registerAction.apply(this._dispatcher, arguments);
@@ -5239,53 +5290,105 @@ Fluxy.prototype = utils.extend(Fluxy.prototype, {
     return this._dispatcher.dispatchAction.apply(this._dispatcher, arguments);
   },
 });
-  Exim = Fluxy;
 
-  Exim.cx = function (classNames) {
-    if (typeof classNames == 'object') {
-      return Object.keys(classNames).filter(function(className) {
-        return classNames[className];
-      }).join(' ');
-    } else {
-      return Array.prototype.join.call(arguments, ' ');
-    }
-  };
 
-  var domHelpers = {};
-
-  var tag = function (name) {
-    var args, attributes, name;
-    args = [].slice.call(arguments, 1);
-    var first = args[0] && args[0].constructor;
-    if (first === Object) {
-      attributes = args.shift();
-    } else {
-      attributes = {};
-    }
-    return React.DOM[name].apply(React.DOM, [attributes].concat(args))
-  };
-
-  var bindTag = function(tagName) {
-    return domHelpers[tagName] = tag.bind(this, tagName);
-  };
-
-  for (var tagName in React.DOM) {
-    bindTag(tagName);
+Exim.cx = function (classNames) {
+  if (typeof classNames == 'object') {
+    return Object.keys(classNames).filter(function(className) {
+      return classNames[className];
+    }).join(' ');
+  } else {
+    return Array.prototype.join.call(arguments, ' ');
   }
+};
 
-  domHelpers['space'] = function() {
-    return React.DOM.span({
-      dangerouslySetInnerHTML: {
-        __html: '&nbsp;'
-      }
-    });
-  };
+var domHelpers = {};
 
-  Exim.DOM = domHelpers;
-
-  Exim.addTag = function (name, tag) {
-    this.DOM[name] = tag;
+var tag = function (name) {
+  var args, attributes, name;
+  args = [].slice.call(arguments, 1);
+  var first = args[0] && args[0].constructor;
+  if (first === Object) {
+    attributes = args.shift();
+  } else {
+    attributes = {};
   }
+  return React.DOM[name].apply(React.DOM, [attributes].concat(args))
+};
 
-  return Exim;
+var bindTag = function(tagName) {
+  return domHelpers[tagName] = tag.bind(this, tagName);
+};
+
+for (var tagName in React.DOM) {
+  bindTag(tagName);
+}
+
+domHelpers['space'] = function() {
+  return React.DOM.span({
+    dangerouslySetInnerHTML: {
+      __html: '&nbsp;'
+    }
+  });
+};
+
+Exim.DOM = domHelpers;
+
+Exim.addTag = function (name, tag) {
+  this.DOM[name] = tag;
+}
+
+Exim.router = ReactRouter;
+
+Exim._exims = {};
+Exim.mixins = {};
+
+var getSerivceActions = function (constants, actions) {
+  var serviceActions = {};
+  for (var key in actions) {
+    serviceActions[key] = [constants[key], actions[key]];
+  }
+  return serviceActions;
+};
+
+var getCompletedActions = function (actions) {
+  var afterActions = {};
+  for (var key in actions) {
+    afterActions[key + '_COMPLETED'] = actions[key];
+  }
+  return afterActions;
+};
+
+var getFailedActions = function (actions) {
+  var failedActions = {};
+  for (var key in actions) {
+    failedActions[key + '_FAILED'] = actions[key];
+  }
+  return failedActions;
+};
+
+
+var EximConstructor = function (args) {
+  var actions = args.actions;
+  var name = args.name
+  var initial = args.initial
+
+  var before = args.before;
+  var after = getCompletedActions(args.after);
+  var failed = getFailedActions(args.failed);
+  var storeActions = utils.extend(after, before, failed);
+
+  this.constants = Exim.createConstants({serviceMessages: Object.keys(actions)});
+  this.actions = Exim.createActions({serviceActions: getSerivceActions(this.constants, actions)});
+  this.store = Exim.createStore({name:name, getInitialState: initial, actions: Exim.utils.transform(this.constants, storeActions )});
+  Exim.bootstrap('__exim__');
+}
+
+Exim.create = function (args) {
+  return new EximConstructor(args);
+};
+
+return Exim;
+
+
 });
