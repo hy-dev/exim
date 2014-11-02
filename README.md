@@ -42,14 +42,15 @@ TwoPane = React.createClass
 
 # 2. Define your routes.
 {startHistory, match} = Exim.Router
-routes = startHistory match 'app', App, path: '/',
-  match 'feedback', FeedbackPage  # Each route handler is React view
-  match 'terms', TermsPage        # @props.activeRouteHandler()
-  match 'privacy', PrivacyPage    # is passed to each view.
+routes = startHistory
+  match 'app', App, path: '/',
+    match 'feedback', FeedbackPage  # Each route handler is React view
+    match 'terms', TermsPage        # @props.activeRouteHandler()
+    match 'privacy', PrivacyPage    # is passed to each view.
 
-  match TwoPane,
-    match 'calendar', Calendar
-    MessagesRoutes  # Easy nesting!
+    match TwoPane,
+      match 'calendar', Calendar
+      MessagesRoutes  # Easy nesting!
 
 MessagesRoutes = [
   match 'messages', Messages,
