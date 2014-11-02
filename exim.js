@@ -4774,9 +4774,11 @@ EximAction.prototype = utils.extend(EximAction.prototype, {
   _configureServiceActions: function () {
     var self = this;
     Object.keys(this.serviceActions).forEach(function (key) {
-      var pair = self.serviceActions[key];
-      var serviceName = pair[0].value;
+      console.log(key);
+      //var pair = self.serviceActions[key];
+      var serviceName = key;
       var actionName = key;
+      var method = self.serviceActions[key];
       if (self[actionName]) {
         throw new Error('Cannot assign duplicate function name "' + actionName + '"');
       }
@@ -4784,7 +4786,7 @@ EximAction.prototype = utils.extend(EximAction.prototype, {
       self[actionName] = function () {
         var args = constructArgs(serviceName, arguments);
         self.dispatchAction.apply(self.flux, args);
-        return pair[1].apply(self, Array.prototype.slice.call(arguments))
+        return method.apply(self, Array.prototype.slice.call(arguments))
           .then(function (result) {
             self.dispatchAction(serviceName+'_COMPLETED', result);
           })
@@ -5379,7 +5381,7 @@ var EximConstructor = function (args) {
   var storeActions = utils.extend(after, before, failed);
 
   this.constants = Exim.createConstants({serviceMessages: Object.keys(actions)});
-  this.actions = Exim.createActions({serviceActions: getSerivceActions(this.constants, actions)});
+  this.actions = Exim.createActions({serviceActions: actions});
   this.store = Exim.createStore({name:name, getInitialState: initial, actions: Exim.utils.transform(this.constants, storeActions )});
   Exim.bootstrap('__exim__');
 }
