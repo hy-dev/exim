@@ -53,7 +53,7 @@ routes = startHistory match 'app', App, path: '/',
 MessagesRoutes = [
   match 'messages', Messages,
     match 'new', Compose, path: 'new'
-    match 'conversation', Conversation, path: ':conversationId'
+    match 'conversation', Conversation, path: ':id'
 ]
 
 # 3. Launch your app.
