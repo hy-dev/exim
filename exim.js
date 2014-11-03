@@ -4807,51 +4807,6 @@ EximAction.extend = function (ChildProto) {
   return ChildFn;
 };
 /**
- * @param {object} constants - a hash of constant values
- *
- * Creates a new Object for the provided constants. There are three types of constants:
- *  * serviceMessages: automatically have complimented COMPLETED and FAILED messages created
- *  * messages: a string constant, where the value is the same as the key
- *  * values: a string -> constant value lookup
- *
- * serviceMessages and messages should be specified as Array<String>. Values should be a hash.
- *
- */
-
-var ConstantsFactory = function (constants) {
-  var values = {};
-  if (constants) {
-    if (constants.serviceMessages) {
-      constants.serviceMessages.forEach(function (key) {
-        var messages = [key, key+'_COMPLETED', key+'_FAILED'];
-        messages.forEach(function (m) { values[m] = m; });
-      });
-    }
-    if (constants.messages) {
-      constants.messages.forEach(function (key) {
-        values[key] = key;
-      });
-    }
-    if (constants.values) {
-      Object.keys(constants.values).forEach(function (key) {
-        values[key] = constants.values[key];
-      });
-    }
-  }
-
-  var result = {};
-  var enums = [];
-  Object.keys(values).forEach(function(key, index) {
-    result[key] = {
-      key: key,
-      value: values[key]
-    }
-    enums.push(result[key])
-  });
-  result.enums = enums;
-  return result;
-};
-/**
  *
  * Dispatcher
  *
@@ -4868,8 +4823,8 @@ var Dispatcher = function () {
   this._dispatchQueue = [];
 
   this._registerActionHandler = function (action, handler) {
-    this._actions[action.key] = this._actions[action] || [];
-    return this._actions[action.key].push(handler);
+    this._actions[action] = this._actions[action] || [];
+    return this._actions[action].push(handler);
   };
 
   this._processQueue = function () {
@@ -4936,9 +4891,6 @@ Dispatcher.prototype = utils.extend(Dispatcher.prototype, {
    */
   dispatchAction: function(action, payload) {
     var self = this;
-    if (action.key) {
-      action = action.key;
-    }
     var handlers = this._actions[action];
     if (!handlers || handlers.length < 1) {
       return;
@@ -4967,9 +4919,6 @@ Dispatcher.prototype = utils.extend(Dispatcher.prototype, {
 });
 var getActionKeyForName = function (actionName) {
   var name = actionName;
-  if (name.value) {
-    name = name.value;
-  }
   name = utils.convertName(name);
   name = name.charAt(0).toUpperCase() + name.substr(1, name.length);
   return 'handle'+name;
@@ -5013,8 +4962,7 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
     var flux = this._getFlux();
     if (waitForHandlers) {
       registeredAction = flux.registerDeferedAction(actionName, waitForHandlers, handler.bind(this));
-    }
-    else {
+    } else {
       registeredAction = flux.registerAction(actionName, handler.bind(this));
     }
     this[actionKey] = registeredAction;
@@ -5026,6 +4974,23 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
     this._actionMap = {};
 
     if (this.actions) {
+      for (var name in this.actions) {
+        var actionName = name;
+        var actionKey = getActionKeyForName(actionName);
+        var handler = this.actions[name];
+
+        self._registerAction(actionName, actionKey, handler);
+      }
+
+      /*
+      ===TODO: waitFor===
+
+      if (this.waitFor) {
+        if (!Array.isArray(waitFor)) {
+          waitFor = [waitFor];
+        }
+      }
+
       this.actions.forEach(function (action) {
         if (!action[0]) {
           throw new Error("Action name must be provided");
@@ -5034,7 +4999,7 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
           throw new Error("Action handler must be provided");
         }
 
-        var actionName = action[0];
+        var actionName = action;
         var actionKey = getActionKeyForName(actionName);
 
         if (action.length === 2) {
@@ -5055,6 +5020,7 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
           }
         }
       });
+      */
     }
   },
 
@@ -5232,10 +5198,6 @@ Exim.createActions = function (proto) {
   return action;
 };
 
-Exim.createConstants = function (values) {
-  return ConstantsFactory(values);
-};
-
 Exim.start = function (initialData) {
   var flux = new Exim();
   stores.forEach(function (store) {
@@ -5345,13 +5307,6 @@ Exim.router = ReactRouter;
 Exim._exims = {};
 Exim.mixins = {};
 
-var getSerivceActions = function (constants, actions) {
-  var serviceActions = {};
-  for (var key in actions) {
-    serviceActions[key] = [constants[key], actions[key]];
-  }
-  return serviceActions;
-};
 
 var getCompletedActions = function (actions) {
   var afterActions = {};
@@ -5380,9 +5335,8 @@ var EximConstructor = function (args) {
   var failed = getFailedActions(args.failed);
   var storeActions = utils.extend(after, before, failed);
 
-  this.constants = Exim.createConstants({serviceMessages: Object.keys(actions)});
   this.actions = Exim.createActions({serviceActions: actions});
-  this.store = Exim.createStore({name:name, getInitialState: initial, actions: Exim.utils.transform(this.constants, storeActions )});
+  this.store = Exim.createStore({name:name, getInitialState: initial, actions: storeActions});
   Exim.bootstrap('__exim__');
 }
 
