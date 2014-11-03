@@ -85,12 +85,6 @@ utils.convertName = function (name) {
   return res;
 };
 
-utils.transform = function (constants, mappings) {
-  return Object.keys(mappings).map(function (k) {
-    return [constants[k], mappings[k]];
-  })
-};
-
 utils.bindTags = function (tags, scope) {
   if (!scope) {
     scope = this;
@@ -4760,8 +4754,8 @@ var constructArgs = function (serviceName, args) {
   return arrArgs;
 };
 
-var EximAction = function () {
- this._configureServiceActions();
+var EximAction = function (scope) {
+ this._configureServiceActions(scope);
 };
 
 EximAction.prototype = utils.extend(EximAction.prototype, {
@@ -4771,7 +4765,7 @@ EximAction.prototype = utils.extend(EximAction.prototype, {
     this.flux = flux;
     this.dispatchAction = flux.dispatchAction.bind(flux);
   },
-  _configureServiceActions: function () {
+  _configureServiceActions: function (scope) {
     var self = this;
     Object.keys(this.serviceActions).forEach(function (key) {
       console.log(key);
@@ -4786,7 +4780,11 @@ EximAction.prototype = utils.extend(EximAction.prototype, {
       self[actionName] = function () {
         var args = constructArgs(serviceName, arguments);
         self.dispatchAction.apply(self.flux, args);
-        return method.apply(self, Array.prototype.slice.call(arguments))
+        var actionResult = method.apply(self, Array.prototype.slice.call(arguments));
+        if (actionResult.constructor !== Promise) {
+          actionResult = new Promise(function(r){r()});
+        }
+        return actionResult
           .then(function (result) {
             self.dispatchAction(serviceName+'_COMPLETED', result);
           })
@@ -5074,8 +5072,15 @@ EximStore.prototype = utils.extend(EximStore.prototype, {
   },
 
   set: function (key, value) {
+    var newState;
     var oldState = this.state;
-    var newState = updateKeys(this.state, key, value);
+
+    if (!value && typeof key === 'object') {
+      newState = utils.extend(this.state, key);
+    } else {
+      newState = updateKeys(oldState, key, value);
+    }
+
     this._updateState(newState);
     this._notify([key], oldState, newState);
   },
@@ -5335,10 +5340,13 @@ var EximConstructor = function (args) {
   var failed = getFailedActions(args.failed);
   var storeActions = utils.extend(after, before, failed);
 
+
   this.actions = Exim.createActions({serviceActions: actions});
   this.store = Exim.createStore({name:name, getInitialState: initial, actions: storeActions});
   Exim.bootstrap('__exim__');
 }
+
+
 
 Exim.create = function (args) {
   return new EximConstructor(args);
