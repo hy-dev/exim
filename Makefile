@@ -1,7 +1,10 @@
 OUTPUT ?= exim.js
 
 exim:
-	cat lib/{header,utils,Router,Action,Constants,Dispatcher,Store,Fluxy,footer}.js > $(OUTPUT)
+	cat src/{header,eventEmitter,utils,joins,Router,ListenerMethods,PublisherMethods,createAction,createStore,Keep,connect,ListenerMixin,listenTo,listenToMany,index,Exim,footer}.js > $(OUTPUT)
+
+exim_old:
+	cat lib/{header,utils,Router,Action,Dispatcher,Store,Listener,Exim,footer}.js > $(OUTPUT)
 
 min:
 	@uglifyjs -m < exim.js > exim.min.js
