@@ -12,12 +12,14 @@ utils.extend = function(obj) {
     var source, kl;'//';
     for (var i = 1, length = arguments.length; i < length; i++) {
         source = arguments[i];
-        for (prop in source) {
+        for (var prop in source) {
             obj[prop] = source[prop];
         }
     }
     return obj;
 };
+
+utils.EventEmitter = EventEmitter;
 
 utils.isFunction = function(value) {
     return typeof value === 'function';
