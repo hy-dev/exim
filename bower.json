@@ -10,7 +10,8 @@
   "dependencies": {
     "bluebird": "~2.3.6",
     "fetch": "~0.2.1",
-    "react": "~0.12.0"
+    "react": "~0.12.0",
+    "eventEmitter": "~4.2.9"
   },
   "devDependencies": {
     "qunit": "~1"
