@@ -1,8 +1,8 @@
 var Keep = {};
 
-var createdStores = [];
+Keep.createdStores = [];
 
-var createdActions = [];
+Keep.createdActions = [];
 
 Keep.reset = function() {
     while(exports.createdStores.length) {

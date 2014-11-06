@@ -37,7 +37,7 @@ Reflux.createAction = function (definition) {
 
   utils.extend(functor,context);
 
-  Reflux.Keep.createdActions.push(functor);
+  Keep.createdActions.push(functor);
 
   return functor;
 

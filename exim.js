@@ -5559,7 +5559,7 @@ Reflux.createAction = function (definition) {
 
   utils.extend(functor,context);
 
-  Reflux.Keep.createdActions.push(functor);
+  Keep.createdActions.push(functor);
 
   return functor;
 
@@ -5616,9 +5616,9 @@ Reflux.createStore = function(definition) {
 };
 var Keep = {};
 
-var createdStores = [];
+Keep.createdStores = [];
 
-var createdActions = [];
+Keep.createdActions = [];
 
 Keep.reset = function() {
     while(exports.createdStores.length) {
@@ -5757,7 +5757,7 @@ Reflux.joinConcat = maker('all');
 Reflux.createActions = function(actionNames) {
     var i = 0, actions = {};
     for (; i < actionNames.length; i++) {
-        actions[actionNames[i]] = exports.createAction();
+        actions[actionNames[i]] = Reflux.createAction();
     }
     return actions;
 };
