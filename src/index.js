@@ -22,7 +22,7 @@ Reflux.joinConcat = maker('all');
 Reflux.createActions = function(actionNames) {
     var i = 0, actions = {};
     for (; i < actionNames.length; i++) {
-        actions[actionNames[i]] = exports.createAction();
+        actions[actionNames[i]] = Reflux.createAction();
     }
     return actions;
 };
