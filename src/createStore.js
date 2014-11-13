@@ -15,6 +15,7 @@ var allowed = {preEmit:1,shouldEmit:1};
 
 Reflux.createStore = function(definition) {
 
+    var _store = {};
     definition = definition || {};
 
     for(var d in definition){
@@ -30,9 +31,18 @@ Reflux.createStore = function(definition) {
         this.subscriptions = [];
         this.emitter = new utils.EventEmitter();
         this.eventLabel = "change";
+
+        if (this.getInitial) {
+            var initial = this.getInitial()
+            for (key of initial) {
+                _store[key] = initial[key];
+            }
+        }
+
         if (this.init && utils.isFunction(this.init)) {
             this.init();
         }
+
         if (this.listenables){
             arr = [].concat(this.listenables);
             for(;i < arr.length;i++){
@@ -40,6 +50,30 @@ Reflux.createStore = function(definition) {
             }
         }
     }
+
+    Store.prototype.set = function (key, value) {
+        if (key.constructor === Object && !value) {
+            for (var k in key) {
+                _store[k] = key[k];
+            }
+            return key;
+        } else {
+            return _store[key] = value;
+        }
+    };
+
+    Store.prototype.get = function (key) {
+        return key ? _store[key] : _store;
+    };
+
+    Store.prototype.distribute = function () {
+        this.trigger(_store);
+    };
+
+    Store.prototype.update = function (key, value) {
+        this.set(key, value);
+        this.distribute();
+    };
 
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
 
