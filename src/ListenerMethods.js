@@ -31,7 +31,7 @@ Reflux.ListenerMethods = {
      *
      * @param {Object} listenables An object of listenables. Keys will be used as callback method names.
      */
-    listenToMany: function(listenables){
+    listenToMany: function(listenables) {
         for(var key in listenables){
             var cbname = utils.callbackName(key),
                 localname = this[cbname] ? cbname : this[key] ? key : undefined;
@@ -73,7 +73,28 @@ Reflux.ListenerMethods = {
         var desub, unsubscriber, subscriptionobj, subs = this.subscriptions = this.subscriptions || [];
         utils.throwIf(this.validateListening(listenable));
         this.fetchDefaultData(listenable, defaultCallback);
-        desub = listenable.listen(this[callback]||callback, this);
+        var fn = this[callback]||callback;
+        var cb = function () {
+            var prevName = utils.callbackToPrevName(callback);
+            var prevFn = this[prevName];
+            if (prevFn) {
+                var prevResult = prevFn.apply(this, arguments);
+                var isPrevPromise = Promise.is(prevResult);
+            }
+            var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
+            var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
+            var isPromise = Promise.is(fnResult);
+            if (fnResult && isPromise) {
+                var nextName = utils.callbackToNextName(callback);
+                var errorName = utils.callbackToErrorName(callback);
+                var nextFn = this[nextName];
+                var errorFn = this[errorName];
+                if (nextFn) {
+                    fnResult.then(nextFn, errorFn);
+                }
+            }
+        };
+        desub = listenable.listen(cb, this);
         unsubscriber = function() {
             var index = subs.indexOf(subscriptionobj);
             utils.throwIf(index === -1,'Tried to remove listen already gone from subscriptions list!');
