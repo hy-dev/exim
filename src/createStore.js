@@ -33,8 +33,8 @@ Reflux.createStore = function(definition) {
         this.eventLabel = "change";
 
         if (this.getInitial) {
-            var initial = this.getInitial()
-            for (key of initial) {
+            var initial = this.getInitial();
+            for (var key in initial) {
                 _store[key] = initial[key];
             }
         }
