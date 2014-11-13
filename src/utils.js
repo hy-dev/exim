@@ -30,7 +30,19 @@ utils.nextTick = function(callback) {
 };
 
 utils.callbackName = function(string){
-    return "on"+string.charAt(0).toUpperCase()+string.slice(1);
+    return 'on' + string.charAt(0).toUpperCase()+string.slice(1);
+};
+
+utils.callbackToNextName = function (string) {
+    return 'did' + (string = string.slice(2));
+};
+
+utils.callbackToPrevName = function (string) {
+    return 'will' + (string = string.slice(2));
+};
+
+utils.callbackToErrorName = function (string) {
+    return 'didNot' + (string = string.slice(2));
 };
 
 utils.object = function(keys,vals){
