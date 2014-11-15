@@ -1,7 +1,8 @@
 var utils = {}
 
 utils.isObject = function(obj) {
-    return typeof obj === 'function' || type === 'object' && !!obj;
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
 };
 
 utils.extend = function(obj) {
