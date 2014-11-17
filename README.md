@@ -27,10 +27,10 @@ Dependencies are specified in `bower.json`. They are:
 
 Exim apps consist of four things:
 
-1. Routes
-2. Actions
-3. Stores
-4. Views (React components)
+1. Actions
+2. Stores
+3. Views (React components)
+4. Routes
 
 Exim confirms to Flux architecture, which means application flow is one-way and looks like this:
 
