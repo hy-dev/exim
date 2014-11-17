@@ -493,7 +493,8 @@
 var utils = {}
 
 utils.isObject = function(obj) {
-    return obj && obj.constructor === Object
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
 };
 
 utils.extend = function(obj) {
@@ -5951,6 +5952,11 @@ Exim.addTag = function (name, tag) {
     goBack: ReactRouter.goBack,
     replaceWith: ReactRouter.replaceWith
   };
+
+  Exim.createAction = Reflux.createAction;
+  Exim.createActions = Reflux.createActions;
+  Exim.createStore = Reflux.createStore;
+  Exim.createView = React.createClass;
 
   return Exim;
 });
