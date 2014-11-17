@@ -1,12 +1,12 @@
 var utils = {}
 
-utils.isObject = function(obj) {
+utils.isObjectOrFunction = function(obj) {
     var type = typeof obj;
-    return type === 'function' || obj.constructor === Object && !!obj;
+    return type === 'function' || type === 'object' && !!obj;
 };
 
 utils.extend = function(obj) {
-    if (!utils.isObject(obj)) {
+    if (!utils.isObjectOrFunction(obj)) {
         return obj;
     }
     var source, kl;'//';
