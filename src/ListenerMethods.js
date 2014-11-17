@@ -75,6 +75,7 @@ Reflux.ListenerMethods = {
         this.fetchDefaultData(listenable, defaultCallback);
         var fn = this[callback]||callback;
         var cb = function () {
+            if (typeof callback === 'function') return fn.apply(this, arguments);
             var prevName = utils.callbackToPrevName(callback);
             var prevFn = this[prevName];
             if (prevFn) {
@@ -90,7 +91,7 @@ Reflux.ListenerMethods = {
                 var nextFn = this[nextName];
                 var errorFn = this[errorName];
                 if (nextFn) {
-                    fnResult.then(nextFn, errorFn);
+                    fnResult.then(nextFn.bind(this), errorFn.bind(this));
                 }
             }
         };

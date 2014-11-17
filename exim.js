@@ -493,7 +493,8 @@
 var utils = {}
 
 utils.isObject = function(obj) {
-    return obj && obj.constructor === Object
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
 };
 
 utils.extend = function(obj) {
@@ -5370,6 +5371,7 @@ Reflux.ListenerMethods = {
         this.fetchDefaultData(listenable, defaultCallback);
         var fn = this[callback]||callback;
         var cb = function () {
+            if (typeof callback === 'function') return fn.apply(this, arguments);
             var prevName = utils.callbackToPrevName(callback);
             var prevFn = this[prevName];
             if (prevFn) {
@@ -5385,7 +5387,7 @@ Reflux.ListenerMethods = {
                 var nextFn = this[nextName];
                 var errorFn = this[errorName];
                 if (nextFn) {
-                    fnResult.then(nextFn, errorFn);
+                    fnResult.then(nextFn.bind(this), errorFn.bind(this));
                 }
             }
         };
@@ -5700,6 +5702,10 @@ Keep.reset = function() {
 
 Reflux.connect = function (listenable, key) {
   return {
+    getInitialState: function () {
+      var initialData;
+      return (initialData = listenable.get()) ? initialData : {}
+    },
     componentDidMount: function() {
       for(var m in Reflux.ListenerMethods) {
         if (this[m] !== Reflux.ListenerMethods[m]){
@@ -5726,12 +5732,15 @@ Reflux.connect = function (listenable, key) {
           me.setState(state);
         }
       }
-
       this.listenTo(listenable,cb,cb);
     },
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
 };
+
+// Reflux.watch = function (listenable, keys) {
+
+// };
 // var _ = require('./utils'),
 //     ListenerMethods = require('./ListenerMethods');
 
