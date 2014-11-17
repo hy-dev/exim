@@ -122,6 +122,42 @@ Cafe = Exim.createView
 Cafe city: 'Prague'
 ```
 
+Here's a full app structure using actions, stores and views:
+
+```javascript
+
+var userActions = Exim.createActions(['eat', 'drink'])
+
+// the actual work happens here:
+var Users = Exim.createStore({
+  listenables: actions,
+  init: function() {
+    this.update({type: '', with: '', food: ''})
+  },
+  onEat: function(food) {
+    this.update({type: 'Brunch', with: 'Chaplin', food: food})
+  },
+  onDrink: function(drink) {
+    this.update({type: 'Brunch', with: 'Chaplin', food: 'liquid ' + drink})
+  }
+})
+
+var UserView = Exim.createView({
+  mixins: [Exim.connect(Users)],
+  render: function() {
+    var s = this.state; // just a convenience. In ES6: {food, friend, type} = this.state
+    var food = s.food;
+    var friend = s.with;
+    var type = s.type;
+    return <div>Eating some {food} with {friend} over {type};</div>
+  }
+})
+
+userActions.eat('Omelette')
+userActions.drink('Porridge')
+
+```
+
 ### Routes
 
 Routes represent browser URLs in your application.
