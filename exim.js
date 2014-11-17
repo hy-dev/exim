@@ -529,6 +529,10 @@ utils.callbackToNextName = function (string) {
     return 'did' + string.slice(2);
 };
 
+utils.callbackToWhileName = function (string) {
+    return 'while' + string.slice(2);
+};
+
 utils.callbackToPrevName = function (string) {
     return 'will' + string.slice(2);
 };
@@ -5374,9 +5378,14 @@ Reflux.ListenerMethods = {
             if (typeof callback === 'function') return fn.apply(this, arguments);
             var prevName = utils.callbackToPrevName(callback);
             var prevFn = this[prevName];
+            var whileName = utils.callbackToWhileName(callback);
+            var whileFn = this[whileName];
             if (prevFn) {
                 var prevResult = prevFn.apply(this, arguments);
                 var isPrevPromise = Promise.is(prevResult);
+            }
+            if (whileFn) {
+                whileFn.call(this, true);
             }
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
@@ -5386,8 +5395,17 @@ Reflux.ListenerMethods = {
                 var errorName = utils.callbackToErrorName(callback);
                 var nextFn = this[nextName];
                 var errorFn = this[errorName];
+                var self = this;
+                var nextCb = function (fn) {
+                    return function () {
+                        if (whileFn) whileFn.call(self, false);
+                        return fn.apply(self, arguments);
+                    }
+                };
                 if (nextFn) {
-                    fnResult.then(nextFn.bind(this), errorFn.bind(this));
+                    fnResult.then(nextCb(nextFn), nextCb(errorFn));
+                } else if (whileFn) {
+                    whileFn.call(this, false);
                 }
             }
         };
@@ -5960,6 +5978,11 @@ Exim.addTag = function (name, tag) {
     goBack: ReactRouter.goBack,
     replaceWith: ReactRouter.replaceWith
   };
+
+  Exim.createAction = Reflux.createAction;
+  Exim.createActions = Reflux.createActions;
+  Exim.createStore = Reflux.createStore;
+  Exim.createView = React.createClass;
 
   return Exim;
 });

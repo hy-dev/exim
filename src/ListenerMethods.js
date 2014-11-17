@@ -95,15 +95,16 @@ Reflux.ListenerMethods = {
                 var errorName = utils.callbackToErrorName(callback);
                 var nextFn = this[nextName];
                 var errorFn = this[errorName];
-                var whileCb = function (fn) {
+                var self = this;
+                var nextCb = function (fn) {
                     return function () {
-                        whileFn.call(this, false);
-                        fn.apply(this, arguments)
+                        if (whileFn) whileFn.call(self, false);
+                        return fn.apply(self, arguments);
                     }
                 };
                 if (nextFn) {
-                    fnResult.then(whileCb(nextFn), whileCb(errorFn));
-                } else {
+                    fnResult.then(nextCb(nextFn), nextCb(errorFn));
+                } else if (whileFn) {
                     whileFn.call(this, false);
                 }
             }
