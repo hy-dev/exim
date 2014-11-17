@@ -29,7 +29,7 @@ Reflux.connect = function (listenable, key) {
               state[k] = v[k]
             });
           } else {
-            state[key] = utils.isObject(v) ? v[key] : v;
+            state[key] = utils.isObjectOrFunction(v) ? v[key] : v;
           }
           me.setState(state);
         }

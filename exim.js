@@ -492,13 +492,13 @@
 }.call(this));
 var utils = {}
 
-utils.isObject = function(obj) {
+utils.isObjectOrFunction = function(obj) {
     var type = typeof obj;
     return type === 'function' || type === 'object' && !!obj;
 };
 
 utils.extend = function(obj) {
-    if (!utils.isObject(obj)) {
+    if (!utils.isObjectOrFunction(obj)) {
         return obj;
     }
     var source, kl;'//';
@@ -5727,7 +5727,7 @@ Reflux.connect = function (listenable, key) {
               state[k] = v[k]
             });
           } else {
-            state[key] = utils.isObject(v) ? v[key] : v;
+            state[key] = utils.isObjectOrFunction(v) ? v[key] : v;
           }
           me.setState(state);
         }
