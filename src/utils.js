@@ -37,6 +37,10 @@ utils.callbackToNextName = function (string) {
     return 'did' + string.slice(2);
 };
 
+utils.callbackToWhileName = function (string) {
+    return 'while' + string.slice(2);
+};
+
 utils.callbackToPrevName = function (string) {
     return 'will' + string.slice(2);
 };

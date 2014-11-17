@@ -529,6 +529,10 @@ utils.callbackToNextName = function (string) {
     return 'did' + string.slice(2);
 };
 
+utils.callbackToWhileName = function (string) {
+    return 'while' + string.slice(2);
+};
+
 utils.callbackToPrevName = function (string) {
     return 'will' + string.slice(2);
 };
@@ -5373,9 +5377,14 @@ Reflux.ListenerMethods = {
         var cb = function () {
             var prevName = utils.callbackToPrevName(callback);
             var prevFn = this[prevName];
+            var whileName = utils.callbackToWhileName(callback);
+            var whileFn = this[whileName];
             if (prevFn) {
                 var prevResult = prevFn.apply(this, arguments);
                 var isPrevPromise = Promise.is(prevResult);
+            }
+            if (whileFn) {
+                whileFn.call(this, true);
             }
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
@@ -5385,8 +5394,16 @@ Reflux.ListenerMethods = {
                 var errorName = utils.callbackToErrorName(callback);
                 var nextFn = this[nextName];
                 var errorFn = this[errorName];
+                var whileCb = function (fn) {
+                    return function () {
+                        whileFn.call(this, false);
+                        fn.apply(this, arguments)
+                    }
+                };
                 if (nextFn) {
-                    fnResult.then(nextFn, errorFn);
+                    fnResult.then(whileCb(nextFn), whileCb(errorFn));
+                } else {
+                    whileFn.call(this, false);
                 }
             }
         };
