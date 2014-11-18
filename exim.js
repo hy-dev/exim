@@ -492,13 +492,13 @@
 }.call(this));
 var utils = {}
 
-utils.isObject = function(obj) {
+utils.isObjectOrFunction = function(obj) {
     var type = typeof obj;
     return type === 'function' || type === 'object' && !!obj;
 };
 
 utils.extend = function(obj) {
-    if (!utils.isObject(obj)) {
+    if (!utils.isObjectOrFunction(obj)) {
         return obj;
     }
     var source, kl;'//';
@@ -527,6 +527,10 @@ utils.callbackName = function(string){
 
 utils.callbackToNextName = function (string) {
     return 'did' + string.slice(2);
+};
+
+utils.callbackToWhileName = function (string) {
+    return 'while' + string.slice(2);
 };
 
 utils.callbackToPrevName = function (string) {
@@ -5371,11 +5375,17 @@ Reflux.ListenerMethods = {
         this.fetchDefaultData(listenable, defaultCallback);
         var fn = this[callback]||callback;
         var cb = function () {
+            if (typeof callback === 'function') return fn.apply(this, arguments);
             var prevName = utils.callbackToPrevName(callback);
             var prevFn = this[prevName];
+            var whileName = utils.callbackToWhileName(callback);
+            var whileFn = this[whileName];
             if (prevFn) {
                 var prevResult = prevFn.apply(this, arguments);
                 var isPrevPromise = Promise.is(prevResult);
+            }
+            if (whileFn) {
+                whileFn.call(this, true);
             }
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
@@ -5385,8 +5395,17 @@ Reflux.ListenerMethods = {
                 var errorName = utils.callbackToErrorName(callback);
                 var nextFn = this[nextName];
                 var errorFn = this[errorName];
+                var self = this;
+                var nextCb = function (fn) {
+                    return function () {
+                        if (whileFn) whileFn.call(self, false);
+                        return fn.apply(self, arguments);
+                    }
+                };
                 if (nextFn) {
-                    fnResult.then(nextFn, errorFn);
+                    fnResult.then(nextCb(nextFn), nextCb(errorFn));
+                } else if (whileFn) {
+                    whileFn.call(this, false);
                 }
             }
         };
@@ -5701,6 +5720,10 @@ Keep.reset = function() {
 
 Reflux.connect = function (listenable, key) {
   return {
+    getInitialState: function () {
+      var initialData;
+      return (initialData = listenable.get()) ? initialData : {}
+    },
     componentDidMount: function() {
       for(var m in Reflux.ListenerMethods) {
         if (this[m] !== Reflux.ListenerMethods[m]){
@@ -5722,17 +5745,20 @@ Reflux.connect = function (listenable, key) {
               state[k] = v[k]
             });
           } else {
-            state[key] = utils.isObject(v) ? v[key] : v;
+            state[key] = utils.isObjectOrFunction(v) ? v[key] : v;
           }
           me.setState(state);
         }
       }
-
       this.listenTo(listenable,cb,cb);
     },
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
 };
+
+// Reflux.watch = function (listenable, keys) {
+
+// };
 // var _ = require('./utils'),
 //     ListenerMethods = require('./ListenerMethods');
 

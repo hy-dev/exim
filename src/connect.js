@@ -4,6 +4,10 @@
 
 Reflux.connect = function (listenable, key) {
   return {
+    getInitialState: function () {
+      var initialData;
+      return (initialData = listenable.get()) ? initialData : {}
+    },
     componentDidMount: function() {
       for(var m in Reflux.ListenerMethods) {
         if (this[m] !== Reflux.ListenerMethods[m]){
@@ -25,14 +29,17 @@ Reflux.connect = function (listenable, key) {
               state[k] = v[k]
             });
           } else {
-            state[key] = utils.isObject(v) ? v[key] : v;
+            state[key] = utils.isObjectOrFunction(v) ? v[key] : v;
           }
           me.setState(state);
         }
       }
-
       this.listenTo(listenable,cb,cb);
     },
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
 };
+
+// Reflux.watch = function (listenable, keys) {
+
+// };
