@@ -5719,10 +5719,28 @@ Keep.reset = function() {
 
 
 Reflux.connect = function (listenable, key) {
+  var getStateFromArray = function (source, arr) {
+    var state = {};
+    arr.forEach(function (k) {
+      state[k] = source[k];
+    })
+    return state;
+  };
   return {
     getInitialState: function () {
       var initialData;
-      return (initialData = listenable.get()) ? initialData : {}
+      if (Array.isArray(key)) {
+        initialData = listenable.get()
+        var state = getStateFromArray(initialData, key)
+        return state
+      } else if (!key) {
+        return (initialData = listenable.get()) ? initialData : {}
+      } else if (typeof key === 'string') {
+        initialData = listenable.get();
+        var state = {};
+        state[key] = initialData[key];
+        return state;
+      }
     },
     componentDidMount: function() {
       for(var m in Reflux.ListenerMethods) {
