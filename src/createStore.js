@@ -17,6 +17,7 @@ Reflux.createStore = function(definition) {
 
     var _store = {};
     definition = definition || {};
+    var privateMethods = ['set', 'update', 'trigger', 'distribute', 'triggerAsync'];
 
     for(var d in definition){
         if (!allowed[d] && (Reflux.PublisherMethods[d] || Reflux.ListenerMethods[d])){
@@ -37,6 +38,12 @@ Reflux.createStore = function(definition) {
             for (var key in initial) {
                 _store[key] = initial[key];
             }
+        }
+
+        if (Array.isArray(this.privateMethods)) {
+            this.privateMethods.forEach(function (method) {
+                privateMethods.push(method);
+            });
         }
 
         if (this.init && utils.isFunction(this.init)) {
@@ -62,10 +69,6 @@ Reflux.createStore = function(definition) {
         }
     };
 
-    Store.prototype.get = function (key) {
-        return key ? _store[key] : _store;
-    };
-
     Store.prototype.distribute = function () {
         this.trigger(_store);
     };
@@ -75,10 +78,23 @@ Reflux.createStore = function(definition) {
         this.distribute();
     };
 
+    Store.prototype.get = function (key) {
+        return key ? _store[key] : _store;
+    };
+
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
 
     var store = new Store();
+
+    var storeGetter = {};
+
+    for (var key in store) {
+        if (!~privateMethods.indexOf(key)) {
+            storeGetter[key] = store[key];
+        }
+    };
+
     Keep.createdStores.push(store);
 
-    return store;
+    return storeGetter;
 };
