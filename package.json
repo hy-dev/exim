@@ -1,0 +1,34 @@
+{
+  "name": "exim",
+  "version": "0.3.0",
+  "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
+  "main": "exim.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "phantomjs": "~1.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:hellyeahllc/exim.git"
+  },
+  "keywords": [
+    "exim",
+    "clean",
+    "framework",
+    "library",
+    "architecture",
+    "flux",
+    "facebook",
+    "html5",
+    "react",
+    "reactive"
+  ],
+  "author": "Paul Miller",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hellyeahllc/exim/issues"
+  },
+  "homepage": "https://github.com/hellyeahllc/exim"
+}
