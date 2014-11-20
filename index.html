@@ -45,7 +45,13 @@
       <div class="dark-box"></div>
       <div class="content">
         <h1 id='exim-js'>Exim.js</h1>
-<p>Exim.js is a React.js architecture based on Flux.</p>
+<p>Exim.js is a HTML5 application architecture using Facebook&rsquo;s React.js / Flux libraries.</p>
+
+<p>Exim takes Flux&rsquo;s simplicity and brings it to another level. We re-engineered Facebook&rsquo;s lib in order to make ultra-simple and convenient framework for real-world applications.</p>
+
+<p>You can discuss the project on the GitHub issues page, post questions to Ost.io forum or send tweets to @hellyeahllc</p>
+
+<p>Exim is an open-source project by Hell Yeah available freely under the MIT license.</p>
 <h1 id='installation'>Installation</h1>
 <p>To use Exim, get the latest release with bower.</p>
 <pre><code class="highlight plaintext">bower install exim
@@ -69,6 +75,20 @@ Simply put, this means that instead of traditional MVC with bi-directional flow,
 </code></pre>
 
 <p>In other words, unlike MVC, you don&rsquo;t call stores directly.</p>
+<h2 id='differences-from-pure-flux'>Differences from pure Flux</h2>
+<p>Flux architecture looks like this:</p>
+
+<p>We still have stores, actions and the data flow which is unidirectional.</p>
+
+<p>But, in Exim we:</p>
+
+<ol>
+<li>Removed Dispatcher. We are using simpler approach: store joins and aggregates instead.</li>
+<li>Made actions ultra-short. They don&rsquo;t have method bodies now. Instead, all logic is located in Stores.</li>
+<li>Don&rsquo;t use constants for communicating between various app parts. Constants is old and unnecessary concept.</li>
+<li>Radically simplified Stores and the way they consume actions.</li>
+<li>Added optional helpers for CoffeeScript folks</li>
+</ol>
 <h2 id='actions'>Actions</h2>
 <p>Actions are simple abstractions.
 They don&rsquo;t do anything on their own, they just say out loud &ldquo;action <code class="prettyprint">sleep</code>&rdquo; was activated, and then it&rsquo;s up to stores to do something useful based on that/</p>
@@ -147,14 +167,11 @@ Usually, a store would perform an HTTP request in response to action and store t
 <span class="kd">var</span> <span class="nx">UserView</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createView</span><span class="p">({</span>
   <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">Exim</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">Users</span><span class="p">)],</span>
   <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span> <span class="c1">// just a convenience. In ES6: {food, friend, type} = this.state</span>
-    <span class="kd">var</span> <span class="nx">food</span> <span class="o">=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">food</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">friend</span> <span class="o">=</span> <span class="nx">s</span><span class="p">.</span><span class="kd">with</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
     <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user-view"</span><span class="o">&gt;</span>
       <span class="o">&lt;</span><span class="nx">h2</span><span class="o">&gt;</span><span class="nx">Eatr</span><span class="o">&lt;</span><span class="sr">/h2</span><span class="err">&gt;
 </span>
-      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Eating</span> <span class="nx">some</span> <span class="p">{</span><span class="nx">food</span><span class="p">}</span> <span class="kd">with</span> <span class="p">{</span><span class="nx">friend</span><span class="p">}</span> <span class="nx">over</span> <span class="p">{</span><span class="nx">type</span><span class="p">};</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Eating</span> <span class="nx">some</span> <span class="p">{</span><span class="nx">s</span><span class="p">.</span><span class="nx">food</span><span class="p">}</span> <span class="kd">with</span> <span class="p">{</span><span class="nx">s</span><span class="p">.</span><span class="nx">friend</span><span class="p">}</span> <span class="nx">over</span> <span class="p">{</span><span class="nx">s</span><span class="p">.</span><span class="nx">type</span><span class="p">};</span><span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
 </span>    <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
 </span>  <span class="p">}</span>
 <span class="p">})</span>
@@ -168,13 +185,13 @@ Usually, a store would perform an HTTP request in response to action and store t
   <span class="na">listenables</span><span class="o">:</span> <span class="nx">actions</span>
 
   <span class="na">init</span><span class="o">:</span> <span class="o">-&gt;</span>
-    <span class="k">this</span><span class="p">.</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">''</span>
+    <span class="vi">@</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">''</span>
 
   <span class="na">onEat</span><span class="o">:</span> <span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="k">this</span><span class="p">.</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="nx">food</span><span class="p">)</span>
+    <span class="vi">@</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="nx">food</span><span class="p">)</span>
 
   <span class="na">onDrink</span><span class="o">:</span> <span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="k">this</span><span class="p">.</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">'liquid '</span> <span class="o">+</span> <span class="nx">drink</span>
+    <span class="vi">@</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">'liquid '</span> <span class="o">+</span> <span class="nx">drink</span>
 
 <span class="nx">var</span> <span class="nx">UserView</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createView</span>
   <span class="na">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">Exim</span><span class="p">.</span><span class="na">connect</span><span class="p">(</span><span class="nx">Users</span><span class="p">)]</span>
@@ -187,8 +204,6 @@ Usually, a store would perform an HTTP request in response to action and store t
 
       <span class="nx">div</span> <span class="p">{},</span>
         <span class="s">"Eating some </span><span class="si">#{</span><span class="nx">food</span><span class="si">}</span><span class="s"> with </span><span class="si">#{</span><span class="nx">friend</span><span class="si">}</span><span class="s"> over </span><span class="si">#{</span><span class="nx">type</span><span class="si">}</span><span class="s">"</span>
-
-    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Eating</span> <span class="nx">some</span> <span class="p">{</span><span class="nx">food</span><span class="p">}</span> <span class="nx">with</span> <span class="p">{</span><span class="nx">friend</span><span class="p">}</span> <span class="nx">over</span> <span class="p">{</span><span class="nx">type</span><span class="p">};</span><span class="o">&lt;/</span><span class="nx">div</span><span class="o">&gt;</span>
 
 <span class="nx">userActions</span><span class="p">.</span><span class="na">eat</span><span class="p">(</span><span class="s">'Omelette'</span><span class="p">)</span>
 <span class="nx">userActions</span><span class="p">.</span><span class="na">drink</span><span class="p">(</span><span class="s">'Porridge'</span><span class="p">)</span>
@@ -218,7 +233,7 @@ Usually, a store would perform an HTTP request in response to action and store t
 
     <span class="nx">match</span><span class="p">(</span><span class="nx">TwoPane</span><span class="p">,</span>
       <span class="nx">match</span><span class="p">(</span><span class="s1">'calendar'</span><span class="p">,</span> <span class="nx">Calendar</span><span class="p">),</span>
-      <span class="nx">MessagesRoutes</span>  <span class="err">#</span> <span class="nx">Easy</span> <span class="nx">nesting</span><span class="o">!</span>
+      <span class="nx">MessagesRoutes</span>  <span class="c1">// Easy nesting!</span>
     <span class="p">)</span>
   <span class="p">)</span>
 <span class="p">)</span>
