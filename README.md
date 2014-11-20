@@ -1,3 +1,14 @@
+$ gch gh-pages-source
+$ bundle install
+$ bundle exec middleman server
+
+when finished making changes, commit on source branch and do
+
+$ rake publish
+
+to update the compiled branch
+
+
 Slate
 ========
 
