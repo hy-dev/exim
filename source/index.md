@@ -13,7 +13,13 @@ search: true
 
 # Exim.js
 
-Exim.js is a React.js architecture based on Flux.
+Exim.js is a HTML5 application architecture using Facebook's React.js / Flux libraries.
+
+Exim takes Flux's simplicity and brings it to another level. We re-engineered Facebook's lib in order to make ultra-simple and convenient framework for real-world applications.
+
+You can discuss the project on the GitHub issues page, post questions to Ost.io forum or send tweets to @hellyeahllc
+
+Exim is an open-source project by Hell Yeah available freely under the MIT license.
 
 # Installation
 
@@ -43,6 +49,20 @@ components ---> (actions) ---> stores
 ```
 
 In other words, unlike MVC, you don't call stores directly.
+
+## Differences from pure Flux
+
+Flux architecture looks like this:
+
+We still have stores, actions and the data flow which is unidirectional.
+
+But, in Exim we:
+
+1. Removed Dispatcher. We are using simpler approach: store joins and aggregates instead.
+2. Made actions ultra-short. They don't have method bodies now. Instead, all logic is located in Stores.
+3. Don't use constants for communicating between various app parts. Constants is old and unnecessary concept.
+4. Radically simplified Stores and the way they consume actions.
+5. Added optional helpers for CoffeeScript folks
 
 ## Actions
 
@@ -137,14 +157,11 @@ var Users = Exim.createStore({
 var UserView = Exim.createView({
   mixins: [Exim.connect(Users)],
   render: function() {
-    var s = this.state; // just a convenience. In ES6: {food, friend, type} = this.state
-    var food = s.food;
-    var friend = s.with;
-    var type = s.type;
+    var s = this.state;
     return <div className="user-view">
       <h2>Eatr</h2>
 
-      <div>Eating some {food} with {friend} over {type};</div>
+      <div>Eating some {s.food} with {s.friend} over {s.type};</div>
     </div>
   }
 })
@@ -160,13 +177,13 @@ Users = Exim.createStore
   listenables: actions
 
   init: ->
-    this.update type: '', with: '', food: ''
+    @update type: '', with: '', food: ''
 
   onEat: (food) ->
-    this.update type: 'Brunch', with: 'Chaplin', food: food)
+    @update type: 'Brunch', with: 'Chaplin', food: food)
 
   onDrink: (drink) ->
-    this.update type: 'Brunch', with: 'Chaplin', food: 'liquid ' + drink
+    @update type: 'Brunch', with: 'Chaplin', food: 'liquid ' + drink
 
 var UserView = Exim.createView
   mixins: [Exim.connect(Users)]
@@ -179,8 +196,6 @@ var UserView = Exim.createView
 
       div {},
         "Eating some #{food} with #{friend} over #{type}"
-
-    return <div>Eating some {food} with {friend} over {type};</div>
 
 userActions.eat('Omelette')
 userActions.drink('Porridge')
@@ -214,7 +229,7 @@ var Routes = startHistory(
 
     match(TwoPane,
       match('calendar', Calendar),
-      MessagesRoutes  # Easy nesting!
+      MessagesRoutes  // Easy nesting!
     )
   )
 )
