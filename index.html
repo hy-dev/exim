@@ -45,16 +45,18 @@
       <div class="dark-box"></div>
       <div class="content">
         <h1 id='exim-js'>Exim.js</h1>
-<p>Exim.js is a HTML5 application architecture using Facebook&rsquo;s React.js / Flux libraries.</p>
+<p>Exim.js is a HTML5 application architecture using Facebook&rsquo;s <a href="http://facebook.github.io/react/">React.js</a> / <a href="http://facebook.github.io/flux/">Flux</a> libraries.</p>
 
 <p>Exim takes Flux&rsquo;s simplicity and brings it to another level. We re-engineered Facebook&rsquo;s lib in order to make ultra-simple and convenient framework for real-world applications.</p>
 
-<p>You can discuss the project on the GitHub issues page, post questions to Ost.io forum or send tweets to @hellyeahllc</p>
+<p>You can discuss the project on the <a href="https://github.com/hellyeahllc/exim/issues">GitHub issues page</a>, post questions to <a href="http://ost.io/hellyeahllc/exim">Ost.io forum</a> or send tweets to <a href="https://twitter.com/hellyeahllc">@hellyeahllc</a></p>
 
-<p>Exim is an open-source project by Hell Yeah available freely under the MIT license.</p>
+<p>Exim is an open-source project by <a href="http://hellyeah.is">Hell Yeah</a> available freely under the <a href="#">MIT license</a>.</p>
 <h1 id='installation'>Installation</h1>
-<p>To use Exim, get the latest release with bower.</p>
+<p>To use Exim, get the latest release with bower. Or, simply use NPM.</p>
 <pre><code class="highlight plaintext">bower install exim
+# or
+npm install exim
 </code></pre>
 <h1 id='architecture'>Architecture</h1>
 <p>Exim applications have four major parts:</p>
@@ -89,6 +91,12 @@ Simply put, this means that instead of traditional MVC with bi-directional flow,
 <li>Radically simplified Stores and the way they consume actions.</li>
 <li>Added optional helpers for CoffeeScript folks</li>
 </ol>
+<pre><code class="highlight plaintext">Pure Flux
+components ---&gt; actions ---&gt; Dispatcher ---&gt; Callbacks ---&gt; stores
+^                                                           |
+|                                                           V
+------------- (publish changes to components) ---------------
+</code></pre>
 <h2 id='actions'>Actions</h2>
 <p>Actions are simple abstractions.
 They don&rsquo;t do anything on their own, they just say out loud &ldquo;action <code class="prettyprint">sleep</code>&rdquo; was activated, and then it&rsquo;s up to stores to do something useful based on that/</p>
@@ -130,18 +138,18 @@ Usually, a store would perform an HTTP request in response to action and store t
   <span class="nx">didEat</span><span class="err">:</span>   <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">}</span>
 <span class="p">})</span>
 </code></pre>
-<pre><code class="highlight javascript"><span class="nx">actions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createActions</span><span class="p">([</span><span class="s1">'work'</span><span class="p">,</span> <span class="s1">'eat'</span><span class="p">])</span>
+<pre><code class="highlight coffeescript"><span class="nx">actions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createActions</span><span class="p">([</span><span class="s">'work'</span><span class="p">,</span> <span class="s">'eat'</span><span class="p">])</span>
 
-<span class="nx">People</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createStore</span>
-  <span class="nl">listenables</span><span class="p">:</span> <span class="nx">actions</span>
+<span class="nx">People</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createStore</span>
+  <span class="na">listenables</span><span class="o">:</span> <span class="nx">actions</span>
 
-  <span class="nl">willWork</span><span class="p">:</span> <span class="o">-&gt;</span> <span class="err">#</span> <span class="nx">some</span>
-  <span class="nl">onWork</span><span class="p">:</span>   <span class="o">-&gt;</span> <span class="err">#</span> <span class="kd">function</span>
-  <span class="nx">didWork</span><span class="err">:</span>  <span class="o">-&gt;</span> <span class="err">#</span> <span class="nx">body</span>
-  <span class="nl">willEat</span><span class="p">:</span>  <span class="o">-&gt;</span> <span class="err">#</span> <span class="nx">goes</span>
-  <span class="nl">onEat</span><span class="p">:</span>    <span class="o">-&gt;</span> <span class="err">#</span> <span class="nx">right</span>
-  <span class="nl">didEat</span><span class="p">:</span>   <span class="o">-&gt;</span> <span class="err">#</span> <span class="nx">here</span>
-</code></pre>
+  <span class="na">willWork</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="c1"># some
+</span>  <span class="na">onWork</span><span class="o">:</span>   <span class="o">-&gt;</span> <span class="c1"># function
+</span>  <span class="na">didWork</span><span class="o">:</span>  <span class="o">-&gt;</span> <span class="c1"># body
+</span>  <span class="na">willEat</span><span class="o">:</span>  <span class="o">-&gt;</span> <span class="c1"># goes
+</span>  <span class="na">onEat</span><span class="o">:</span>    <span class="o">-&gt;</span> <span class="c1"># right
+</span>  <span class="na">didEat</span><span class="o">:</span>   <span class="o">-&gt;</span> <span class="c1"># here
+</span></code></pre>
 <h2 id='components'>Components</h2>
 <p>Simple React components.</p>
 
