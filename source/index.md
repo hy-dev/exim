@@ -13,20 +13,22 @@ search: true
 
 # Exim.js
 
-Exim.js is a HTML5 application architecture using Facebook's React.js / Flux libraries.
+Exim.js is a HTML5 application architecture using Facebook's [React.js](http://facebook.github.io/react/) / [Flux](http://facebook.github.io/flux/) libraries.
 
 Exim takes Flux's simplicity and brings it to another level. We re-engineered Facebook's lib in order to make ultra-simple and convenient framework for real-world applications.
 
-You can discuss the project on the GitHub issues page, post questions to Ost.io forum or send tweets to @hellyeahllc
+You can discuss the project on the [GitHub issues page](https://github.com/hellyeahllc/exim/issues), post questions to [Ost.io forum](http://ost.io/hellyeahllc/exim) or send tweets to [@hellyeahllc](https://twitter.com/hellyeahllc)
 
-Exim is an open-source project by Hell Yeah available freely under the MIT license.
+Exim is an open-source project by [Hell Yeah](http://hellyeah.is) available freely under the [MIT license]().
 
 # Installation
 
-To use Exim, get the latest release with bower.
+To use Exim, get the latest release with bower. Or, simply use NPM.
 
 ```
 bower install exim
+# or
+npm install exim
 ```
 
 # Architecture
@@ -63,6 +65,14 @@ But, in Exim we:
 3. Don't use constants for communicating between various app parts. Constants is old and unnecessary concept.
 4. Radically simplified Stores and the way they consume actions.
 5. Added optional helpers for CoffeeScript folks
+
+```
+Pure Flux
+components ---> actions ---> Dispatcher ---> Callbacks ---> stores
+^                                                           |
+|                                                           V
+------------- (publish changes to components) ---------------
+```
 
 ## Actions
 
@@ -115,7 +125,7 @@ var People = Exim.createStore({
 })
 ```
 
-```javascript
+```coffeescript
 actions = Exim.createActions(['work', 'eat'])
 
 People = Exim.createStore
