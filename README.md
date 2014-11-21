@@ -2,7 +2,7 @@
 
 # Exim.js
 
-http://hellyeah.is/exim/
+[hellyeah.is/exim](http://hellyeah.is/exim/)
 
 An architecture for HTML5 apps using Facebook's Flux.js library.
 
