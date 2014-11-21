@@ -1,4 +1,4 @@
-**[[PRE-RELEASE]]**
+**[[PRE-RELEASE]]. Public release is expected later in November.**
 
 # Exim.js
 
