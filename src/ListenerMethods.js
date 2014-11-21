@@ -90,24 +90,28 @@ Reflux.ListenerMethods = {
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
             var isPromise = Promise.is(fnResult);
-            if (fnResult && isPromise) {
-                var nextName = utils.callbackToNextName(callback);
-                var errorName = utils.callbackToErrorName(callback);
-                var nextFn = this[nextName];
-                var errorFn = this[errorName];
-                var self = this;
-                var nextCb = function (fn) {
-                    return function () {
-                        if (whileFn) whileFn.call(self, false);
-                        return fn.apply(self, arguments);
-                    }
-                };
-                if (nextFn) {
-                    fnResult.then(nextCb(nextFn), nextCb(errorFn));
-                } else if (whileFn) {
-                    whileFn.call(this, false);
+            //if (fnResult && isPromise) {
+            var nextName = utils.callbackToNextName(callback);
+            var errorName = utils.callbackToErrorName(callback);
+            var nextFn = this[nextName];
+            var errorFn = this[errorName];
+            var self = this;
+            var nextCb = function (fn) {
+                return function () {
+                    if (whileFn) whileFn.call(self, false);
+                    return fn.apply(self, arguments);
                 }
+            };
+            if (nextFn) {
+                if (isPromise) {
+                    fnResult.then(nextCb(nextFn), nextCb(errorFn));
+                } else {
+                    nextCb(nextFn).call(this, fnResult);
+                }
+            } else if (whileFn) {
+                whileFn.call(this, false);
             }
+            //}
         };
         desub = listenable.listen(cb, this);
         unsubscriber = function() {
