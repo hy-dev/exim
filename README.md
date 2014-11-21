@@ -23,10 +23,7 @@ Standing on the shoulders of giants
 
 The only hard dependency is React.js.
 
-Optional deps:
-
-- **Bluebird** - ultra-fast promises
-- **fetch** - polyfill for in-browser AJAX `fetch()` API
+Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Future TODO
 
