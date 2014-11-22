@@ -5306,6 +5306,14 @@ define(function() {
  */
 var maker = instanceJoinCreator;
 
+if (!Promise) {
+    var Promise = {
+        is: function () {
+            return false;
+        }
+    }
+}
+
 Reflux.ListenerMethods = {
 
     /**
@@ -5370,38 +5378,53 @@ Reflux.ListenerMethods = {
      * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
      */
     listenTo: function(listenable, callback, defaultCallback) {
-        var desub, unsubscriber, subscriptionobj, subs = this.subscriptions = this.subscriptions || [];
+        var desub, unsubscriber, catchError, cb, subscriptionobj,
+            subs = this.subscriptions = this.subscriptions || [];
+
         utils.throwIf(this.validateListening(listenable));
         this.fetchDefaultData(listenable, defaultCallback);
-        var fn = this[callback]||callback;
-        var cb = function () {
-            if (typeof callback === 'function') return fn.apply(this, arguments);
+
+        cb = function () {
+            if (typeof callback === 'function') return callback.apply(this, arguments);
+
+            var prevFn, prevResult, isPrevPromise, whileFn;
+
             var prevName = utils.callbackToPrevName(callback);
-            var prevFn = this[prevName];
             var whileName = utils.callbackToWhileName(callback);
-            var whileFn = this[whileName];
-            if (prevFn) {
-                var prevResult = prevFn.apply(this, arguments);
-                var isPrevPromise = Promise.is(prevResult);
-            }
-            if (whileFn) {
-                whileFn.call(this, true);
-            }
-            var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
-            var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
-            var isPromise = Promise.is(fnResult);
-            //if (fnResult && isPromise) {
             var nextName = utils.callbackToNextName(callback);
             var errorName = utils.callbackToErrorName(callback);
             var nextFn = this[nextName];
             var errorFn = this[errorName];
+
+            if (prevFn = this[prevName]) {
+                try {
+                    prevResult = prevFn.apply(this, arguments);
+                } catch (e) {
+                    console.error(e);
+                    return errorFn.call(this, e);
+                }
+                isPrevPromise = Promise.is(prevResult);
+            }
+
+            if (whileFn = this[whileName]) {
+                whileFn.call(this, true);
+            }
+
+            var fn = this[callback]||callback;
+            var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
+            var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
+            var isPromise = Promise.is(fnResult);
             var self = this;
+
             var nextCb = function (fn) {
                 return function () {
                     if (whileFn) whileFn.call(self, false);
-                    return fn.apply(self, arguments);
+                    if (fn) {
+                        return fn.apply(self, arguments);
+                    }
                 }
             };
+
             if (nextFn) {
                 if (isPromise) {
                     fnResult.then(nextCb(nextFn), nextCb(errorFn));
@@ -5411,7 +5434,6 @@ Reflux.ListenerMethods = {
             } else if (whileFn) {
                 whileFn.call(this, false);
             }
-            //}
         };
         desub = listenable.listen(cb, this);
         unsubscriber = function() {
