@@ -5306,14 +5306,6 @@ define(function() {
  */
 var maker = instanceJoinCreator;
 
-if (!Promise) {
-    var Promise = {
-        is: function () {
-            return false;
-        }
-    }
-}
-
 Reflux.ListenerMethods = {
 
     /**
@@ -5378,6 +5370,14 @@ Reflux.ListenerMethods = {
      * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
      */
     listenTo: function(listenable, callback, defaultCallback) {
+        if (!Promise) {
+            var Promise = {
+                is: function () {
+                    return false;
+                }
+            }
+        }
+
         var desub, unsubscriber, catchError, cb, subscriptionobj,
             subs = this.subscriptions = this.subscriptions || [];
 
