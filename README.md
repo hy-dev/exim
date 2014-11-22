@@ -19,7 +19,6 @@ Standing on the shoulders of giants
 
 Dependencies are specified in `bower.json`. They are:
 
-- **Bluebird** - ultra-fast promises
 - **React** - great library by Facebook
 
 ## Documentation

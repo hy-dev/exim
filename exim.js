@@ -5371,7 +5371,7 @@ Reflux.ListenerMethods = {
      */
     listenTo: function(listenable, callback, defaultCallback) {
         if (!Promise) {
-            var Promise = {
+            Promise = {
                 is: function () {
                     return false;
                 }
