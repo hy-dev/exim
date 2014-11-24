@@ -163,13 +163,13 @@ var userActions = Exim.createActions(['eat', 'drink'])
 var Users = Exim.createStore({
   actions: actions,
   init: function() {
-    this.update({type: '', with: '', food: ''})
+    this.update({type: '', with: '', food: ''});
   },
   onEat: function(food) {
-    this.update({type: 'Brunch', with: 'Chaplin', food: food})
+    this.update({type: 'Brunch', with: 'Chaplin', food: food});
   },
   onDrink: function(drink) {
-    this.update({type: 'Brunch', with: 'Chaplin', food: 'liquid ' + drink})
+    this.update({type: 'Brunch', with: 'Chaplin', food: 'liquid ' + drink});
   }
 })
 
