@@ -521,6 +521,23 @@ utils.nextTick = function(callback) {
     setTimeout(callback, 0);
 };
 
+utils.capitalize = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+utils.lookupCallback = function(store, name, prefix) {
+  if (typeof store[name] === 'object') {
+    if (!prefix) prefix = 'on';
+    return store[name][prefix];
+  } else if (typeof store[name] === 'function') {
+    if (!prefix) {
+      return store[name];
+    } else {
+      return store[prefix + utils.capitalize(name)];
+    }
+  }
+};
+
 utils.callbackName = function(string){
     return 'on' + string.charAt(0).toUpperCase() + string.slice(1);
 };
@@ -5367,11 +5384,7 @@ Reflux.ListenerMethods = {
      */
     listenToMany: function(listenables) {
         for(var key in listenables){
-            var cbname = utils.callbackName(key),
-                localname = this[cbname] ? cbname : this[key] ? key : undefined;
-            if (localname){
-                this.listenTo(listenables[key],localname,this[cbname+"Default"]||this[localname+"Default"]||localname);
-            }
+            this.listenTo(listenables[key], key, this[key + 'Default'] || key);
         }
     },
 
@@ -5421,16 +5434,14 @@ Reflux.ListenerMethods = {
         cb = function () {
             if (typeof callback === 'function') return callback.apply(this, arguments);
 
-            var prevFn, prevResult, isPrevPromise, whileFn;
+            var prevResult, isPrevPromise;
 
-            var prevName = utils.callbackToPrevName(callback);
-            var whileName = utils.callbackToWhileName(callback);
-            var nextName = utils.callbackToNextName(callback);
-            var errorName = utils.callbackToErrorName(callback);
-            var nextFn = this[nextName];
-            var errorFn = this[errorName];
+            var prevFn = utils.lookupCallback(this, callback, 'will');
+            var whileFn = utils.lookupCallback(this, callback, 'while');
+            var nextFn = utils.lookupCallback(this, callback, 'did');
+            var errorFn = utils.lookupCallback(this, callback, 'didNot');
 
-            if (prevFn = this[prevName]) {
+            if (prevFn) {
                 try {
                     prevResult = prevFn.apply(this, arguments);
                 } catch (e) {
@@ -5440,11 +5451,11 @@ Reflux.ListenerMethods = {
                 isPrevPromise = Promise.is(prevResult);
             }
 
-            if (whileFn = this[whileName]) {
+            if (whileFn) {
                 whileFn.call(this, true);
             }
 
-            var fn = this[callback]||callback;
+            var fn = utils.lookupCallback(this, callback);
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
             var isPromise = Promise.is(fnResult);
@@ -5728,8 +5739,12 @@ Reflux.createStore = function(definition) {
             this.init();
         }
 
-        if (this.listenables){
-            arr = [].concat(this.listenables);
+        if (this.actions){
+            if (this.actions.length) {
+              this.actions = Exim.createActions(this.actions)
+            }
+
+            arr = [].concat(this.actions);
             for(;i < arr.length;i++){
                 this.listenToMany(arr[i]);
             }
