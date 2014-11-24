@@ -106,22 +106,28 @@ actions.work()  # anything.
 Stores subscribe to, and react on, specific actions.
 Usually, a store would perform an HTTP request in response to action and store the result.
 
-To listen to specific actions, you pass an object of actions to the `listenables` property.
+To listen to specific actions, you pass an object of actions to the `actions` property.
 
 Then, you can define three functions for each action: `willAction`, `onAction`, and `didAction`, where `Action` is the name of action.
+
+Alternatively, you can use a short form, hash with `will`, `on`, `did` properties.
 
 ```javascript
 var actions = Exim.createActions(['work', 'eat'])
 
 var People = Exim.createStore({
-  listenables: actions,
+  actions: actions,
 
   willWork: function() { /* ... */ },
   onWork:   function() { /* ... */ },
   didWork:  function() { /* ... */ },
-  willEat:  function() { /* ... */ },
-  onEat:    function() { /* ... */ },
-  didEat:   function() { /* ... */ }
+
+  // Alternative form.
+  eat: {
+    will: function() {},
+    on:   function() {},
+    did:  function() {}
+  }
 })
 ```
 
@@ -129,14 +135,17 @@ var People = Exim.createStore({
 actions = Exim.createActions(['work', 'eat'])
 
 People = Exim.createStore
-  listenables: actions
+  actions: actions
 
   willWork: -> # some
   onWork:   -> # function
   didWork:  -> # body
-  willEat:  -> # goes
-  onEat:    -> # right
-  didEat:   -> # here
+
+  # Alternative form.
+  eat:
+    will: -> # goes
+    on:   -> # right
+    did:  -> # here
 ```
 
 ## Components
@@ -152,7 +161,7 @@ var userActions = Exim.createActions(['eat', 'drink'])
 
 // the actual work happens here:
 var Users = Exim.createStore({
-  listenables: actions,
+  actions: actions,
   init: function() {
     this.update({type: '', with: '', food: ''})
   },
@@ -184,7 +193,7 @@ userActions.drink('Porridge')
 userActions = Exim.createActions(['eat', 'drink'])
 
 Users = Exim.createStore
-  listenables: actions
+  actions: actions
 
   init: ->
     @update type: '', with: '', food: ''
