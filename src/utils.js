@@ -57,6 +57,40 @@ utils.object = function(keys,vals){
     return o;
 };
 
+utils.clone = function (orig) {
+    var copy;
+
+    if (null == orig || "object" != typeof orig) {
+        return orig;
+    }
+
+    if (orig instanceof Date) {
+        copy = new Date();
+        copy.setTime(orig.getTime());
+        return copy;
+    }
+
+    if (orig instanceof Array) {
+        copy = [];
+        for (var i = 0, len = orig.length; i < len; i++) {
+            copy[i] = utils.clone(orig[i]);
+        }
+        return copy;
+    }
+
+    if (orig instanceof Object) {
+        copy = {};
+        for (var key in orig) {
+            if (orig.hasOwnProperty(key)) {
+                copy[key] = utils.clone(orig[key]);
+            }
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy!");
+}
+
 utils.isArguments = function(value) {
     return value && typeof value == 'object' && typeof value.length == 'number' &&
       (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
