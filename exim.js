@@ -549,6 +549,40 @@ utils.object = function(keys,vals){
     return o;
 };
 
+utils.clone = function (orig) {
+    var copy;
+
+    if (null == orig || "object" != typeof orig) {
+        return orig;
+    }
+
+    if (orig instanceof Date) {
+        copy = new Date();
+        copy.setTime(orig.getTime());
+        return copy;
+    }
+
+    if (orig instanceof Array) {
+        copy = [];
+        for (var i = 0, len = orig.length; i < len; i++) {
+            copy[i] = utils.clone(orig[i]);
+        }
+        return copy;
+    }
+
+    if (orig instanceof Object) {
+        copy = {};
+        for (var key in orig) {
+            if (orig.hasOwnProperty(key)) {
+                copy[key] = utils.clone(orig[key]);
+            }
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy!");
+}
+
 utils.isArguments = function(value) {
     return value && typeof value == 'object' && typeof value.length == 'number' &&
       (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
@@ -5370,38 +5404,61 @@ Reflux.ListenerMethods = {
      * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
      */
     listenTo: function(listenable, callback, defaultCallback) {
-        var desub, unsubscriber, subscriptionobj, subs = this.subscriptions = this.subscriptions || [];
+        if (!Promise) {
+            Promise = {
+                is: function () {
+                    return false;
+                }
+            }
+        }
+
+        var desub, unsubscriber, catchError, cb, subscriptionobj,
+            subs = this.subscriptions = this.subscriptions || [];
+
         utils.throwIf(this.validateListening(listenable));
         this.fetchDefaultData(listenable, defaultCallback);
-        var fn = this[callback]||callback;
-        var cb = function () {
-            if (typeof callback === 'function') return fn.apply(this, arguments);
+
+        cb = function () {
+            if (typeof callback === 'function') return callback.apply(this, arguments);
+
+            var prevFn, prevResult, isPrevPromise, whileFn;
+
             var prevName = utils.callbackToPrevName(callback);
-            var prevFn = this[prevName];
             var whileName = utils.callbackToWhileName(callback);
-            var whileFn = this[whileName];
-            if (prevFn) {
-                var prevResult = prevFn.apply(this, arguments);
-                var isPrevPromise = Promise.is(prevResult);
-            }
-            if (whileFn) {
-                whileFn.call(this, true);
-            }
-            var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
-            var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
-            var isPromise = Promise.is(fnResult);
-            //if (fnResult && isPromise) {
             var nextName = utils.callbackToNextName(callback);
             var errorName = utils.callbackToErrorName(callback);
             var nextFn = this[nextName];
             var errorFn = this[errorName];
+
+            if (prevFn = this[prevName]) {
+                try {
+                    prevResult = prevFn.apply(this, arguments);
+                } catch (e) {
+                    console.error(e);
+                    return errorFn.call(this, e);
+                }
+                isPrevPromise = Promise.is(prevResult);
+            }
+
+            if (whileFn = this[whileName]) {
+                whileFn.call(this, true);
+            }
+
+            var fn = this[callback]||callback;
+            var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
+            var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
+            var isPromise = Promise.is(fnResult);
             var self = this;
+
             var nextCb = function (fn) {
                 return function () {
                     if (whileFn) whileFn.call(self, false);
-                    return fn.apply(self, arguments);
+                    if (fn) {
+                        return fn.apply(self, arguments);
+                    }
                 }
             };
+
             if (nextFn) {
                 if (isPromise) {
                     fnResult.then(nextCb(nextFn), nextCb(errorFn));
@@ -5411,7 +5468,6 @@ Reflux.ListenerMethods = {
             } else if (whileFn) {
                 whileFn.call(this, false);
             }
-            //}
         };
         desub = listenable.listen(cb, this);
         unsubscriber = function() {
@@ -5701,7 +5757,8 @@ Reflux.createStore = function(definition) {
     };
 
     Store.prototype.get = function (key) {
-        return key ? _store[key] : _store;
+        var result = key ? _store[key] : _store;
+        return utils.clone(result);
     };
 
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);

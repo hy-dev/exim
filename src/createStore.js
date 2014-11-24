@@ -79,7 +79,8 @@ Reflux.createStore = function(definition) {
     };
 
     Store.prototype.get = function (key) {
-        return key ? _store[key] : _store;
+        var result = key ? _store[key] : _store;
+        return utils.clone(result);
     };
 
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
