@@ -50,8 +50,12 @@ Reflux.createStore = function(definition) {
             this.init();
         }
 
-        if (this.listenables){
-            arr = [].concat(this.listenables);
+        if (this.actions){
+            if (this.actions.length) {
+              this.actions = Exim.createActions(this.actions)
+            }
+
+            arr = [].concat(this.actions);
             for(;i < arr.length;i++){
                 this.listenToMany(arr[i]);
             }
