@@ -29,24 +29,21 @@ utils.nextTick = function(callback) {
     setTimeout(callback, 0);
 };
 
-utils.callbackName = function(string){
-    return 'on' + string.charAt(0).toUpperCase() + string.slice(1);
+utils.capitalize = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-utils.callbackToNextName = function (string) {
-    return 'did' + string.slice(2);
-};
-
-utils.callbackToWhileName = function (string) {
-    return 'while' + string.slice(2);
-};
-
-utils.callbackToPrevName = function (string) {
-    return 'will' + string.slice(2);
-};
-
-utils.callbackToErrorName = function (string) {
-    return 'didNot' + string.slice(2);
+utils.lookupCallback = function(store, name, prefix) {
+  if (typeof store[name] === 'object') {
+    if (!prefix) prefix = 'on';
+    return store[name][prefix];
+  } else if (typeof store[name] === 'function') {
+    if (!prefix) {
+      return store[name];
+    } else {
+      return store[prefix + utils.capitalize(name)];
+    }
+  }
 };
 
 utils.object = function(keys,vals){
