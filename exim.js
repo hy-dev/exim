@@ -529,33 +529,14 @@ utils.lookupCallback = function(store, name, prefix) {
   if (typeof store[name] === 'object') {
     if (!prefix) prefix = 'on';
     return store[name][prefix];
-  } else if (typeof store[name] === 'function') {
+  } else {
     if (!prefix) {
-      return store[name];
+      var prefixedName = 'on' + utils.capitalize(name);
+      return store[name] || store[prefixedName];
     } else {
       return store[prefix + utils.capitalize(name)];
     }
   }
-};
-
-utils.callbackName = function(string){
-    return 'on' + string.charAt(0).toUpperCase() + string.slice(1);
-};
-
-utils.callbackToNextName = function (string) {
-    return 'did' + string.slice(2);
-};
-
-utils.callbackToWhileName = function (string) {
-    return 'while' + string.slice(2);
-};
-
-utils.callbackToPrevName = function (string) {
-    return 'will' + string.slice(2);
-};
-
-utils.callbackToErrorName = function (string) {
-    return 'didNot' + string.slice(2);
 };
 
 utils.object = function(keys,vals){
