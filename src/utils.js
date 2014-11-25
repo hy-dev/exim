@@ -37,9 +37,10 @@ utils.lookupCallback = function(store, name, prefix) {
   if (typeof store[name] === 'object') {
     if (!prefix) prefix = 'on';
     return store[name][prefix];
-  } else if (typeof store[name] === 'function') {
+  } else {
     if (!prefix) {
-      return store[name];
+      var prefixedName = 'on' + utils.capitalize(name);
+      return store[name] || store[prefixedName];
     } else {
       return store[prefix + utils.capitalize(name)];
     }
