@@ -4,12 +4,9 @@ var init    = require('init');
 
 var store = Exim.createStore({
   actions: actions,
-
-  willStart: function () {
-    init()
-  },
-  onStart: function () {
-    ReactRouter.run(routes, ReactRouter.HistoryLocation, function (Handler) {
+  start: function () {
+    init();
+    ReactRouter.run(routes, ReactRouter.HistoryLocation, function(Handler) {
       React.render(React.createElement(Handler, null), document.body)
     })
   }

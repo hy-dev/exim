@@ -1,11 +1,9 @@
 var Route = ReactRouter.Route;
-
-var mount = function (name) {
-  return require('components/' + name);
-};
+var App = require('./components/App');
+var MessageSection = require('./components/MessageSection');
 
 module.exports = (
-  <Route handler={mount("App")} path="/">
-    <Route name="message" handler={mount("MessageSection")} path="threads/:id" />
+  <Route handler={App} path="/">
+    <Route name="message" handler={MessageSection} path="threads/:id" />
   </Route>
 );
