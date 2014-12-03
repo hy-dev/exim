@@ -95,7 +95,7 @@ Reflux.ListenerMethods = {
                     prevResult = prevFn.apply(this, arguments);
                 } catch (e) {
                     console.error(e);
-                    return errorFn.call(this, e);
+                    return errorFn ? errorFn.call(this, e) : null;
                 }
                 isPrevPromise = Promise.is(prevResult);
             }

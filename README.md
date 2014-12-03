@@ -36,6 +36,7 @@ The MIT License (MIT)
 
 Copyright (c) 2014 Hellyeah LLC
 http://hellyeah.is
+
 With contributions by several individuals:
 https://github.com/hellyeahllc/exim/graphs/contributors
 

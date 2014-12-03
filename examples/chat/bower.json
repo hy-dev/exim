@@ -1,0 +1,17 @@
+{
+  "name": "your-app",
+  "version": "0.0.1",
+  "main": "public/app.js",
+  "dependencies": {
+    "bluebird": "~2.3.6",
+    "react": "~0.12.1",
+    "react-router": "*"
+  },
+  "overrides": {
+    "react-router": {
+      "dependencies": {
+        "react": "*"
+      }
+    }
+  }
+}
