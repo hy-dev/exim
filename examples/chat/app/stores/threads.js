@@ -4,7 +4,7 @@ var utils = require('lib/utils');
 var store = Exim.createStore({
   actions: actions,
 
-  getInitial: function () {
+  getInitial: function() {
     return {
       threads: {},
       currentID: null,
@@ -12,31 +12,30 @@ var store = Exim.createStore({
     }
   },
 
-  willRecieveThreads: function () {
-    var messages = utils.getAndParse('messages').map(utils.dateSetter).sort(utils.dateComparator);
-    return utils.getThreads(messages)
+  recieveThreads: function() {
+    var messages = utils.getAndParse('messages')
+      .map(utils.dateSetter)
+      .sort(utils.dateComparator);
+    var threads = utils.getThreads(messages);
+    this.update('threads', threads);
   },
 
-  recieveThreads: function (threads) {
-    this.update('threads', threads)
+  didRecieveThreads: function() {
+    actions.updateUnread();
   },
 
-  didRecieveThreads: function () {
-    actions.updateUnread()
-  },
-
-  updateCurrent: function (id) {
+  updateCurrent: function(id) {
     this.update('currentID', id);
   },
 
-  updateLast: function (message) {
+  updateLast: function(message) {
     var threads = this.get('threads');
     var thread = threads[message.threadID];
     thread.lastMessage = message;
     this.update('threads', threads);
   },
 
-  updateUnread: function (threadId, value) {
+  updateUnread: function(threadId, value) {
     var lastMessage;
     var threads = this.get('threads');
 
@@ -48,8 +47,9 @@ var store = Exim.createStore({
 
     var unread = 0;
     for (key in threads) {
-      if (lastMessage = threads[key].lastMessage) {
-        if (!lastMessage.isRead) unread++;
+      lastMessage = threads[key].lastMessage
+      if (lastMessage && !lastMessage.isRead) {
+        unread++;
       }
     }
     this.update('unread', unread);
