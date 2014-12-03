@@ -3,6 +3,8 @@
 
 
 Reflux.connect = function (listenable, key) {
+  var key = arguments.length > 2 ? [].slice.call(arguments, 1) : key;
+
   var getStateFromArray = function (source, arr) {
     var state = {};
     arr.forEach(function (k) {
@@ -10,6 +12,7 @@ Reflux.connect = function (listenable, key) {
     })
     return state;
   };
+
   return {
     getInitialState: function () {
       var initialData;
