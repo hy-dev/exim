@@ -10,6 +10,10 @@
 var actions = Exim.createActions(['createPost']);
 
 var PostStore = Exim.createStore({
+  actions: actions,
+  getInitial() {
+    return {posts: [], isSaving: false}
+  },
   createPost: {
     on(data) {
       var posts = this.get('posts')
