@@ -11,23 +11,25 @@ var actions = Exim.createActions(['createPost']);
 
 var PostStore = Exim.createStore({
   createPost: {
-    will: (data) =>
+    on(data) {
       var posts = this.get('posts')
       posts.push(data)
       this.update({posts: posts})
 
-    on: (data) =>
       // Returns promise.
       return request.post('/v1/posts', data)
+    },
 
-    didNot: (error, newPost) =>
+    didNot(error, newPost) {
       // Remove the new post from the store.
       var filtered = this.get('posts')
         .filter(p => p.date !== newPost.date)
       this.update({posts: filtered})
+    },
 
-    while: (status) =>
+    while(status) {
       this.update({isSaving: status})
+    }
   }
 });
 
