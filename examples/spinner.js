@@ -1,15 +1,19 @@
 // Save the user on the server;
 // While saving => show the spinner
 
-var actions = Exim.createActions('saveUser');
+var action = Exim.createAction('saveUser');
 
 var UserStore = Exim.createStore({
-  actions: actions,
+  actions: action,
+  getInitial: () => {
+    return {isLoading: false}
+  },
   saveUser: {
     on: (data) => {
       return request.post('/v1/user', data);
     }
     while: (isLoading) => {
+      //Runs before and after action.
       this.update({isLoading: isLoading});
     }
   }
