@@ -25,18 +25,19 @@
 
       return ReactRouter.Route.apply(ReactRouter.Route, args);
     },
-    startHistory: function() {
-      var routes = [].slice.call(arguments);
-      return ReactRouter.Routes.apply(ReactRouter.Routes, [{location: 'history'}].concat(routes));
+    startRouting: function(routes, element) {
+      return ReactRouter.run(routes, ReactRouter.HistoryLocation, function(Handler) {
+        React.render(React.createElement(Handler, null), element)
+      });
     },
     defaultTo: function(View) {
       return ReactRouter.DefaultRoute({handler: View});
-    },
-    Link: ReactRouter.Link,
-    transitionTo: ReactRouter.transitionTo,
-    goBack: ReactRouter.goBack,
-    replaceWith: ReactRouter.replaceWith
+    }
   };
+
+  ['Link', 'transitionTo', 'goBack', 'replaceWith', 'Route', 'RouteHandler', 'State', 'Link'].forEach(function(name) {
+    Exim.Router[name] = ReactRouter[name]
+  });
 
   Exim.createAction = Reflux.createAction;
   Exim.createActions = Reflux.createActions;
