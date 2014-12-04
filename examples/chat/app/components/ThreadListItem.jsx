@@ -1,8 +1,8 @@
-var Link = ReactRouter.Link;
-var State = ReactRouter.State;
+var Link = Exim.Router.Link;
+var State = Exim.Router.State;
 
 var ListItem = React.createClass({
-  mixins: [ State ],
+  mixins: [State],
 
   render: function () {
     var isActive = this.isActive(this.props.to, this.props.params, this.props.query);

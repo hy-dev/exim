@@ -1,8 +1,6 @@
-var actions = Exim.createActions([
+module.exports = Exim.createActions([
   'recieveThreads',
   'updateCurrent',
   'updateLast',
   'updateUnread'
 ]);
-
-module.exports = actions;
