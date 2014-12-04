@@ -4,14 +4,14 @@ var MessageListItem = React.createClass({
   },
 
   render: function() {
-    var message = this.props.message;
+    var msg = this.props.message;
     return (
       <li className="message-list-item">
-        <h5 className="message-author-name">{message.authorName}</h5>
+        <h5 className="message-author-name">{msg.authorName}</h5>
         <div className="message-time">
-          {message.date.toLocaleTimeString()}
+          {msg.date.toLocaleTimeString()}
         </div>
-        <div className="message-text">{message.text}</div>
+        <div className="message-text">{msg.text}</div>
       </li>
     );
   }

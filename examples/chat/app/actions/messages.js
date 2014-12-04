@@ -1,6 +1,4 @@
-var actions = Exim.createActions([
+module.exports = Exim.createActions([
   'recieveMessages',
   'createMessage'
 ]);
-
-module.exports = actions;

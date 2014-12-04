@@ -7,7 +7,7 @@ var threadStore     = require("stores/threads");
 
 var MessageSection = React.createClass({
   mixins: [
-    ReactRouter.State,
+    Exim.Router.State,
     Exim.connect(messagesStore, 'messages'),
     Exim.connect(threadStore, 'currentID')
   ],

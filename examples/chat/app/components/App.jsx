@@ -1,6 +1,6 @@
 var ThreadSection  = require("./ThreadSection");
 var MessageSection = require("./MessageSection");
-var RouteHandler   = ReactRouter.RouteHandler;
+var RouteHandler   = Exim.Router.RouteHandler;
 
 App = React.createClass({
   render: function () {
