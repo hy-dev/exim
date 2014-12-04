@@ -1,6 +1,6 @@
 var actions = require('actions/messages');
-var threadActions = require('actions/threads')
-var threadsStore = require('./threads');
+var ThreadActions = require('actions/threads')
+var ThreadStore = require('./threads');
 
 var store = Exim.createStore({
   actions: actions,
@@ -12,7 +12,7 @@ var store = Exim.createStore({
   },
 
   recieveMessages: function () {
-    var threadID = threadsStore.get('currentID');
+    var threadID = ThreadStore.get('currentID');
     var messages = utils.getAndParse('messages');
     var filtered = messages
       .filter(function (message) {
@@ -28,7 +28,7 @@ var store = Exim.createStore({
       var timestamp = Date.now();
       var message = {
         id: 'm_' + timestamp,
-        threadID: threadsStore.get('currentID'),
+        threadID: ThreadStore.get('currentID'),
         text: text,
         isRead: true,
         authorName: 'Bill',
@@ -46,7 +46,7 @@ var store = Exim.createStore({
       return message;
     },
     did: function(message) {
-      threadActions.updateLast(message);
+      ThreadActions.updateLast(message);
     }
   }
 })
