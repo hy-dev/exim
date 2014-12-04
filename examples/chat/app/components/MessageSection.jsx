@@ -1,22 +1,22 @@
 var MessageListItem = require("./MessageListItem");
 var MessageComposer = require("./MessageComposer");
-var messagesActions = require("actions/messages");
-var messagesStore   = require("stores/messages");
-var threadActions   = require("actions/threads");
-var threadStore     = require("stores/threads");
+var MessageActions  = require("actions/messages");
+var MessageStore    = require("stores/messages");
+var ThreadActions   = require("actions/threads");
+var ThreadStore     = require("stores/threads");
 
 var MessageSection = React.createClass({
   mixins: [
     Exim.Router.State,
-    Exim.connect(messagesStore, 'messages'),
-    Exim.connect(threadStore, 'currentID')
+    Exim.connect(MessageStore, 'messages'),
+    Exim.connect(ThreadStore, 'currentID')
   ],
 
   statics: {
     willTransitionTo: function (transition, params) {
       if (params && params.id) {
-        threadActions.updateCurrent(params.id);
-        messagesActions.recieveMessages();
+        ThreadActions.updateCurrent(params.id);
+        MessageActions.recieveMessages();
       }
     }
   },
@@ -27,9 +27,9 @@ var MessageSection = React.createClass({
 
   updateUnread: function () {
     var id = this.getParams().id;
-    var thread = threadStore.get('threads')[id];
+    var thread = ThreadStore.get('threads')[id];
     if (!thread.lastMessage.isRead) {
-      threadActions.updateUnread(id);
+      ThreadActions.updateUnread(id);
     }
   },
 
