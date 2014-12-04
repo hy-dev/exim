@@ -14,16 +14,13 @@ var store = Exim.createStore({
   recieveMessages: function () {
     var threadID = threadsStore.get('currentID');
     var messages = utils.getAndParse('messages');
-    return messages
+    var filtered = messages
       .filter(function (message) {
         return message.threadID === threadID;
       })
       .map(utils.dateSetter)
       .sort(utils.dateComparator);
-  },
-
-  didRecieveMessages: function (data) {
-    this.update({messages: data});
+    this.update({messages: filtered});
   },
 
   createMessage: {
@@ -41,14 +38,16 @@ var store = Exim.createStore({
       var localStorageItems = JSON.parse(localStorage.getItem('messages'));
       localStorageItems.push(message);
       localStorage.setItem('messages', JSON.stringify(localStorageItems));
-      return message;
-    },
-    did: function(message) {
+
       var storeItems = this.get('messages');
       storeItems.push(message);
       this.update('messages', storeItems);
-      threadActions.updateLast(message);
+
+      return message;
     },
+    did: function(message) {
+      threadActions.updateLast(message);
+    }
   }
 })
 

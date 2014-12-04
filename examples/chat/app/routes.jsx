@@ -1,4 +1,4 @@
-var Route = ReactRouter.Route;
+var Route = Exim.Router.Route;
 var App = require('./components/App');
 var MessageSection = require('./components/MessageSection');
 
