@@ -25,21 +25,19 @@ The only hard dependency is React.js.
 
 Optional dependency: **Bluebird** - ultra-fast promises
 
-## Future TODO
+## Changelog
 
-- Data fetcher
-- Explicit state (https://github.com/dustingetz/react-cursor)
+### Exim 0.4.0 (9 Dec 2014)
+
+Initial release.
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Hellyeah LLC
-http://hellyeah.is
+Copyright (c) 2014 Hellyeah LLC http://hellyeah.is
 
-With contributions by several individuals:
-https://github.com/hellyeahllc/exim/graphs/contributors
-
+With contributions by several individuals: https://github.com/hellyeahllc/exim/graphs/contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
