@@ -31,7 +31,7 @@ Reflux.createActions = function(actionNames) {
  * Sets the eventmitter that Reflux uses
  */
 Reflux.setEventEmitter = function(ctx) {
-    var _ = require('./utils');
+    var _ = utils;
     _.EventEmitter = ctx;
 };
 
@@ -39,7 +39,7 @@ Reflux.setEventEmitter = function(ctx) {
  * Sets the method used for deferring actions and stores
  */
 Reflux.nextTick = function(nextTick) {
-    var _ = require('./utils');
+    var _ = utils;
     _.nextTick = nextTick;
 };
 
