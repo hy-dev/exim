@@ -8,14 +8,6 @@ var textIsNotEmpty = function(text) {
   return text.trim() !== '';
 };
 
-var isEnterKeyPressed = function(event) {
-  return event.nativeEvent.keyCode === 13;
-};
-
-var isEscapeKeyPressed = function(event) {
-  return event.nativeEvent.keyCode === 27;
-};
-
 var actions = Exim.createActions([
   'create',
   'updateText',
