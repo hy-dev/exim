@@ -13,8 +13,4 @@
 })(this, function(root, Reflux) {
   "use strict";
 
-  if (typeof React === 'undefined') {
-    throw("React required");
-  }
-
   var Reflux = {};

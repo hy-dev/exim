@@ -1,7 +1,3 @@
-// var Reflux = require('../src'),
-//     _ = require('./utils');
-
-
 Reflux.connect = function (listenable, key) {
   var key = arguments.length > 2 ? [].slice.call(arguments, 1) : key;
 
@@ -59,6 +55,23 @@ Reflux.connect = function (listenable, key) {
     },
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
+};
+
+Reflux.onChange = function (listenable, cb) {
+  for(var m in Reflux.ListenerMethods) {
+    if (this[m] !== Reflux.ListenerMethods[m]){
+      if (this[m]) {
+        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
+      }
+      this[m] = Reflux.ListenerMethods[m];
+    }
+  }
+
+  callback = function () {
+    cb(listenable.get());
+  }
+
+  listenable.listen(callback)
 };
 
 // Reflux.watch = function (listenable, keys) {
