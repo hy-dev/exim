@@ -19,6 +19,14 @@ utils.extend = function(obj) {
     return obj;
 };
 
+utils.inheritMixins = function (target, mixins) {
+    if (mixins) {
+        mixins.forEach(function (mixin) {
+            utils.extend(target.prototype, mixin);
+        })
+    }
+};
+
 utils.EventEmitter = EventEmitter;
 
 utils.isFunction = function(value) {

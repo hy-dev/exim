@@ -13,10 +13,6 @@
 })(this, function(root, Reflux) {
   "use strict";
 
-  if (typeof React === 'undefined') {
-    throw("React required");
-  }
-
   var Reflux = {};
 /*!
  * EventEmitter v4.2.9 - git.io/ee
@@ -511,6 +507,14 @@ utils.extend = function(obj) {
     return obj;
 };
 
+utils.inheritMixins = function (target, mixins) {
+    if (mixins) {
+        mixins.forEach(function (mixin) {
+            utils.extend(target.prototype, mixin);
+        })
+    }
+};
+
 utils.EventEmitter = EventEmitter;
 
 utils.isFunction = function(value) {
@@ -743,12 +747,8 @@ Reflux.ListenerMethods = {
      * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
      */
     listenTo: function(listenable, callback, defaultCallback) {
-        if (!Promise) {
-            Promise = {
-                is: function () {
-                    return false;
-                }
-            }
+        var isPromise = function (target) {
+            return typeof Promise !== 'undefined' && typeof target !== 'undefined' && target.constructor === Promise;
         }
 
         var desub, unsubscriber, catchError, cb, subscriptionobj,
@@ -774,7 +774,7 @@ Reflux.ListenerMethods = {
                     console.error(e);
                     return errorFn ? errorFn.call(this, e) : null;
                 }
-                isPrevPromise = Promise.is(prevResult);
+                isPrevPromise = isPromise(prevResult);
             }
 
             if (whileFn) {
@@ -784,7 +784,7 @@ Reflux.ListenerMethods = {
             var fn = utils.lookupCallback(this, callback);
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
-            var isPromise = Promise.is(fnResult);
+            var isCurrentPromise = isPromise(fnResult);
             var self = this;
 
             var nextCb = function (fn) {
@@ -797,7 +797,7 @@ Reflux.ListenerMethods = {
             };
 
             if (nextFn) {
-                if (isPromise) {
+                if (isCurrentPromise) {
                     fnResult.then(nextCb(nextFn), nextCb(errorFn));
                 } else {
                     nextCb(nextFn).call(this, fnResult);
@@ -1102,6 +1102,8 @@ Reflux.createStore = function(definition) {
         return utils.clone(result);
     };
 
+    utils.inheritMixins(Store, definition.mixins);
+
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
 
     var store = new Store();
@@ -1132,10 +1134,6 @@ Keep.reset = function() {
         createdActions.pop();
     }
 };
-// var Reflux = require('../src'),
-//     _ = require('./utils');
-
-
 Reflux.connect = function (listenable, key) {
   var key = arguments.length > 2 ? [].slice.call(arguments, 1) : key;
 
@@ -1193,6 +1191,23 @@ Reflux.connect = function (listenable, key) {
     },
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
+};
+
+Reflux.onChange = function (listenable, cb) {
+  for(var m in Reflux.ListenerMethods) {
+    if (this[m] !== Reflux.ListenerMethods[m]){
+      if (this[m]) {
+        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
+      }
+      this[m] = Reflux.ListenerMethods[m];
+    }
+  }
+
+  callback = function () {
+    cb(listenable.get());
+  }
+
+  listenable.listen(callback)
 };
 
 // Reflux.watch = function (listenable, keys) {
@@ -1343,40 +1358,42 @@ Exim.cx = function (classNames) {
   }
 };
 
-var domHelpers = {};
+if (typeof React !== 'undefined') {
+  var domHelpers = {};
 
-var tag = function (name) {
-  var args, attributes, name;
-  args = [].slice.call(arguments, 1);
-  var first = args[0] && args[0].constructor;
-  if (first === Object) {
-    attributes = args.shift();
-  } else {
-    attributes = {};
-  }
-  return React.DOM[name].apply(React.DOM, [attributes].concat(args))
-};
-
-var bindTag = function(tagName) {
-  return domHelpers[tagName] = tag.bind(this, tagName);
-};
-
-for (var tagName in React.DOM) {
-  bindTag(tagName);
-}
-
-domHelpers['space'] = function() {
-  return React.DOM.span({
-    dangerouslySetInnerHTML: {
-      __html: '&nbsp;'
+  var tag = function (name) {
+    var args, attributes, name;
+    args = [].slice.call(arguments, 1);
+    var first = args[0] && args[0].constructor;
+    if (first === Object) {
+      attributes = args.shift();
+    } else {
+      attributes = {};
     }
-  });
-};
+    return React.DOM[name].apply(React.DOM, [attributes].concat(args))
+  };
 
-Exim.DOM = domHelpers;
+  var bindTag = function(tagName) {
+    return domHelpers[tagName] = tag.bind(this, tagName);
+  };
 
-Exim.addTag = function (name, tag) {
-  this.DOM[name] = tag;
+  for (var tagName in React.DOM) {
+    bindTag(tagName);
+  }
+
+  domHelpers['space'] = function() {
+    return React.DOM.span({
+      dangerouslySetInnerHTML: {
+        __html: '&nbsp;'
+      }
+    });
+  };
+
+  Exim.DOM = domHelpers;
+
+  Exim.addTag = function (name, tag) {
+    this.DOM[name] = tag;
+  }
 }
 
   var toS = Object.prototype.toString;
@@ -1425,7 +1442,6 @@ Exim.addTag = function (name, tag) {
   Exim.createAction = Reflux.createAction;
   Exim.createActions = Reflux.createActions;
   Exim.createStore = Reflux.createStore;
-  Exim.createView = React.createClass;
 
   return Exim;
 });

@@ -45,7 +45,6 @@
   Exim.createAction = Reflux.createAction;
   Exim.createActions = Reflux.createActions;
   Exim.createStore = Reflux.createStore;
-  Exim.createView = React.createClass;
 
   return Exim;
 });
