@@ -2,7 +2,7 @@
   "name": "exim",
   "version": "0.4.0",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
-  "main": "exim.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,5 +30,10 @@
   "bugs": {
     "url": "https://github.com/hellyeahllc/exim/issues"
   },
-  "homepage": "https://github.com/hellyeahllc/exim"
+  "format":"cjs",
+  "homepage": "https://github.com/hellyeahllc/exim",
+  "dependencies": {
+    "react": "~0.12.2",
+    "react-router": "~0.12.0"
+  }
 }
