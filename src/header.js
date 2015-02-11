@@ -6,15 +6,16 @@
       return factory(root, exports);
     });
   } else if (typeof exports !== 'undefined') {
-    factory(root, exports);
+    var f = factory(root, exports);
+
   } else {
     root.Exim = factory(root, {});
   }
 })(this, function(root, Reflux) {
   "use strict";
+  var React = require('react');
+  var ReactRouter = require('react-router');
 
   if (typeof React === 'undefined') {
     throw("React required");
   }
-
-  var Reflux = {};
