@@ -19,7 +19,16 @@ utils.extend = function(obj) {
     return obj;
 };
 
-utils.EventEmitter = EventEmitter;
+// Expose the class either via AMD, CommonJS or the global object
+if (typeof define === 'function' && define.amd) {
+  utils.EventEmitter = require('EventEmitter')
+}
+else if (typeof module === 'object' && module.exports){
+    utils.EventEmitter = module.exports.EventEmitter;
+}
+else {
+    utils.EventEmitter = window.EventEmitter;
+}
 
 utils.isFunction = function(value) {
     return typeof value === 'function';
