@@ -3,12 +3,11 @@ import Action from './Action'
 
 export default class Store extends Class {
   constructor(args) {
-    var actions = args.actions
+    var {actions} = args;
     var runners = {};
-    var store = this;
     if (Array.isArray(actions))
       var actionsToSave = actions.map((action, i, acts) => {
-        var instance = new Action({action, store})
+        var instance = new Action({action, store: this})
         runners[action] = instance.run
         return instance
       });
