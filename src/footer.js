@@ -2,6 +2,14 @@
   var toS = Object.prototype.toString;
 
   if (typeof ReactRouter === "object") {
+    var routerElements, routerMixins, routerFunctions, routerObjects, copyItems;
+
+    routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'];
+    routerMixins = ['Navigation', 'State'];
+    routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'];
+    routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'];
+    copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+
     Exim.Router = {
       match: function(name, View) {
         var options = {};
@@ -36,16 +44,26 @@
       }
     };
 
+    for (var i = 0; i < routerElements.length; i++) {
+      var elementName = routerElements[i];
+      Exim.Router[elementName] = React.createElement.bind(React.createElement, ReactRouter[elementName]);
+    }
 
-    ['Link', 'transitionTo', 'goBack', 'replaceWith', 'Route', 'RouteHandler', 'State', 'Link'].forEach(function(name) {
-      Exim.Router[name] = ReactRouter[name]
-    });
+    for (var i = 0; i < copyItems.length; i++) {
+      var itemName = copyItems[i];
+      Exim.Router[itemName] = ReactRouter[itemName];
+    }
   }
+
+  Exim.createView = function (classArgs) {
+    var ReactClass = React.createClass(classArgs);
+    var ReactElement = React.createElement.bind(React.createElement, ReactClass);
+    return ReactElement;
+  };
 
   Exim.createAction = Reflux.createAction;
   Exim.createActions = Reflux.createActions;
   Exim.createStore = Reflux.createStore;
-  Exim.createView = React.createClass;
 
   return Exim;
 });

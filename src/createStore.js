@@ -87,6 +87,8 @@ Reflux.createStore = function(definition) {
         return utils.clone(result);
     };
 
+    utils.inheritMixins(Store, definition.mixins);
+
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
 
     var store = new Store();

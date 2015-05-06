@@ -66,12 +66,8 @@ Reflux.ListenerMethods = {
      * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
      */
     listenTo: function(listenable, callback, defaultCallback) {
-        if (!Promise) {
-            Promise = {
-                is: function () {
-                    return false;
-                }
-            }
+        var isPromise = function (target) {
+            return typeof Promise !== 'undefined' && typeof target !== 'undefined' && target.constructor === Promise;
         }
 
         var desub, unsubscriber, catchError, cb, subscriptionobj,
@@ -97,7 +93,7 @@ Reflux.ListenerMethods = {
                     console.error(e);
                     return errorFn ? errorFn.call(this, e) : null;
                 }
-                isPrevPromise = Promise.is(prevResult);
+                isPrevPromise = isPromise(prevResult);
             }
 
             if (whileFn) {
@@ -107,7 +103,7 @@ Reflux.ListenerMethods = {
             var fn = utils.lookupCallback(this, callback);
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
-            var isPromise = Promise.is(fnResult);
+            var isCurrentPromise = isPromise(fnResult);
             var self = this;
 
             var nextCb = function (fn) {
@@ -120,7 +116,7 @@ Reflux.ListenerMethods = {
             };
 
             if (nextFn) {
-                if (isPromise) {
+                if (isCurrentPromise) {
                     fnResult.then(nextCb(nextFn), nextCb(errorFn));
                 } else {
                     nextCb(nextFn).call(this, fnResult);

@@ -16,6 +16,4 @@
   var React = require('react');
   var ReactRouter = require('react-router');
 
-  if (typeof React === 'undefined') {
-    throw("React required");
-  }
+  var Reflux = {};
