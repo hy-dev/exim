@@ -27,6 +27,12 @@ Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
 
+### Exim 0.5.0 (6 May 2015)
+
+1. Implement **Exim.createView**.
+2. **Exim.Router** enhancements.
+3. Add **Exim.helpers**.
+
 ### Exim 0.4.0 (9 Dec 2014)
 
 Initial release.

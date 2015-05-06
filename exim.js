@@ -1192,27 +1192,6 @@ Reflux.connect = function (listenable, key) {
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
 };
-
-Reflux.onChange = function (listenable, cb) {
-  for(var m in Reflux.ListenerMethods) {
-    if (this[m] !== Reflux.ListenerMethods[m]){
-      if (this[m]) {
-        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
-      }
-      this[m] = Reflux.ListenerMethods[m];
-    }
-  }
-
-  callback = function () {
-    cb(listenable.get());
-  }
-
-  listenable.listen(callback)
-};
-
-// Reflux.watch = function (listenable, keys) {
-
-// };
 // var _ = require('./utils'),
 //     ListenerMethods = require('./ListenerMethods');
 
@@ -1349,6 +1328,7 @@ Reflux.__keep = Keep;
 var Exim = Reflux;
 
 Exim.cx = function (classNames) {
+  console.log('`Exim.cx` is deprecated and will be removed in next versions. Use `Exim.helpers.cx` instead');
   if (typeof classNames == 'object') {
     return Object.keys(classNames).filter(function(className) {
       return classNames[className];
@@ -1357,6 +1337,20 @@ Exim.cx = function (classNames) {
     return Array.prototype.join.call(arguments, ' ');
   }
 };
+
+var helpers = {};
+
+helpers.cx = function (classNames) {
+  if (typeof classNames == 'object') {
+    return Object.keys(classNames).filter(function(className) {
+      return classNames[className];
+    }).join(' ');
+  } else {
+    return Array.prototype.join.call(arguments, ' ');
+  }
+};
+
+Exim.helpers = helpers;
 
 if (typeof React !== 'undefined') {
   var domHelpers = {};
@@ -1399,6 +1393,14 @@ if (typeof React !== 'undefined') {
   var toS = Object.prototype.toString;
 
   if (typeof ReactRouter === "object") {
+    var routerElements, routerMixins, routerFunctions, routerObjects, copyItems;
+
+    routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'];
+    routerMixins = ['Navigation', 'State'];
+    routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'];
+    routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'];
+    copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+
     Exim.Router = {
       match: function(name, View) {
         var options = {};
@@ -1433,11 +1435,22 @@ if (typeof React !== 'undefined') {
       }
     };
 
+    for (var i = 0; i < routerElements.length; i++) {
+      var elementName = routerElements[i];
+      Exim.Router[elementName] = React.createElement.bind(React.createElement, ReactRouter[elementName]);
+    }
 
-    ['Link', 'transitionTo', 'goBack', 'replaceWith', 'Route', 'RouteHandler', 'State', 'Link'].forEach(function(name) {
-      Exim.Router[name] = ReactRouter[name]
-    });
+    for (var i = 0; i < copyItems.length; i++) {
+      var itemName = copyItems[i];
+      Exim.Router[itemName] = ReactRouter[itemName];
+    }
   }
+
+  Exim.createView = function (classArgs) {
+    var ReactClass = React.createClass(classArgs);
+    var ReactElement = React.createElement.bind(React.createElement, ReactClass);
+    return ReactElement;
+  };
 
   Exim.createAction = Reflux.createAction;
   Exim.createActions = Reflux.createActions;
