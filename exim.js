@@ -13,10 +13,21 @@
   }
 })(this, function(root, Reflux) {
   "use strict";
-  var React = require('react');
-  var ReactRouter = require('react-router');
-
+  var React, ReactRouter;
   var Reflux = {};
+
+  if (typeof define === 'function' && define.amd) {
+    React = require('react');
+    ReactRouter = require('react-router');
+  }
+  else if (typeof module === 'object' && module.exports){
+    React = module.exports.React;
+    ReactRouter = module.exports.ReactRouter;
+  }
+  else {
+    React = window.React;
+    ReactRouter = window.ReactRouter;
+  }
 /*!
  * EventEmitter v4.2.9 - git.io/ee
  * Oliver Caldwell
