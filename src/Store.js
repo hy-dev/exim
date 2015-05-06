@@ -1,14 +1,17 @@
 import Class from './Class'
 import Action from './Action'
+import config from './Config'
 
-export default class Store extends Class {
+require("babelify/polyfill")
+
+export class Store extends Class {
   constructor(args) {
     var {actions} = args;
     var runners = {};
     if (Array.isArray(actions))
       var actionsToSave = actions.map((action, i, acts) => {
         var instance = new Action({action, store: this})
-        runners[action] = instance.run
+        runners[action] = instance.run.bind(instance)
         return instance
       });
 
@@ -37,5 +40,22 @@ export default class Store extends Class {
       if (~index)
         action.removeStore(this)
         this.actions = this.actions.splice(index, 1)
+  }
+
+  runCycle() {
+    console.log('Run cycle');
+  }
+}
+
+export class Getter extends Class {
+  constructor(store) {
+    let _store = Symbol('store');
+    this[_store] = store;
+    for (var key in store) {
+      let privateMethods = config.privateMethods.concat(store.privateMethods);
+      if (!privateMethods.includes(key)) {
+        this[key] = store[key];
+      }
+    }
   }
 }

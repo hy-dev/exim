@@ -2,12 +2,15 @@ import Class from './Class'
 
 export default class Action extends Class {
   constructor(args) {
-    var name = args.name;
-    var store = args.store;
-    this.name = name;
-    this.stores = [];
-    // if (store)
-      // this.setStore(store)
+    var [store, stores, allStores] = [args.store, args.stores, []]
+    this.name = args.name;
+
+    if (store)
+      allStores.push(store);
+    if (stores)
+      allStores.push.apply(allStores, stores);
+
+    this.stores = allStores;
   }
 
   run(...args) {

@@ -1,5 +1,5 @@
 import Action from './Action'
-import Store from './Store'
+import {Store, Getter}  from './Store'
 
 var Exim = {
   _stores: []
@@ -7,21 +7,13 @@ var Exim = {
 
 Exim.Action = Action;
 Exim.Store = Store;
+Exim.Getter = Getter;
 
-var createGetter = function (store) {
-  a = 1
-};
 
 Exim.createStore = function (args) {
-  var store = new Store(args)
-  var getter = {}
+  var store = new Store(args);
+  var getter = new Getter(store);
+  return getter;
 }
-
-
-Exim.createStore({
-  getInitial: function () {
-    return {}
-  },
-})
 
 window.Exim = Exim;
