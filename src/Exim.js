@@ -1,6 +1,7 @@
 var Exim = Reflux;
 
 Exim.cx = function (classNames) {
+  console.log('`Exim.cx` is deprecated and will be removed in next versions. Use `Exim.helpers.cx` instead');
   if (typeof classNames == 'object') {
     return Object.keys(classNames).filter(function(className) {
       return classNames[className];
@@ -9,6 +10,20 @@ Exim.cx = function (classNames) {
     return Array.prototype.join.call(arguments, ' ');
   }
 };
+
+var helpers = {};
+
+helpers.cx = function (classNames) {
+  if (typeof classNames == 'object') {
+    return Object.keys(classNames).filter(function(className) {
+      return classNames[className];
+    }).join(' ');
+  } else {
+    return Array.prototype.join.call(arguments, ' ');
+  }
+};
+
+Exim.helpers = helpers;
 
 if (typeof React !== 'undefined') {
   var domHelpers = {};
