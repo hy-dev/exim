@@ -526,22 +526,30 @@ if (typeof define === 'function' && define.amd) {
   utils.EventEmitter = require('EventEmitter')
 }
 else if (typeof module === 'object' && module.exports){
-    utils.EventEmitter = module.exports.EventEmitter;
+  utils.EventEmitter = module.exports.EventEmitter;
 }
 else {
-    utils.EventEmitter = window.EventEmitter;
+  utils.EventEmitter = window.EventEmitter;
 }
 
 utils.isFunction = function(value) {
-    return typeof value === 'function';
+  return typeof value === 'function';
 };
 
 utils.nextTick = function(callback) {
-    setTimeout(callback, 0);
+  setTimeout(callback, 0);
 };
 
 utils.capitalize = function(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+utils.inheritMixins = function (target, mixins) {
+  if (mixins) {
+    mixins.forEach(function (mixin) {
+      utils.extend(target.prototype, mixin);
+    })
+  }
 };
 
 utils.lookupCallback = function(store, name, prefix) {
@@ -559,11 +567,11 @@ utils.lookupCallback = function(store, name, prefix) {
 };
 
 utils.object = function(keys,vals){
-    var o={}, i=0;
-    for(;i<keys.length;i++){
-        o[keys[i]] = vals[i];
-    }
-    return o;
+  var o={}, i=0;
+  for(;i<keys.length;i++){
+      o[keys[i]] = vals[i];
+  }
+  return o;
 };
 
 utils.clone = function (orig) {
