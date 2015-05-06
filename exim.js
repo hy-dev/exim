@@ -13,11 +13,20 @@
   }
 })(this, function(root, Reflux) {
   "use strict";
-  var React = require('react');
-  var ReactRouter = require('react-router');
+  var React, ReactRouter;
+  var Reflux = {};
 
-  if (typeof React === 'undefined') {
-    throw("React required");
+  if (typeof define === 'function' && define.amd) {
+    React = require('react');
+    ReactRouter = require('react-router');
+  }
+  else if (typeof module === 'object' && module.exports){
+    React = module.exports.React;
+    ReactRouter = module.exports.ReactRouter;
+  }
+  else {
+    React = window.React;
+    ReactRouter = window.ReactRouter;
   }
 /*!
  * EventEmitter v4.2.9 - git.io/ee
@@ -517,22 +526,30 @@ if (typeof define === 'function' && define.amd) {
   utils.EventEmitter = require('EventEmitter')
 }
 else if (typeof module === 'object' && module.exports){
-    utils.EventEmitter = module.exports.EventEmitter;
+  utils.EventEmitter = module.exports.EventEmitter;
 }
 else {
-    utils.EventEmitter = window.EventEmitter;
+  utils.EventEmitter = window.EventEmitter;
 }
 
 utils.isFunction = function(value) {
-    return typeof value === 'function';
+  return typeof value === 'function';
 };
 
 utils.nextTick = function(callback) {
-    setTimeout(callback, 0);
+  setTimeout(callback, 0);
 };
 
 utils.capitalize = function(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+utils.inheritMixins = function (target, mixins) {
+  if (mixins) {
+    mixins.forEach(function (mixin) {
+      utils.extend(target.prototype, mixin);
+    })
+  }
 };
 
 utils.lookupCallback = function(store, name, prefix) {
@@ -550,11 +567,11 @@ utils.lookupCallback = function(store, name, prefix) {
 };
 
 utils.object = function(keys,vals){
-    var o={}, i=0;
-    for(;i<keys.length;i++){
-        o[keys[i]] = vals[i];
-    }
-    return o;
+  var o={}, i=0;
+  for(;i<keys.length;i++){
+      o[keys[i]] = vals[i];
+  }
+  return o;
 };
 
 utils.clone = function (orig) {
@@ -753,12 +770,8 @@ Reflux.ListenerMethods = {
      * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
      */
     listenTo: function(listenable, callback, defaultCallback) {
-        if (!Promise) {
-            Promise = {
-                is: function () {
-                    return false;
-                }
-            }
+        var isPromise = function (target) {
+            return typeof Promise !== 'undefined' && typeof target !== 'undefined' && target.constructor === Promise;
         }
 
         var desub, unsubscriber, catchError, cb, subscriptionobj,
@@ -784,7 +797,7 @@ Reflux.ListenerMethods = {
                     console.error(e);
                     return errorFn ? errorFn.call(this, e) : null;
                 }
-                isPrevPromise = Promise.is(prevResult);
+                isPrevPromise = isPromise(prevResult);
             }
 
             if (whileFn) {
@@ -794,7 +807,7 @@ Reflux.ListenerMethods = {
             var fn = utils.lookupCallback(this, callback);
             var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
             var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
-            var isPromise = Promise.is(fnResult);
+            var isCurrentPromise = isPromise(fnResult);
             var self = this;
 
             var nextCb = function (fn) {
@@ -807,7 +820,7 @@ Reflux.ListenerMethods = {
             };
 
             if (nextFn) {
-                if (isPromise) {
+                if (isCurrentPromise) {
                     fnResult.then(nextCb(nextFn), nextCb(errorFn));
                 } else {
                     nextCb(nextFn).call(this, fnResult);
@@ -1112,6 +1125,8 @@ Reflux.createStore = function(definition) {
         return utils.clone(result);
     };
 
+    utils.inheritMixins(Store, definition.mixins);
+
     utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
 
     var store = new Store();
@@ -1142,10 +1157,6 @@ Keep.reset = function() {
         createdActions.pop();
     }
 };
-// var Reflux = require('../src'),
-//     _ = require('./utils');
-
-
 Reflux.connect = function (listenable, key) {
   var key = arguments.length > 2 ? [].slice.call(arguments, 1) : key;
 
@@ -1204,10 +1215,6 @@ Reflux.connect = function (listenable, key) {
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
 };
-
-// Reflux.watch = function (listenable, keys) {
-
-// };
 // var _ = require('./utils'),
 //     ListenerMethods = require('./ListenerMethods');
 
@@ -1344,6 +1351,7 @@ Reflux.__keep = Keep;
 var Exim = Reflux;
 
 Exim.cx = function (classNames) {
+  console.log('`Exim.cx` is deprecated and will be removed in next versions. Use `Exim.helpers.cx` instead');
   if (typeof classNames == 'object') {
     return Object.keys(classNames).filter(function(className) {
       return classNames[className];
@@ -1353,45 +1361,69 @@ Exim.cx = function (classNames) {
   }
 };
 
-var domHelpers = {};
+var helpers = {};
 
-var tag = function (name) {
-  var args, attributes, name;
-  args = [].slice.call(arguments, 1);
-  var first = args[0] && args[0].constructor;
-  if (first === Object) {
-    attributes = args.shift();
+helpers.cx = function (classNames) {
+  if (typeof classNames == 'object') {
+    return Object.keys(classNames).filter(function(className) {
+      return classNames[className];
+    }).join(' ');
   } else {
-    attributes = {};
+    return Array.prototype.join.call(arguments, ' ');
   }
-  return React.DOM[name].apply(React.DOM, [attributes].concat(args))
 };
 
-var bindTag = function(tagName) {
-  return domHelpers[tagName] = tag.bind(this, tagName);
-};
+Exim.helpers = helpers;
 
-for (var tagName in React.DOM) {
-  bindTag(tagName);
-}
+if (typeof React !== 'undefined') {
+  var domHelpers = {};
 
-domHelpers['space'] = function() {
-  return React.DOM.span({
-    dangerouslySetInnerHTML: {
-      __html: '&nbsp;'
+  var tag = function (name) {
+    var args, attributes, name;
+    args = [].slice.call(arguments, 1);
+    var first = args[0] && args[0].constructor;
+    if (first === Object) {
+      attributes = args.shift();
+    } else {
+      attributes = {};
     }
-  });
-};
+    return React.DOM[name].apply(React.DOM, [attributes].concat(args))
+  };
 
-Exim.DOM = domHelpers;
+  var bindTag = function(tagName) {
+    return domHelpers[tagName] = tag.bind(this, tagName);
+  };
 
-Exim.addTag = function (name, tag) {
-  this.DOM[name] = tag;
+  for (var tagName in React.DOM) {
+    bindTag(tagName);
+  }
+
+  domHelpers['space'] = function() {
+    return React.DOM.span({
+      dangerouslySetInnerHTML: {
+        __html: '&nbsp;'
+      }
+    });
+  };
+
+  Exim.DOM = domHelpers;
+
+  Exim.addTag = function (name, tag) {
+    this.DOM[name] = tag;
+  }
 }
 
   var toS = Object.prototype.toString;
 
   if (typeof ReactRouter === "object") {
+    var routerElements, routerMixins, routerFunctions, routerObjects, copyItems;
+
+    routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'];
+    routerMixins = ['Navigation', 'State'];
+    routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'];
+    routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'];
+    copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+
     Exim.Router = {
       match: function(name, View) {
         var options = {};
@@ -1426,16 +1458,26 @@ Exim.addTag = function (name, tag) {
       }
     };
 
+    for (var i = 0; i < routerElements.length; i++) {
+      var elementName = routerElements[i];
+      Exim.Router[elementName] = React.createElement.bind(React.createElement, ReactRouter[elementName]);
+    }
 
-    ['Link', 'transitionTo', 'goBack', 'replaceWith', 'Route', 'RouteHandler', 'State', 'Link'].forEach(function(name) {
-      Exim.Router[name] = ReactRouter[name]
-    });
+    for (var i = 0; i < copyItems.length; i++) {
+      var itemName = copyItems[i];
+      Exim.Router[itemName] = ReactRouter[itemName];
+    }
   }
+
+  Exim.createView = function (classArgs) {
+    var ReactClass = React.createClass(classArgs);
+    var ReactElement = React.createElement.bind(React.createElement, ReactClass);
+    return ReactElement;
+  };
 
   Exim.createAction = Reflux.createAction;
   Exim.createActions = Reflux.createActions;
   Exim.createStore = Reflux.createStore;
-  Exim.createView = React.createClass;
 
   return Exim;
 });

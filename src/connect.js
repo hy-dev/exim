@@ -1,7 +1,3 @@
-// var Reflux = require('../src'),
-//     _ = require('./utils');
-
-
 Reflux.connect = function (listenable, key) {
   var key = arguments.length > 2 ? [].slice.call(arguments, 1) : key;
 
@@ -60,7 +56,3 @@ Reflux.connect = function (listenable, key) {
     componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
   };
 };
-
-// Reflux.watch = function (listenable, keys) {
-
-// };
