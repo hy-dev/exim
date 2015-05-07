@@ -1,6 +1,6 @@
 {
-  "name": "exim",
-  "version": "0.5.0",
+  "name": "Exim",
+  "version": "0.0.1",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
   "main": "exim.js",
   "scripts": {

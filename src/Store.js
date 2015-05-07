@@ -7,18 +7,9 @@ require("babelify/polyfill")
 export class Store extends Class {
   constructor(args) {
     var {actions} = args;
-    var runners = {};
+    var handlers = utils.getWithout('actions', args);
     if (Array.isArray(actions))
-      var actionsToSave = actions.map((action, i, acts) => {
-        var instance = new Action({action, store: this})
-        runners[action] = instance.run.bind(instance)
-        return instance
-      });
-
-      Object.keys(runners).forEach( (key) =>
-        actionsToSave[key] = runners[key]
-      )
-      this.actions = actionsToSave;
+      this.actions = new Actions(actions);
   }
 
   addAction(item) {
@@ -42,8 +33,24 @@ export class Store extends Class {
         this.actions = this.actions.splice(index, 1)
   }
 
-  runCycle() {
+  // getActionCycle(actionName) {
+  //   if (typeof this[name] === 'object') {
+  //     if (!prefix) prefix = 'on';
+  //     return store[name][prefix];
+  //   } else {
+  //     if (!prefix) {
+  //       var prefixedName = 'on' + utils.capitalize(name);
+  //       return store[name] || store[prefixedName];
+  //     } else {
+  //       return store[prefix + utils.capitalize(name)];
+  //     }
+  //   }
+  // }
+
+  runCycle(actionName, ...args) {
     console.log('Run cycle');
+    // cycle = this.getActionCycle(actionName)
+    // Promise.all(cycle)
   }
 }
 

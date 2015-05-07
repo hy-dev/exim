@@ -1,0 +1,35 @@
+{
+  "name": "Exim",
+  "version": "0.0.1",
+  "author":  "Artem Yavorsky <artem@yavorsky.org>",
+  "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
+  "main": "exim.js",
+  "devDependencies": {
+    "qunit": "~1"
+  },
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "exim",
+    "framework",
+    "library",
+    "architecture",
+    "flux",
+    "facebook",
+    "html5",
+    "react",
+    "reactive"
+  ],
+  "license": "MIT",
+  "homepage": "http://eximjs.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
