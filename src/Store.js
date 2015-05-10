@@ -1,6 +1,7 @@
 import Class from './Class'
-import Action from './Action'
+import {Action, Actions} from './Action'
 import config from './Config'
+import utils from './utils'
 
 require("babelify/polyfill")
 
@@ -10,6 +11,7 @@ export class Store extends Class {
     var handlers = utils.getWithout('actions', args);
     if (Array.isArray(actions))
       this.actions = new Actions(actions);
+      this.actions.addStore(this);
   }
 
   addAction(item) {

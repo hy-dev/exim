@@ -15,50 +15,62 @@ export class Action extends Class {
 
   run(...args) {
     var storesCycles = this.stores.map( store =>
-      return store.runCycle.apply(store, [this.name]concat(args));
+      store.runCycle.apply(store, [this.name].concat(args))
     )
     return Promise.all(storeCycles)
   }
 
-  setStore(store) {
+  addStore(store) {
     this.stores.push(store)
   }
 }
 
-
 export class Actions extends Class {
   constructor(actions) {
+    this.all = [];
     if (Array.isArray(actions))
       actions.forEach( action => {
         this.addAction(action);
       });
+    // return this.getter = {};
   }
 
   addAction(item, noOverride) {
+    console.log(this);
     var old;
-    action = this.detectAction(item);
+    var action = this.detectAction(item);
     if (noOverride)
       action = false
     else
       if (old = this[action.name])
         this.removeAction(old)
-      this[action.name] = action.run.bind(instance);
+      this.all.push(action);
+      this[action.name] = action.run.bind(action);
 
     return action;
   }
 
   removeAction(item) {
     action = this.detectAction(item, true);
+    index = this.all.indexOf(action)
+    if (~index)
+      this.all(splice(index,1))
     delete this[action.name];
   }
 
-  detectAction(action, isOld, store=this) {
+  addStore(store) {
+    this.all.forEach(action =>
+      action.addStore(store)
+    )
+  }
+
+  detectAction(action, isOld) {
     if (action.constructor === Action)
       return action;
     else if (typeof action === 'string')
       if (isOld)
         return this[action];
       else
-        return new Action({name: action, store});
+        return new Action({name: action});
   }
 }
