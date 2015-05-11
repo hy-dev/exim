@@ -17,7 +17,7 @@ export class Action extends Class {
     var storesCycles = this.stores.map( store =>
       store.runCycle.apply(store, [this.name].concat(args))
     )
-    return Promise.all(storeCycles)
+    return Promise.all(storesCycles)
   }
 
   addStore(store) {
@@ -36,7 +36,6 @@ export class Actions extends Class {
   }
 
   addAction(item, noOverride) {
-    console.log(this);
     var old;
     var action = this.detectAction(item);
     if (noOverride)

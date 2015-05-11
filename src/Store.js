@@ -8,7 +8,7 @@ require("babelify/polyfill")
 export class Store extends Class {
   constructor(args) {
     var {actions} = args;
-    var handlers = utils.getWithout('actions', args);
+    this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
     if (Array.isArray(actions))
       this.actions = new Actions(actions);
       this.actions.addStore(this);
@@ -35,24 +35,30 @@ export class Store extends Class {
         this.actions = this.actions.splice(index, 1)
   }
 
-  // getActionCycle(actionName) {
-  //   if (typeof this[name] === 'object') {
-  //     if (!prefix) prefix = 'on';
-  //     return store[name][prefix];
-  //   } else {
-  //     if (!prefix) {
-  //       var prefixedName = 'on' + utils.capitalize(name);
-  //       return store[name] || store[prefixedName];
-  //     } else {
-  //       return store[prefix + utils.capitalize(name)];
-  //     }
-  //   }
-  // }
+  getActionCycle(actionName, prefix='on') {
+    var actions;
+    var capitalized = utils.capitalize(actionName);
+    var fullActionName = `${prefix}${capitalized}`
+    console.log(fullActionName);
+    var handler = this.handlers[fullActionName] || this.handlers[actionName];
+    if (!handler)
+      throw new Error(`No handlers for ${actionName} action defined in current store`)
+    else if (Array.isArray(handler))
+      actions = handlers;
+    else if (typeof handler === 'object')
+      actions = utils.objectToArray(handler);
+    else if (typeof handler === 'function')
+      actions = [handler];
+    else
+      throw new Error(`${handler} is not array, object or function`);
+    return actions;
+  }
 
   runCycle(actionName, ...args) {
-    console.log('Run cycle');
-    // cycle = this.getActionCycle(actionName)
-    // Promise.all(cycle)
+    // new Promise(resolve => resolve(true))
+    var cycle = this.getActionCycle(actionName);
+    var chain = cycle.map(fn => fn.apply(this, args)); //TODO: Make promise chain, that args to next chain item and have common cycle value
+    return Promise.all(chain);
   }
 }
 
