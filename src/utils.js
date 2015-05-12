@@ -1,4 +1,4 @@
-var utils = {}
+const utils = {}
 
 utils.getWithoutFields = function (outcast, target) {
   if (!target) throw new Error('TypeError: target is not an object.');
@@ -16,8 +16,8 @@ utils.objectToArray = function (object) {
 }
 
 utils.capitalize = function (str) {
-  var first = str.charAt(0).toUpperCase();
-  var rest = str.slice(1);
+  const first = str.charAt(0).toUpperCase();
+  const rest = str.slice(1);
   return `${first}${rest}`;
 }
 

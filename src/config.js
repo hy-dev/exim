@@ -1,5 +1,5 @@
-const config = {};
-
-config.privateMethods = ['set', 'update', 'trigger', 'distribute', 'triggerAsync'];
+const config = {
+  privateMethods: ['set', 'update', 'trigger', 'distribute', 'triggerAsync']
+};
 
 export default config;
