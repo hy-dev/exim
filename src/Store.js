@@ -62,8 +62,11 @@ export class Store extends Class {
   runCycle(actionName, ...args) {
     // new Promise(resolve => resolve(true))
     const cycle = this.getActionCycle(actionName);
-    const chain = cycle.map(fn => fn.apply(this, args)); //TODO: Make promise chain, that args to next chain item and have common cycle value
-    return Promise.all(chain);
+    let promise = Promise.resolve();
+    for (let fn in cycle) {
+      promise.then(() => fn.apply(this, args));
+    }
+    return promise;
   }
 }
 
