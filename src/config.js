@@ -1,4 +1,4 @@
-var config = {};
+const config = {};
 
 config.privateMethods = ['set', 'update', 'trigger', 'distribute', 'triggerAsync'];
 

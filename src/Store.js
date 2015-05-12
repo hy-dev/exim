@@ -7,7 +7,7 @@ require("babelify/polyfill")
 
 export class Store extends Class {
   constructor(args) {
-    var {actions} = args;
+    const {actions} = args;
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
     if (Array.isArray(actions))
       this.actions = new Actions(actions);
@@ -36,11 +36,11 @@ export class Store extends Class {
   }
 
   getActionCycle(actionName, prefix='on') {
-    var actions;
-    var capitalized = utils.capitalize(actionName);
-    var fullActionName = `${prefix}${capitalized}`
+    const capitalized = utils.capitalize(actionName);
+    const fullActionName = `${prefix}${capitalized}`
     console.log(fullActionName);
-    var handler = this.handlers[fullActionName] || this.handlers[actionName];
+    const handler = this.handlers[fullActionName] || this.handlers[actionName];
+    var actions;
     if (!handler)
       throw new Error(`No handlers for ${actionName} action defined in current store`)
     else if (Array.isArray(handler))
@@ -56,17 +56,17 @@ export class Store extends Class {
 
   runCycle(actionName, ...args) {
     // new Promise(resolve => resolve(true))
-    var cycle = this.getActionCycle(actionName);
-    var chain = cycle.map(fn => fn.apply(this, args)); //TODO: Make promise chain, that args to next chain item and have common cycle value
+    const cycle = this.getActionCycle(actionName);
+    const chain = cycle.map(fn => fn.apply(this, args)); //TODO: Make promise chain, that args to next chain item and have common cycle value
     return Promise.all(chain);
   }
 }
 
 export class Getter extends Class {
   constructor(store) {
-    let _store = Symbol('store');
+    var _store = Symbol('store');
     this[_store] = store;
-    for (var key in store) {
+    for (let key in store) {
       let privateMethods = config.privateMethods.concat(store.privateMethods);
       if (!privateMethods.includes(key)) {
         this[key] = store[key];

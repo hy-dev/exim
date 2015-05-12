@@ -2,7 +2,7 @@ import Class from './Class'
 
 export class Action extends Class {
   constructor(args) {
-    var [store, stores, allStores] = [args.store, args.stores, []];
+    const [store, stores, allStores] = [args.store, args.stores, []];
     this.name = args.name;
 
     if (store)
@@ -14,7 +14,7 @@ export class Action extends Class {
   }
 
   run(...args) {
-    var storesCycles = this.stores.map( store =>
+    const storesCycles = this.stores.map( store =>
       store.runCycle.apply(store, [this.name].concat(args))
     )
     return Promise.all(storesCycles)

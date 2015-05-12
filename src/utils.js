@@ -4,8 +4,8 @@ utils.getWithoutFields = function (outcast, target) {
   if (!target) throw new Error('TypeError: target is not an object.');
   var result = {};
   if (typeof outcast === 'string') outcast = [outcast];
-  for (var fieldName in outcast)
-    for (var key in target)
+  for (let fieldName in outcast)
+    for (let key in target)
       if (target.hasOwnProperty(key) && key !== fieldName)
         result[key] = target[key];
   return result;

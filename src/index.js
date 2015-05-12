@@ -1,7 +1,7 @@
 import Action from './Action'
 import {Store, Getter}  from './Store'
 
-var Exim = {
+const Exim = {
   _stores: []
 }
 
