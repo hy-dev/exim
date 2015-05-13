@@ -9,7 +9,7 @@ export function createView (classArgs) {
 
 function getRouter () {
   let Router = {};
-  if (ReactRouter) {
+  if (typeof ReactRouter !== 'undefined') {
     let routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'],
     routerMixins = ['Navigation', 'State'],
     routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'],

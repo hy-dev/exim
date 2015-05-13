@@ -30,11 +30,12 @@ export default class Store {
       this.actions = new Actions(actions);
       this.actions.addStore(this);
     }
+    let _this = this;
 
     const setValue = function (key, value) {
       const correctArgs = ['key', 'value'].every(item => typeof item === 'string');
       const result = (correctArgs) ? store[key] = value : false;
-      if (result) this.emit();
+      if (result) _this.emit();
     }
 
     const getValue = function (key) {
@@ -62,15 +63,21 @@ export default class Store {
       } else if (typeof item === 'object') {
         let result = {};
         for (let key in item) {
-          if (typeof item[key] === 'function') {
+          let val = item[key];
+          let type = typeof val;
+          if (type === 'function') {
             result[key] = item[key](getValue(key));
-           } else if (typeof item[key] === 'sting') {
-            result[key] = getValue(key)[item[key]]
+           } else if (type === 'sting') {
+            result[key] = getValue(key)[val]
           }
         }
         return result;
       }
     }
+
+    this.set = set;
+    this.get = get;
+    this.stateProto = {set, get};
 
     return this.getter = new Getter(this);
   }
