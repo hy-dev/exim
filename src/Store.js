@@ -18,28 +18,27 @@ export class Store {
       this.actions.addStore(this);
     }
 
-    let setValue = function (key, value) {
-      let correctArgs = ['key', 'value'].every(item => typeof item === 'string');
-      return (correctArgs) ? store[key] = value : false;
+    const setValue = function (key, value) {
+      const correctArgs = ['key', 'value'].every(item => typeof item === 'string');
+      return correctArgs ? store[key] = value : false;
     }
 
-    let getValue = function (key) {
+    const getValue = function (key) {
       return key ? store[key]: store;
     }
 
-    this.set = function (item, value, options) {
+    const set = function (item, value, options) {
       if (utils.isObject(item)) {
         if (!value) value = options;
         for (let key in item) {
           setValue(key, item[key]);
         }
-      }
-      else {
+      } else {
         setValue(item, value);
       }
     }
 
-    this.get = function (item) {
+    const get = function (item) {
       if (typeof item === 'string' || typeof item === 'number') {
         return getValue(item);
       } else if (Array.isArray(item)) {
@@ -59,9 +58,7 @@ export class Store {
       }
     }
 
-    // this.reset = function () {
-    //   store = initial || {};
-    // }
+    this.stateProto = {get, set};
   }
 
   addAction(item) {
@@ -119,20 +116,36 @@ export class Store {
     // new Promise(resolve => resolve(true))
     const cycle = this.getActionCycle(actionName);
     let promise = Promise.resolve();
+    let will = cycle.will, while_ = cycle.while, on_ = cycle.on;
+    let did = cycle.did, didNot = cycle.didNot;
 
-    if (cycle.will) promise = promise.then(() => cycle.will.apply(cycle, args));
-    if (cycle.while) promise.then(() => cycle.while.apply(cycle, [true].concat(args)));
+    // Local state for this cycle.
+    let state = Object.create(this.stateProto);
+
+    // Pre-check & preparations.
+    if (will) promise = promise.then(() => will.apply(state, args));
+
+    // Start while()..
+    if (while_) promise.then(() => while_.apply(state, [true].concat(args)));
+
+    // Actual execution.
     promise = promise.then((willResult) => {
       if (willResult == null) {
-        return cycle.on.apply(cycle, args)
+        return on_.apply(state, args)
       } else {
-        return cycle.on(willResult);
+        return on_.call(state, willResult);
       }
     });
-    if (cycle.while) promise.then(() => cycle.while.apply(cycle, [false].concat(args)));
-    if (cycle.did) promise = promise.then(onResult => cycle.did(onResult));
-    if (cycle.didNot) promise.catch(error => cycle.didNot(error));
-    return promise;
+    // Stop while().
+    if (while_) promise.then(() => while_.apply(state, [false].concat(args)));
+
+    // Handle the result.
+    if (did) promise = promise.then(onResult => did.call(state, onResult));
+    if (didNot) promise.catch(error => didNot.call(state, error));
+    promise.then(() => {
+      Object.freeze(state);
+    });
+
   }
 }
 
