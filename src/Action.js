@@ -1,6 +1,6 @@
 import Class from './Class'
 
-export class Action extends Class {
+export class Action {
   constructor(args) {
     const [store, stores, allStores] = [args.store, args.stores, []];
     this.name = args.name;
@@ -23,7 +23,7 @@ export class Action extends Class {
   }
 }
 
-export class Actions extends Class {
+export class Actions {
   constructor(actions) {
     this.all = [];
     if (Array.isArray(actions)) {

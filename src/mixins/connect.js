@@ -38,7 +38,8 @@ export default function getConnectMixin (store, ...key) {
   return {
     getInitialState: function () {
       getState()
-    }
+    },
+
     componentDidMount: function () {
       store.onChange(changeCallback);
     },

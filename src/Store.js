@@ -1,12 +1,13 @@
-import Class from './Class'
+import Emitter from './Emitter'
 import {Action, Actions} from './Action'
+import connect from './mixins/connect'
 import config from './Config'
 import utils from './utils'
 
 // const __store = Symbol('store');
 // const __store = 'store'
 
-export class Store extends Class {
+export class Store {
   constructor(args) {
     if (!args) args = {};
     const {actions, initial} = args;
@@ -135,7 +136,7 @@ export class Store extends Class {
   }
 }
 
-export class Getter extends Class {
+export class Getter extends Emitter {
   constructor(store) {
     // this[__store] = store;
     for (let key in store) {
@@ -144,4 +145,5 @@ export class Getter extends Class {
       if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
     }
   }
+
 }
