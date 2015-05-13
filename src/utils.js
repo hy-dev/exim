@@ -22,7 +22,8 @@ utils.objectToArray = function (object) {
 // 5. did or didNot
 utils.mapActionNames = function(object) {
   const list = [];
-  ['will', 'whileStart', 'on', 'whileEnd' 'did', 'didNot'].forEach(item =>
+  const prefixes = ['will', 'whileStart', 'on', 'whileEnd', 'did', 'didNot']
+  prefixes.forEach(item => {
     let name = item;
     if (item === 'whileStart' || item === 'whileEnd') {
       name = 'while';
@@ -30,7 +31,7 @@ utils.mapActionNames = function(object) {
     if (object[name]) {
       list.push([item, object[name]]);
     }
-  );
+  });
   return list;
 };
 

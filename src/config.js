@@ -1,5 +1,6 @@
 const config = {
-  privateMethods: ['set', 'update', 'trigger', 'distribute', 'triggerAsync']
+  privateMethods: new Set('set', 'update', 'trigger', 'distribute', 'triggerAsync')
 };
+
 
 export default config;

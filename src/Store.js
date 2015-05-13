@@ -3,15 +3,57 @@ import {Action, Actions} from './Action'
 import config from './Config'
 import utils from './utils'
 
-const __store = Symbol('store');
+// const __store = Symbol('store');
+// const __store = 'store'
 
 export class Store extends Class {
   constructor(args) {
     const {actions} = args;
+    const store = {};
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
     if (Array.isArray(actions)) {
       this.actions = new Actions(actions);
       this.actions.addStore(this);
+    }
+
+    let setValue = function (key, value) {
+      let correctArgs = ['key', 'value'].every(item => typeof item === 'string');
+      return (correctArgs) ? store[key] = value : false;
+    }
+
+    let getValue = function (key) {
+      return key ? store[key]: store;
+    }
+
+    this.set = function (item, value) {
+      if (typeof item === 'object') {
+        for (let key in item) {
+          setValue(key, item[key]);
+        }
+      }
+      else {
+        setValue(item, value);
+      }
+    }
+
+    this.get = function (item) {
+      if (typeof item === 'string' || typeof item === 'number') {
+        return getValue(item);
+      } else if (Array.isArray(item)) {
+        return item.map(key => getValue(key))
+      } else if (!item) {
+        return getValue();
+      } else if (typeof item === 'object') {
+        let result = {};
+        for (let key in item) {
+          if (typeof item[key] === 'function') {
+            result[key] = item[key](getValue(key));
+          } else if (typeof item[key] === 'sting') {
+            result[key] = (getValue(key)[item[key]]
+          }
+        }
+        return result;
+      }
     }
   }
 
@@ -82,16 +124,18 @@ export class Store extends Class {
     });
     if (cycle.while) promise.then(() => cycle.while.apply(cycle, [false].concat(args)));
     if (cycle.did) promise = promise.then(onResult => cycle.did(onResult));
+    if (cycle.didNot) promise.catch(error => cycle.didNot(error));
     return promise;
   }
 }
 
 export class Getter extends Class {
   constructor(store) {
-    this.__store = store;
+    // this[__store] = store;
     for (let key in store) {
-      let priv = config.privateMethods.concat(store.privateMethods);
-      if (!priv.includes(key)) this[key] = store[key];
+      let commonPrivate = config.privateMethods;
+      let itemPrivate = store.privateMethods;
+      if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
     }
   }
 }
