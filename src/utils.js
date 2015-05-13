@@ -35,6 +35,10 @@ utils.mapActionNames = function(object) {
   return list;
 };
 
+utils.isObject = function (targ) {
+  return targ.toString().slice(8,14) === 'Object'
+}
+
 utils.capitalize = function (str) {
   const first = str.charAt(0).toUpperCase();
   const rest = str.slice(1);

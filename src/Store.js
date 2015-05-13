@@ -8,8 +8,9 @@ import utils from './utils'
 
 export class Store extends Class {
   constructor(args) {
-    const {actions} = args;
-    const store = {};
+    if (!args) args = {};
+    const {actions, initial} = args;
+    const store = initial || {};
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
     if (Array.isArray(actions)) {
       this.actions = new Actions(actions);
@@ -25,8 +26,9 @@ export class Store extends Class {
       return key ? store[key]: store;
     }
 
-    this.set = function (item, value) {
-      if (typeof item === 'object') {
+    this.set = function (item, value, options) {
+      if (utils.isObject(item)) {
+        if (!value) value = options;
         for (let key in item) {
           setValue(key, item[key]);
         }
@@ -48,13 +50,17 @@ export class Store extends Class {
         for (let key in item) {
           if (typeof item[key] === 'function') {
             result[key] = item[key](getValue(key));
-          } else if (typeof item[key] === 'sting') {
-            result[key] = (getValue(key)[item[key]]
+           } else if (typeof item[key] === 'sting') {
+            result[key] = getValue(key)[item[key]]
           }
         }
         return result;
       }
     }
+
+    // this.reset = function () {
+    //   store = initial || {};
+    // }
   }
 
   addAction(item) {
