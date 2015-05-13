@@ -47,25 +47,41 @@ export class Store extends Class {
       throw new Error(`No handlers for ${actionName} action defined in current store`)
     }
     let actions;
-    if (Array.isArray(handler)) {
-      actions = handlers;
-    } else if (typeof handler === 'object') {
-      actions = utils.objectToArray(handler);
+    // if (Array.isArray(handler)) {
+    //   actions = handlers;
+    // } else
+    if (typeof handler === 'object') {
+      // actions = utils.mapActionNames(handler);
+      actions = handler;
     } else if (typeof handler === 'function') {
-      actions = [handler];
+      actions = {on: handler}
     } else {
-      throw new Error(`${handler} must be an array, object or function`);
+      throw new Error(`${handler} must be an object or function`);
     }
     return actions;
   }
 
+  // 1. will(initial) => willResult
+  // 2. while(true)
+  // 3. on(willResult || initial) => onResult
+  // 4. while(false)
+  // 5. did(onResult)
   runCycle(actionName, ...args) {
     // new Promise(resolve => resolve(true))
     const cycle = this.getActionCycle(actionName);
     let promise = Promise.resolve();
-    for (let fn in cycle) {
-      promise.then(() => fn.apply(this, args));
-    }
+
+    if (cycle.will) promise = promise.then(() => cycle.will.apply(cycle, args));
+    if (cycle.while) promise.then(() => cycle.while.apply(cycle, [true].concat(args)));
+    promise = promise.then((willResult) => {
+      if (willResult == null) {
+        return cycle.on.apply(cycle, args)
+      } else {
+        return cycle.on(willResult);
+      }
+    });
+    if (cycle.while) promise.then(() => cycle.while.apply(cycle, [false].concat(args)));
+    if (cycle.did) promise = promise.then(onResult => cycle.did(onResult));
     return promise;
   }
 }

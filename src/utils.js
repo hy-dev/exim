@@ -15,6 +15,25 @@ utils.objectToArray = function (object) {
   return Object.keys(object).map(key => object[key])
 }
 
+// 1. will
+// 2. while(true)
+// 3. on
+// 4. while(false)
+// 5. did or didNot
+utils.mapActionNames = function(object) {
+  const list = [];
+  ['will', 'whileStart', 'on', 'whileEnd' 'did', 'didNot'].forEach(item =>
+    let name = item;
+    if (item === 'whileStart' || item === 'whileEnd') {
+      name = 'while';
+    }
+    if (object[name]) {
+      list.push([item, object[name]]);
+    }
+  );
+  return list;
+};
+
 utils.capitalize = function (str) {
   const first = str.charAt(0).toUpperCase();
   const rest = str.slice(1);
