@@ -5,6 +5,37 @@
   <script src="lib/exim.js"></script>
 </head>
 <body>
-
+  <script>
+    Exim.createStore({
+      actions: ['fetch'],
+      initial: {
+        items: []
+        fetching: false
+      },
+      fetch: {
+        while: function (state) {
+          this.set('fetching', state)
+        }
+        will: function () {
+          new Promise(function(res){
+            console.log('will')
+            setTimeout(res, 2000, true)
+          })
+        },
+        on: function () {
+          new Promise(function(res){
+            console.log('on')
+            res(true)
+          })
+        },
+        did: function () {
+          new Promise(function(res){
+            console.log('did')
+            res(true)
+          })
+        }
+      }
+    })
+  </script>
 </body>
 </html>
