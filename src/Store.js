@@ -1,18 +1,31 @@
-import Emitter from './Emitter'
-import {Action, Actions} from './Action'
+import {Actions} from './Actions'
 import connect from './mixins/connect'
-import config from './Config'
+import Getter from './Getter'
 import utils from './utils'
 
 // const __store = Symbol('store');
 // const __store = 'store'
 
-export class Store {
+export default class Store {
   constructor(args) {
     if (!args) args = {};
     const {actions, initial} = args;
     const store = initial || {};
+
+    let privateMethods;
+    if (!args.privateMethods) {
+      privateMethods = new Set()
+    } else if (Array.isArray(args.privateMethods)) {
+      privateMethods = new Set();
+      args.privateMethods.forEach(m => privateSet.add(m));
+      args.privateMethods = privateSet;
+    } else if (args.privateMethods.constructor === Set) {
+      privateMethods = args.privateMethods;
+    }
+    this.privateMethods = privateMethods;
+
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
+
     if (Array.isArray(actions)) {
       this.actions = new Actions(actions);
       this.actions.addStore(this);
@@ -20,7 +33,8 @@ export class Store {
 
     let setValue = function (key, value) {
       let correctArgs = ['key', 'value'].every(item => typeof item === 'string');
-      return (correctArgs) ? store[key] = value : false;
+      let result = (correctArgs) ? store[key] = value : false;
+      if (result) this.emit();
     }
 
     let getValue = function (key) {
@@ -62,6 +76,8 @@ export class Store {
     // this.reset = function () {
     //   store = initial || {};
     // }
+
+    return this.getter = new Getter(this);
   }
 
   addAction(item) {
@@ -134,16 +150,4 @@ export class Store {
     if (cycle.didNot) promise.catch(error => cycle.didNot(error));
     return promise;
   }
-}
-
-export class Getter extends Emitter {
-  constructor(store) {
-    // this[__store] = store;
-    for (let key in store) {
-      let commonPrivate = config.privateMethods;
-      let itemPrivate = store.privateMethods;
-      if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
-    }
-  }
-
 }
