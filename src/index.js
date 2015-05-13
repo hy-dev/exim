@@ -1,19 +1,10 @@
-import Action from './Action'
-import {Store, Getter}  from './Store'
+import {Action, Actions} from './Actions'
+import Store from './Store'
 
-const Exim = {
-  _stores: []
-}
-
-Exim.Action = Action;
-Exim.Store = Store;
-Exim.Getter = Getter;
-
+const Exim = {Action, Actions, Store}
 
 Exim.createStore = function (args) {
-  var store = new Store(args);
-  var getter = new Getter(store);
-  return getter;
+  return new Store(args);
 }
 
 window.Exim = Exim;

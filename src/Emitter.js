@@ -8,7 +8,8 @@ export default class {
   }
 
   addListener(listener) {
-    let found = this.findListenerIndex(listener) >= 0;
+    let found = this.findListenerIndex(listener);
+    console.log(found);
     if (!found) {
       this._listeners.push(listener);
     }
@@ -23,9 +24,7 @@ export default class {
     return this;
   }
 
-  emitChange() {
-    for (listener in this._listeners) {
-      listener()
-    }
+  emit() {
+    this._listeners.forEach(listener => listener())
   }
 }
