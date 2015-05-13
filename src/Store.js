@@ -108,7 +108,6 @@ export default class Store {
   getActionCycle(actionName, prefix='on') {
     const capitalized = utils.capitalize(actionName);
     const fullActionName = `${prefix}${capitalized}`
-    console.log(fullActionName);
     const handler = this.handlers[fullActionName] || this.handlers[actionName];
     if (!handler) {
       throw new Error(`No handlers for ${actionName} action defined in current store`)
@@ -144,25 +143,42 @@ export default class Store {
     let state = Object.create(this.stateProto);
 
     // Pre-check & preparations.
-    if (will) promise = promise.then(() => will.apply(state, args));
+    if (will) promise = promise.then(() => {
+      // console.log(actionName, 'will');
+      return will.apply(state, args)
+    });
 
     // Start while()..
-    if (while_) promise.then(() => while_.apply(state, [true].concat(args)));
+    if (while_) promise.then(() => {
+      // console.log(actionName, 'while', true);
+      return while_.apply(state, [true].concat(args));
+    });
 
     // Actual execution.
     promise = promise.then((willResult) => {
+      // console.log(actionName, 'on');
       if (willResult == null) {
         return on_.apply(state, args)
       } else {
         return on_.call(state, willResult);
       }
     });
+
     // Stop while().
-    if (while_) promise.then(() => while_.apply(state, [false].concat(args)));
+    if (while_) promise.then(() => {
+      // console.log(actionName, 'while', false);
+      return while_.apply(state, [false].concat(args));
+    });
 
     // Handle the result.
-    if (did) promise = promise.then(onResult => did.call(state, onResult));
-    if (didNot) promise.catch(error => didNot.call(state, error));
+    if (did) promise = promise.then(onResult => {
+      // console.log(actionName, 'did');
+      return did.call(state, onResult)
+    });
+    if (didNot) promise.catch(error => {
+      // console.log(actionName, 'didNot');
+      return didNot.call(state, error);
+    });
     promise.then(() => {
       Object.freeze(state);
     });

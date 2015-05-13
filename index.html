@@ -6,6 +6,18 @@
 </head>
 <body>
   <script>
+    var prev;
+    var log = function(name) {
+      var curr = Date.now(), diff;
+      if (prev) {
+        diff = curr - prev;
+        prev = curr;
+      } else {
+        diff = 0;
+        prev = curr;
+      }
+      console.log(name, '+', diff, 'ms');
+    };
     window.store = Exim.createStore({
       actions: ['fetch'],
       initial: {
@@ -13,26 +25,26 @@
         fetching: false
       },
       fetch: {
-        while: function (state) {
-          this.set('fetching', state)
+        while: function(state) {
+          console.log('!!!while');
+          this.set('fetching', state);
+          // Won't be executed. WTH?
+          console.log('while!!!');
         },
-        will: function () {
-          new Promise(function(res){
-            console.log('will')
-            setTimeout(res, 2000, true)
+        will: function() {
+          return new Promise(function(res){
+            setTimeout(res, 500, 'willResult');
           })
         },
-        on: function () {
-          new Promise(function(res){
-            console.log('on')
-            res(true)
+        on: function() {
+          return new Promise(function(res){
+            setTimeout(res, 500, 'onResult');
           })
         },
-        did: function () {
-          new Promise(function(res){
-            console.log('did')
-            res(true)
-          })
+        did: function(data) {
+          return new Promise(function(res) {
+            setTimeout(res, 500, 'didResult');
+          });
         }
       }
     })
