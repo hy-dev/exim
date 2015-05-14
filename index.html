@@ -26,22 +26,25 @@
       },
       fetch: {
         while: function(state) {
-          console.log('!!!while');
+          console.log(state, 'whileStart');
           this.set('fetching', state);
           // Won't be executed. WTH?
-          console.log('while!!!');
+          console.log(state, 'whileEnd');
         },
         will: function() {
+          // console.log('will')
           return new Promise(function(res){
             setTimeout(res, 500, 'willResult');
           })
         },
         on: function() {
+          this.set('test', 1)
           return new Promise(function(res){
             setTimeout(res, 500, 'onResult');
           })
         },
         did: function(data) {
+          // console.log('did')
           return new Promise(function(res) {
             setTimeout(res, 500, 'didResult');
           });
