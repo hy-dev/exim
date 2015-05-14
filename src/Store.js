@@ -7,8 +7,7 @@ import utils from './utils'
 // const __store = 'store'
 
 export default class Store {
-  constructor(args) {
-    if (!args) args = {};
+  constructor(args={}) {
     const {actions, initial} = args;
     const store = initial || {};
 
@@ -30,27 +29,30 @@ export default class Store {
       this.actions = new Actions(actions);
       this.actions.addStore(this);
     }
+
     let _this = this;
 
     const setValue = function (key, value) {
       const correctArgs = ['key', 'value'].every(item => typeof item === 'string');
-      const result = (correctArgs) ? store[key] = value : false;
-      if (result) _this.emit();
+      return (correctArgs) ? store[key] = value : false;
     }
 
     const getValue = function (key) {
       return key ? store[key]: store;
     }
 
-    const set = function (item, value, options) {
+    const set = function (item, value, options={}) {
+      let success, result;
       if (utils.isObject(item)) {
-        if (!value) value = options;
+        if (utils.isObject(value)) options = value;
         for (let key in item) {
-          setValue(key, item[key]);
+          result = setValue(key, item[key], options);
+          if (!!result) success = result;
         }
       } else {
-        setValue(item, value);
+        success = !!setValue(item, value, options);
       }
+      if (success && !options.silent) _this.getter.emit();
     }
 
     const get = function (item) {

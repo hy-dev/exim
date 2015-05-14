@@ -12,6 +12,8 @@ export default class Getter extends Emitter {
       if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
     }
 
+    [this.onChange, this.onChange] = [this.addListener, this.removeListener];
+
     this.connect = function (...args) {
       return getConnectMixin.apply(null, [this].concat(args));
     }
