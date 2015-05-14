@@ -15,6 +15,10 @@ utils.objectToArray = function (object) {
   return Object.keys(object).map(key => object[key])
 }
 
+utils.classWithArgs = function (Item, args) {
+  return Item.bind.apply(Item,[Item].concat(args));
+}
+
 // 1. will
 // 2. while(true)
 // 3. on
@@ -36,7 +40,7 @@ utils.mapActionNames = function(object) {
 };
 
 utils.isObject = function (targ) {
-  return targ.toString().slice(8,14) === 'Object'
+  return targ ? targ.toString().slice(8,14) === 'Object' : false
 }
 
 utils.capitalize = function (str) {

@@ -25,10 +25,9 @@ function getDOM () {
 
   if (typeof React !== 'undefined') {
     let tag = function (name, ...args) {
-      let attributes, name;
+      let attributes;
       let first = args[0] && args[0].constructor;
-      // if (first === Object) {
-      if (utils.isObject(first)) {
+      if (first === Object) {
         attributes = args.shift();
       } else {
         attributes = {};
@@ -51,10 +50,6 @@ function getDOM () {
         }
       });
     };
-
-    Exim.addTag = function (name, tag) {
-      DOMHelpers[name] = tag;
-    }
   }
   return DOMHelpers;
 }

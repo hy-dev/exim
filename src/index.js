@@ -5,6 +5,14 @@ import {createView, Router, DOM} from './DOMHelpers'
 
 const Exim = {Action, Actions, Store, Router, DOM, helpers}
 
+Exim.createAction = function (args) {
+  return new Action(args)
+}
+
+Exim.createActions = function (args) {
+  return new Actions(args)
+}
+
 Exim.createStore = function (args) {
   return new Store(args);
 }

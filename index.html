@@ -2,6 +2,7 @@
 <html>
 <head>
   <title></title>
+  <script src="https://fb.me/react-0.13.3.min.js"></script>
   <script src="lib/exim.js"></script>
 </head>
 <body>
@@ -51,6 +52,20 @@
         }
       }
     })
+
+    var Ell = Exim.createView({
+      render: function () {
+        return Exim.DOM.span('WORLD')
+      }
+    });
+
+    var El = Exim.createView({
+      render: function () {
+        return Exim.DOM.div({className: 'test-cls'}, 'HELLO', Ell(), Exim.DOM.i('!!!'), [1,2,3])
+      }
+    });
+
+    React.render(El(), document.body);
   </script>
 </body>
 </html>

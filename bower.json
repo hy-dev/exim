@@ -1,9 +1,12 @@
 {
   "name": "Exim",
-  "version": "0.0.1",
-  "author":  "Artem Yavorsky <artem@yavorsky.org>",
+  "version": "0.2.0",
+  "authors": [
+    "Artem Yavorsky <artem@yavorsky.org>",
+    "Paul Miller <paul@paulmillr.com>"
+  ],
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
-  "main": "exim.js",
+  "main": "lib/exim.js",
   "devDependencies": {
     "qunit": "~1"
   },
