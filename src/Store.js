@@ -3,9 +3,6 @@ import connect from './mixins/connect'
 import Getter from './Getter'
 import utils from './utils'
 
-// const __store = Symbol('store');
-// const __store = 'store'
-
 export default class Store {
   constructor(args={}) {
     const {actions, initial} = args;
@@ -42,17 +39,17 @@ export default class Store {
     }
 
     const set = function (item, value, options={}) {
-      let success, result;
       if (utils.isObject(item)) {
         if (utils.isObject(value)) options = value;
         for (let key in item) {
-          result = setValue(key, item[key], options);
-          if (!!result) success = result;
+          setValue(key, item[key], options);
         }
       } else {
-        success = !!setValue(item, value, options);
+        setValue(item, value, options);
       }
-      if (success && !options.silent) _this.getter.emit();
+      if (!options.silent) {
+        _this.getter.emit();
+      }
     }
 
     const get = function (item) {

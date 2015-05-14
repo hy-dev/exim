@@ -5,6 +5,7 @@ export default function getConnectMixin (store, ...key) {
     let state = {}
     array.forEach(k => {
       if (typeof k === 'string') {
+        // connect('itemName')
         state[k] = source.get(k)
       } else if (utils.isObject(k)) {
         Object.keys(k).forEach(name => {
@@ -24,27 +25,28 @@ export default function getConnectMixin (store, ...key) {
   let getState = function () {
     if (key.length) {
         // get values from array
-      state = getStateFromArray(store, key)
+      return getStateFromArray(store, key);
     } else {
       // get all values
-      state = store.get()
+      return store.get()
     }
-  }
-
-  let changeCallback = function () {
-    this.setState(getState())
   }
 
   return {
     getInitialState: function () {
-      getState()
+      return getState()
+    },
+
+    _changeCallback: function () {
+      this.setState(getState())
     },
 
     componentDidMount: function () {
-      store.onChange(changeCallback);
+      store.onChange(this._changeCallback);
     },
+
     componentWillUnmount: function () {
-      store.offChange(changeCallback);
+      store.offChange(this._changeCallback);
     }
   }
 }
