@@ -9,11 +9,11 @@ function getRouter () {
     routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'],
     copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
-    for (item in routerElements) {
+    for (let item in routerElements) {
       Router[item] = React.createElement.bind(React.createElement, ReactRouter[item]);
     }
 
-    for (item in copyItems) {
+    for (let item in copyItems) {
       Router[item] = ReactRouter[item]
     }
   }
