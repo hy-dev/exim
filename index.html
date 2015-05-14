@@ -2,8 +2,10 @@
 <html>
 <head>
   <title></title>
-  <script src="https://fb.me/react-0.13.3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/0.13.3/ReactRouter.js"></script>
   <script src="lib/exim.js"></script>
+  <script src="https://rawgit.com/github/fetch/master/fetch.js"></script>
 </head>
 <body>
   <script>
@@ -37,9 +39,9 @@
           })
         },
         on: function() {
-          return new Promise(function(res){
-            setTimeout(res, 500, 'onResult');
-          })
+          return fetch('/package.json').then(function(response) {
+            return response.json();
+          });
         },
         did: function(data) {
           // console.log('did')
