@@ -5,8 +5,8 @@ import utils from './utils'
 
 export default class Store {
   constructor(args={}) {
-    const {actions} = args;
-    let initial = typeof args.initial === 'function' ? args.initial() : args.initial;
+    let {actions, initial} = args;
+    initial = typeof initial === 'function' ? initial() : initial;
     const store = initial || {};
 
     let privateMethods;
@@ -24,7 +24,7 @@ export default class Store {
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
 
     if (Array.isArray(actions)) {
-      this.actions = new Actions(actions);
+      this.actions = actions = new Actions(actions);
       this.actions.addStore(this);
     }
 
@@ -77,7 +77,8 @@ export default class Store {
 
     this.set = set;
     this.get = get;
-    this.stateProto = {set, get};
+
+    this.stateProto = {set, get, actions};
 
     return this.getter = new Getter(this);
   }
@@ -175,10 +176,17 @@ export default class Store {
       // console.log(actionName, 'did');
       return did.call(state, onResult)
     });
-    if (didNot) promise.catch(error => {
+    if (didNot) {
+      promise.catch(error => {
       // console.log(actionName, 'didNot');
       return didNot.call(state, error);
-    });
+      });
+    } else {
+      promise.catch(error => {
+        // TODO: Handle error
+        throw error;
+      })
+    }
     promise.then(() => {
       Object.freeze(state);
     });
