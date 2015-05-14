@@ -1,14 +1,7 @@
-export const Router = getRouter();
-export const DOM = getDOM();
-
-export function createView (classArgs) {
-  let ReactClass = React.createClass(classArgs);
-  let ReactElement = React.createElement.bind(React.createElement, ReactClass);
-  return ReactElement;
-};
+import utils from './utils'
 
 function getRouter () {
-  let Router = {};
+  const Router = {};
   if (typeof ReactRouter !== 'undefined') {
     let routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'],
     routerMixins = ['Navigation', 'State'],
@@ -28,14 +21,14 @@ function getRouter () {
 }
 
 function getDOM () {
-  if (typeof React !== 'undefined') {
-    var domHelpers = {};
+  const DOMHelpers = {};
 
-    var tag = function (name) {
-      var args, attributes, name;
-      args = [].slice.call(arguments, 1);
-      var first = args[0] && args[0].constructor;
-      if (first === Object) {
+  if (typeof React !== 'undefined') {
+    let tag = function (name, ...args) {
+      let attributes, name;
+      let first = args[0] && args[0].constructor;
+      // if (first === Object) {
+      if (utils.isObject(first)) {
         attributes = args.shift();
       } else {
         attributes = {};
@@ -43,15 +36,15 @@ function getDOM () {
       return React.DOM[name].apply(React.DOM, [attributes].concat(args))
     };
 
-    var bindTag = function(tagName) {
-      return domHelpers[tagName] = tag.bind(this, tagName);
+    let bindTag = function(tagName) {
+      return DOMHelpers[tagName] = tag.bind(this, tagName);
     };
 
-    for (var tagName in React.DOM) {
+    for (let tagName in React.DOM) {
       bindTag(tagName);
     }
 
-    domHelpers['space'] = function() {
+    DOMHelpers['space'] = function() {
       return React.DOM.span({
         dangerouslySetInnerHTML: {
           __html: '&nbsp;'
@@ -59,10 +52,18 @@ function getDOM () {
       });
     };
 
-    domHelpers;
-
-    // Exim.addTag = function (name, tag) {
-    //   DOM[name] = tag;
-    // }
+    Exim.addTag = function (name, tag) {
+      DOMHelpers[name] = tag;
+    }
   }
+  return DOMHelpers;
 }
+
+export const Router = getRouter();
+export const DOM = getDOM();
+
+export function createView (classArgs) {
+  let ReactClass = React.createClass(classArgs);
+  let ReactElement = React.createElement.bind(React.createElement, ReactClass);
+  return ReactElement;
+};

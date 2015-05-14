@@ -4,20 +4,19 @@ export default class {
   }
 
   findListenerIndex(listener) {
-    return this._listeners.indexOf(listener) >= 0
+    return this._listeners.indexOf(listener)
   }
 
-  addListener(listener) {
-    let found = this.findListenerIndex(listener);
-    console.log(found);
+  _addListener(listener) {
+    let found = this.findListenerIndex(listener) >= 0;
     if (!found) {
       this._listeners.push(listener);
     }
     return this;
   }
 
-  removeListener() {
-    let index, found = (index = this.findListener(listener)) >= 0;
+  _removeListener(listener) {
+    let index, found = (index = this.findListenerIndex(listener)) >= 0;
     if (found) {
       this._listeners.splice(index, 1);
     }

@@ -44,7 +44,7 @@ export default function getConnectMixin (store, ...key) {
       store.onChange(changeCallback);
     },
     componentWillUnmount: function () {
-      store.notChange(changeCallback);
+      store.offChange(changeCallback);
     }
   }
 }
