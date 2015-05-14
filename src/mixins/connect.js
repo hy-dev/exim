@@ -32,21 +32,21 @@ export default function getConnectMixin (store, ...key) {
     }
   }
 
+  let changeCallback = function () {
+    this.setState(getState());
+  }
+
   return {
     getInitialState: function () {
       return getState()
     },
 
-    _changeCallback: function () {
-      this.setState(getState())
-    },
-
     componentDidMount: function () {
-      store.onChange(this._changeCallback);
+      store.onChange(changeCallback, this);
     },
 
     componentWillUnmount: function () {
-      store.offChange(this._changeCallback);
+      store.offChange(changeCallback);
     }
   }
 }

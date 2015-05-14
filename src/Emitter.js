@@ -7,9 +7,10 @@ export default class {
     return this._listeners.indexOf(listener)
   }
 
-  _addListener(listener) {
+  _addListener(listener, context) {
     let found = this.findListenerIndex(listener) >= 0;
     if (!found) {
+      if (context) listener._ctx = context;
       this._listeners.push(listener);
     }
     return this;
@@ -24,6 +25,6 @@ export default class {
   }
 
   emit() {
-    this._listeners.forEach(listener => listener())
+    this._listeners.forEach(listener => listener._ctx ? listener.call(listener._ctx) : listener());
   }
 }
