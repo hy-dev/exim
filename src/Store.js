@@ -5,7 +5,8 @@ import utils from './utils'
 
 export default class Store {
   constructor(args={}) {
-    const {actions, initial} = args;
+    const {actions} = args;
+    let initial = typeof args.initial === 'function' ? args.initial() : args.initial;
     const store = initial || {};
 
     let privateMethods;
@@ -35,7 +36,7 @@ export default class Store {
     }
 
     const getValue = function (key) {
-      return key ? store[key]: store;
+      return key ? store[key] : store;
     }
 
     const set = function (item, value, options={}) {
