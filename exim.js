@@ -32,7 +32,11 @@ Exim.createStore = function (args) {
   return new Store(args);
 };
 
-window.Exim = Exim;
+if (typeof window === "undefined") {
+  module.exports = Exim;
+} else {
+  window.Exim = Exim;
+}
 
 },{"./Actions":2,"./DOMHelpers":4,"./Store":7,"./helpers":9}],2:[function(require,module,exports){
 "use strict";
@@ -193,15 +197,13 @@ function getRouter() {
         routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"],
         copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
-    for (var i in routerElements) {
-      var itemName = routerElements[i];
-      Router[itemName] = React.createElement.bind(React.createElement, ReactRouter[itemName]);
-    }
+    routerElements.forEach(function (name) {
+      Router[name] = React.createElement.bind(React, ReactRouter[name]);
+    });
 
-    for (var i in copyItems) {
-      var itemName = copyItems[i];
+    copyItems.forEach(function (name) {
       Router[itemName] = ReactRouter[itemName];
-    }
+    });
   }
   return Router;
 }
@@ -615,7 +617,7 @@ module.exports = Store;
 "use strict";
 
 var config = {
-  privateMethods: new Set("set", "update", "trigger", "distribute", "triggerAsync")
+  privateMethods: new Set(["set", "update", "trigger", "distribute", "triggerAsync"])
 };
 
 module.exports = config;
@@ -708,11 +710,15 @@ utils.getWithoutFields = function (outcast, target) {
   if (!target) throw new Error("TypeError: target is not an object.");
   var result = {};
   if (typeof outcast === "string") outcast = [outcast];
-  for (var fieldName in outcast) {
-    for (var key in target) {
-      if (target.hasOwnProperty(key) && key !== fieldName) result[key] = target[key];
-    }
-  }return result;
+  var tKeys = Object.keys(target);
+  outcast.forEach(function (fieldName) {
+    tKeys.filter(function (key) {
+      return key !== fieldName;
+    }).forEach(function (key) {
+      result[key] = target[key];
+    });
+  });
+  return result;
 };
 
 utils.objectToArray = function (object) {

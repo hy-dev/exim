@@ -1,8 +1,3 @@
-OUTPUT ?= exim.js
-
-exim:
-	cat src/{header,eventEmitter,utils,joins,ListenerMethods,PublisherMethods,createAction,createStore,Keep,connect,ListenerMixin,listenTo,listenToMany,index,Exim,footer}.js > $(OUTPUT)
-
 min:
 	@uglifyjs -m < exim.js > exim.min.js
 	@echo 'Default:    ' `cat exim.js | wc -l` LOC, `cat exim.js | wc -c` bytes

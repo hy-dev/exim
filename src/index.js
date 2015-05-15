@@ -17,4 +17,8 @@ Exim.createStore = function (args) {
   return new Store(args);
 }
 
-window.Exim = Exim;
+if (typeof window === 'undefined') {
+  module.exports = Exim;
+} else {
+  window.Exim = Exim;
+}

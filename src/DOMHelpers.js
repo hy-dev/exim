@@ -7,17 +7,15 @@ function getRouter () {
     routerMixins = ['Navigation', 'State'],
     routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'],
     routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'],
-    copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+    copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
-    for (let i in routerElements) {
-      let itemName = routerElements[i];
-      Router[itemName] = React.createElement.bind(React.createElement, ReactRouter[itemName]);
-    }
+    routerElements.forEach(function(name) {
+      Router[name] = React.createElement.bind(React, ReactRouter[name]);
+    });
 
-    for (let i in copyItems) {
-      let itemName = copyItems[i];
+    copiedItems.forEach(function(name) {
       Router[itemName] = ReactRouter[itemName];
-    }
+    });
   }
   return Router;
 }
