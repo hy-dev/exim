@@ -595,6 +595,7 @@ var Store = (function () {
         });
 
         promise["catch"](function (error) {
+          if (while_) while_.call(state, false);
           if (didNot) {
             didNot.call(state, error);
           } else {

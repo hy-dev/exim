@@ -181,6 +181,7 @@ export default class Store {
     });
 
     promise.catch(error => {
+      if (while_) while_.call(state, false);
       if (didNot) {
         didNot.call(state, error)
       } else {
