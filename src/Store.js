@@ -145,19 +145,16 @@ export default class Store {
 
     // Pre-check & preparations.
     if (will) promise = promise.then(() => {
-      // console.log(actionName, 'will');
       return will.apply(state, args)
     });
 
-    // Start while()..
-    if (while_) promise.then(() => {
-      // console.log(actionName, 'while', true);
+    // Start while().
+    if (while_) promise = promise.then(() => {
       return while_.apply(state, [true].concat(args));
     });
 
     // Actual execution.
     promise = promise.then((willResult) => {
-      // console.log(actionName, 'on');
       if (willResult == null) {
         return on_.apply(state, args)
       } else {
@@ -166,30 +163,27 @@ export default class Store {
     });
 
     // Stop while().
-    if (while_) promise.then(() => {
-      // console.log(actionName, 'while', false);
+    if (while_) promise = promise.then(() => {
       return while_.apply(state, [false].concat(args));
+    });
+
+    // For did and didNot state is freezed.
+    promise = promise.then((result) => {
+      Object.freeze(state);
+      return result;
     });
 
     // Handle the result.
     if (did) promise = promise.then(onResult => {
-      // console.log(actionName, 'did');
       return did.call(state, onResult)
     });
-    if (didNot) {
-      promise.catch(error => {
-      // console.log(actionName, 'didNot');
-      return didNot.call(state, error);
-      });
-    } else {
-      promise.catch(error => {
-        // TODO: Handle error
-        throw error;
-      })
-    }
-    promise.then(() => {
-      Object.freeze(state);
-    });
 
+    promise.catch(error => {
+      if (didNot) {
+        didNot.call(state, error)
+      } else {
+        throw error
+      }
+    });
   }
 }
