@@ -27,7 +27,8 @@
         items: [],
         fetching: false,
         error: null,
-        data: null
+        data: null,
+        word: 'Hello'
       },
       fetch: {
         while: function(state) {
@@ -36,7 +37,7 @@
         },
         will: function() {
           // console.log('will')
-          this.set('error', null);
+          this.reset('error');
         },
         on: function() {
           // console.log('on')
@@ -62,14 +63,14 @@
     });
 
     var El = Exim.createView({
-      mixins: [store.connect('fetching', 'error', 'data')],
+      mixins: [store.connect('fetching', 'error', 'data', 'word')],
       fetch: function () {
         store.actions.fetch()
       },
       render: function () {
-        var data = this.state.data
+        var data = this.state.data;
         return Exim.DOM.div({className: 'test-cls'},
-          'HELLO',
+          this.state.word,
           Ell(),
           Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH'),
           Exim.DOM.div(this.state.error || data || '')
