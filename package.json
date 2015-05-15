@@ -1,10 +1,9 @@
 {
-  "name": "Exim",
+  "name": "exim",
   "version": "0.6.0",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
   "main": "exim.js",
   "scripts": {
-    "prepublish": "browserify src/ -o exim.js",
     "watch": "watchify src/ -o exim.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
