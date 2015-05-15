@@ -149,8 +149,9 @@ export default class Store {
     });
 
     // Start while().
-    if (while_) promise = promise.then(() => {
-      return while_.apply(state, [true].concat(args));
+    if (while_) promise = promise.then((willResult) => {
+      while_.call(state, true);
+      return willResult;
     });
 
     // Actual execution.
@@ -163,14 +164,15 @@ export default class Store {
     });
 
     // Stop while().
-    if (while_) promise = promise.then(() => {
-      return while_.apply(state, [false].concat(args));
+    if (while_) promise = promise.then((onResult) => {
+      while_.call(state, false);
+      return onResult;
     });
 
     // For did and didNot state is freezed.
-    promise = promise.then((result) => {
+    promise = promise.then((onResult) => {
       Object.freeze(state);
-      return result;
+      return onResult;
     });
 
     // Handle the result.

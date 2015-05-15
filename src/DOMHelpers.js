@@ -14,7 +14,7 @@ function getRouter () {
     });
 
     copiedItems.forEach(function(name) {
-      Router[itemName] = ReactRouter[itemName];
+      Router[name] = ReactRouter[name];
     });
   }
   return Router;

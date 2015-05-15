@@ -195,14 +195,14 @@ function getRouter() {
         routerMixins = ["Navigation", "State"],
         routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"],
         routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"],
-        copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+        copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
     routerElements.forEach(function (name) {
       Router[name] = React.createElement.bind(React, ReactRouter[name]);
     });
 
-    copyItems.forEach(function (name) {
-      Router[itemName] = ReactRouter[itemName];
+    copiedItems.forEach(function (name) {
+      Router[name] = ReactRouter[name];
     });
   }
   return Router;
@@ -559,19 +559,17 @@ var Store = (function () {
 
         // Pre-check & preparations.
         if (will) promise = promise.then(function () {
-          // console.log(actionName, 'will');
           return will.apply(state, args);
         });
 
-        // Start while()..
-        if (while_) promise.then(function () {
-          // console.log(actionName, 'while', true);
-          return while_.apply(state, [true].concat(args));
+        // Start while().
+        if (while_) promise = promise.then(function (willResult) {
+          while_.call(state, true);
+          return willResult;
         });
 
         // Actual execution.
         promise = promise.then(function (willResult) {
-          // console.log(actionName, 'on');
           if (willResult == null) {
             return on_.apply(state, args);
           } else {
@@ -580,29 +578,28 @@ var Store = (function () {
         });
 
         // Stop while().
-        if (while_) promise.then(function () {
-          // console.log(actionName, 'while', false);
-          return while_.apply(state, [false].concat(args));
+        if (while_) promise = promise.then(function (onResult) {
+          while_.call(state, false);
+          return onResult;
+        });
+
+        // For did and didNot state is freezed.
+        promise = promise.then(function (onResult) {
+          Object.freeze(state);
+          return onResult;
         });
 
         // Handle the result.
         if (did) promise = promise.then(function (onResult) {
-          // console.log(actionName, 'did');
           return did.call(state, onResult);
         });
-        if (didNot) {
-          promise["catch"](function (error) {
-            // console.log(actionName, 'didNot');
-            return didNot.call(state, error);
-          });
-        } else {
-          promise["catch"](function (error) {
-            // TODO: Handle error
+
+        promise["catch"](function (error) {
+          if (didNot) {
+            didNot.call(state, error);
+          } else {
             throw error;
-          });
-        }
-        promise.then(function () {
-          Object.freeze(state);
+          }
         });
       }
     }
