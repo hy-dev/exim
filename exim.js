@@ -337,16 +337,18 @@ var getConnectMixin = _interopRequire(require("./mixins/connect"));
 
 var Getter = (function (_Emitter) {
   function Getter(store) {
+    var _this = this;
+
     _classCallCheck(this, Getter);
 
     _get(Object.getPrototypeOf(Getter.prototype), "constructor", this).call(this);
-    // this[__store] = store;
-    for (var key in store) {
-      var commonPrivate = config.privateMethods;
-      var itemPrivate = store.privateMethods;
-      if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
-    }
 
+    // Copy allowed props to getter.
+    config.allowedGetterProps.forEach(function (prop) {
+      return _this[prop] = store[prop];
+    });
+
+    // Consistent names for emitter methods.
     var _ref = [this._addListener, this._removeListener];
 
     var _ref2 = _slicedToArray(_ref, 2);
@@ -354,6 +356,7 @@ var Getter = (function (_Emitter) {
     this.onChange = _ref2[0];
     this.offChange = _ref2[1];
 
+    // Connect mixin binded to getter.
     this.connect = function () {
       for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
@@ -396,8 +399,8 @@ var Store = (function () {
     var actions = args.actions;
     var initial = args.initial;
 
-    initial = typeof initial === "function" ? initial() : initial;
-    var store = initial || {};
+    this.initial = initial = typeof initial === "function" ? initial() : initial;
+    var store = Object.create(initial) || {};
 
     var privateMethods = undefined;
     if (!args.privateMethods) {
@@ -430,7 +433,19 @@ var Store = (function () {
     };
 
     var getValue = function getValue(key) {
-      return key ? store[key] : store;
+      return key ? store[key] : Object.create(store);
+    };
+
+    var removeValue = function removeValue(key) {
+      var success = false;
+      if (!key) {
+        for (var _key in store) {
+          success = store[_key] && delete store[_key];
+        }
+      } else {
+        success = store[key] && delete store[key];
+      }
+      return success;
     };
 
     var set = function set(item, value) {
@@ -473,10 +488,24 @@ var Store = (function () {
       }
     };
 
+    var reset = function reset(item) {
+      var options = arguments[1] === undefined ? {} : arguments[1];
+
+      if (item) {
+        setValue(item, initial[item]);
+      } else {
+        removeValue(item);
+      }
+      if (!options.silent) {
+        _this.getter.emit();
+      }
+    };
+
     this.set = set;
     this.get = get;
+    this.reset = reset;
 
-    this.stateProto = { set: set, get: get, actions: actions };
+    this.stateProto = { set: set, get: get, reset: reset, actions: actions };
 
     return this.getter = new Getter(this);
   }
@@ -614,11 +643,9 @@ module.exports = Store;
 },{"./Actions":2,"./Getter":6,"./mixins/connect":10,"./utils":11}],8:[function(require,module,exports){
 "use strict";
 
-var config = {
-  privateMethods: new Set(["set", "update", "trigger", "distribute", "triggerAsync"])
+module.exports = {
+  allowedGetterProps: ["get", "initial", "actions"]
 };
-
-module.exports = config;
 
 },{}],9:[function(require,module,exports){
 "use strict";

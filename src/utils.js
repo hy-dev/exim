@@ -19,11 +19,11 @@ utils.getWithoutFields = function (outcast, target) {
 
 utils.objectToArray = function (object) {
   return Object.keys(object).map(key => object[key])
-}
+};
 
 utils.classWithArgs = function (Item, args) {
   return Item.bind.apply(Item,[Item].concat(args));
-}
+};
 
 // 1. will
 // 2. while(true)

@@ -5,15 +5,14 @@ import getConnectMixin from './mixins/connect'
 export default class Getter extends Emitter {
   constructor(store) {
     super();
-    // this[__store] = store;
-    for (let key in store) {
-      let commonPrivate = config.privateMethods;
-      let itemPrivate = store.privateMethods;
-      if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
-    }
 
+    // Copy allowed props to getter.
+    config.allowedGetterProps.forEach(prop => this[prop] = store[prop]);
+
+    // Consistent names for emitter methods.
     [this.onChange, this.offChange] = [this._addListener, this._removeListener];
 
+    // Connect mixin binded to getter.
     this.connect = function (...args) {
       return getConnectMixin.apply(null, [this].concat(args));
     }

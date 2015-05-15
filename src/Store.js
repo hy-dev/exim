@@ -6,8 +6,8 @@ import utils from './utils'
 export default class Store {
   constructor(args={}) {
     let {actions, initial} = args;
-    initial = typeof initial === 'function' ? initial() : initial;
-    const store = initial || {};
+    this.initial = initial = typeof initial === 'function' ? initial() : initial;
+    const store = Object.create(initial) || {};
 
     let privateMethods;
     if (!args.privateMethods) {
@@ -36,7 +36,19 @@ export default class Store {
     }
 
     const getValue = function (key) {
-      return key ? store[key] : store;
+      return key ? store[key] : Object.create(store);
+    }
+
+    const removeValue = function (key) {
+      let success = false;
+      if (!key) {
+        for (let key in store) {
+          success = store[key] && delete store[key];
+        }
+      } else {
+       success = store[key] && delete store[key];
+      }
+      return success;
     }
 
     const set = function (item, value, options={}) {
@@ -75,10 +87,22 @@ export default class Store {
       }
     }
 
+    const reset = function (item, options={}) {
+      if (item) {
+        setValue(item, initial[item]);
+      } else {
+        removeValue(item);
+      }
+      if (!options.silent) {
+        _this.getter.emit();
+      }
+    }
+
     this.set = set;
     this.get = get;
+    this.reset = reset;
 
-    this.stateProto = {set, get, actions};
+    this.stateProto = {set, get, reset, actions};
 
     return this.getter = new Getter(this);
   }
