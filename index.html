@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/0.13.3/ReactRouter.js"></script>
+  <script src="exim.js"></script>
+  <script src="https://rawgit.com/github/fetch/master/fetch.js"></script>
+</head>
+<body>
+  <script>
+    var prev;
+    var log = function(name) {
+      var curr = Date.now(), diff;
+      if (prev) {
+        diff = curr - prev;
+        prev = curr;
+      } else {
+        diff = 0;
+        prev = curr;
+      }
+      console.log(name, '+', diff, 'ms');
+    };
+    window.store = Exim.createStore({
+      actions: ['fetch'],
+      initial: {
+        items: [],
+        fetching: false
+      },
+      fetch: {
+        while: function(state) {
+          console.log(state, 'while');
+          this.set('fetching', state);
+        },
+        will: function() {
+          // console.log('will')
+          return new Promise(function(res){
+            setTimeout(res, 500, 'willResult');
+          })
+        },
+        on: function() {
+          return fetch('/package.json').then(function(response) {
+            return response.json();
+          });
+        },
+        did: function(data) {
+          // console.log('did')
+          return new Promise(function(res) {
+            setTimeout(res, 500, 'didResult');
+          });
+        }
+      }
+    })
+
+    var Ell = Exim.createView({
+      render: function () {
+        return Exim.DOM.span('WORLD')
+      }
+    });
+
+    var El = Exim.createView({
+      mixins: [store.connect('fetching')],
+      fetch: function () {
+        store.actions.fetch()
+      },
+      render: function () {
+        console.log(this.state);
+        return Exim.DOM.div({className: 'test-cls'},
+          'HELLO',
+          Ell(),
+          Exim.DOM.i('!!!'),
+          [1,2,3],
+          Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH')
+        )
+      }
+    });
+
+    React.render(El(), document.body);
+  </script>
+</body>
+</html>

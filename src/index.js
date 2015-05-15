@@ -1,49 +1,20 @@
+import {Action, Actions} from './Actions'
+import Store from './Store'
+import helpers from './helpers'
+import {createView, Router, DOM} from './DOMHelpers'
 
+const Exim = {Action, Actions, Store, Router, DOM, helpers, createView}
 
-/**
- * Convenience function for creating a set of actions
- *
- * @param actionNames the names for the actions to be created
- * @returns an object with actions of corresponding action names
- */
+Exim.createAction = function (args) {
+  return new Action(args);
+}
 
-var maker = staticJoinCreator;
+Exim.createActions = function (args) {
+  return new Actions(args);
+}
 
-Reflux.joinTrailing = Reflux.all = maker('last');
+Exim.createStore = function (args) {
+  return new Store(args);
+}
 
-Reflux.joinLeading = maker('first');
-
-Reflux.joinStrict = maker('strict');
-
-Reflux.joinConcat = maker('all');
-
-
-
-Reflux.createActions = function(actionNames) {
-    var i = 0, actions = {};
-    for (; i < actionNames.length; i++) {
-        actions[actionNames[i]] = Reflux.createAction();
-    }
-    return actions;
-};
-
-/**
- * Sets the eventmitter that Reflux uses
- */
-Reflux.setEventEmitter = function(ctx) {
-    var _ = utils;
-    _.EventEmitter = ctx;
-};
-
-/**
- * Sets the method used for deferring actions and stores
- */
-Reflux.nextTick = function(nextTick) {
-    var _ = utils;
-    _.nextTick = nextTick;
-};
-
-/**
- * Provides the set of created actions and stores for introspection
- */
-Reflux.__keep = Keep;
+window.Exim = Exim;

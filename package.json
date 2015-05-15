@@ -1,12 +1,17 @@
 {
-  "name": "exim",
-  "version": "0.5.0",
+  "name": "Exim",
+  "version": "0.2.0",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
-  "main": "index.js",
+  "main": "exim.js",
   "scripts": {
+    "prepublish": "browserify src/ -o exim.js",
+    "watch": "watchify src/ -o exim.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "browserify": "^8.1.0",
+    "watchify": "^3.2.0",
+    "babelify": "^5.0.3",
     "phantomjs": "~1.9.2"
   },
   "repository": {
@@ -25,15 +30,10 @@
     "react",
     "reactive"
   ],
-  "author": "Paul Miller",
+  "author": "Paul Miller <paul@paulmillr.com>, Artem Yavorsky <info@yavorsky.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/hellyeahllc/exim/issues"
   },
-  "format":"cjs",
-  "homepage": "https://github.com/hellyeahllc/exim",
-  "dependencies": {
-    "react": "~0.12.2",
-    "react-router": "~0.12.0"
-  }
+  "homepage": "https://github.com/hellyeahllc/exim"
 }

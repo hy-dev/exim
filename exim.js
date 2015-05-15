@@ -1,1483 +1,760 @@
-(function(root, factory) {
-  "use strict";
-  // Set up Reflux appropriately for the environment.
-  if (typeof define === 'function' && define.amd) {
-    define(['exports'], function(exports) {
-      return factory(root, exports);
-    });
-  } else if (typeof exports !== 'undefined') {
-    var f = factory(root, exports);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
 
-  } else {
-    root.Exim = factory(root, {});
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _Actions = require("./Actions");
+
+var Action = _Actions.Action;
+var Actions = _Actions.Actions;
+
+var Store = _interopRequire(require("./Store"));
+
+var helpers = _interopRequire(require("./helpers"));
+
+var _DOMHelpers = require("./DOMHelpers");
+
+var createView = _DOMHelpers.createView;
+var Router = _DOMHelpers.Router;
+var DOM = _DOMHelpers.DOM;
+
+var Exim = { Action: Action, Actions: Actions, Store: Store, Router: Router, DOM: DOM, helpers: helpers, createView: createView };
+
+Exim.createAction = function (args) {
+  return new Action(args);
+};
+
+Exim.createActions = function (args) {
+  return new Actions(args);
+};
+
+Exim.createStore = function (args) {
+  return new Store(args);
+};
+
+window.Exim = Exim;
+
+},{"./Actions":2,"./DOMHelpers":4,"./Store":7,"./helpers":9}],2:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Class = _interopRequire(require("./Class"));
+
+var Action = exports.Action = (function () {
+  function Action(args) {
+    _classCallCheck(this, Action);
+
+    var store = args.store;
+    var stores = args.stores;
+    var allStores = [];
+
+    this.name = args.name;
+
+    if (store) allStores.push(store);
+    if (stores) allStores.push.apply(allStores, stores);
+
+    this.stores = allStores;
   }
-})(this, function(root, Reflux) {
-  "use strict";
-  var React, ReactRouter;
-  var Reflux = {};
 
-  if (typeof define === 'function' && define.amd) {
-    React = require('react');
-    ReactRouter = require('react-router');
-  }
-  else if (typeof module === 'object' && module.exports){
-    React = module.exports.React;
-    ReactRouter = module.exports.ReactRouter;
-  }
-  else {
-    React = window.React;
-    ReactRouter = window.ReactRouter;
-  }
-/*!
- * EventEmitter v4.2.9 - git.io/ee
- * Oliver Caldwell
- * MIT license
- * @preserve
- */
+  _createClass(Action, {
+    run: {
+      value: function run() {
+        var _this = this;
 
-(function () {
-    'use strict';
-
-    /**
-     * Class for managing events.
-     * Can be extended to provide event functionality in other classes.
-     *
-     * @class EventEmitter Manages event registering and emitting.
-     */
-    var EventEmitter = function EventEmitter() {}
-
-    // Shortcuts to improve speed and size
-    var proto = EventEmitter.prototype;
-    var exports = this;
-    var originalGlobalValue = EventEmitter;
-
-    /**
-     * Finds the index of the listener for the event in its storage array.
-     *
-     * @param {Function[]} listeners Array of listeners to search through.
-     * @param {Function} listener Method to look for.
-     * @return {Number} Index of the specified listener, -1 if not found
-     * @api private
-     */
-    function indexOfListener(listeners, listener) {
-        var i = listeners.length;
-        while (i--) {
-            if (listeners[i].listener === listener) {
-                return i;
-            }
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
         }
 
-        return -1;
-    }
-
-    /**
-     * Alias a method while keeping the context correct, to allow for overwriting of target method.
-     *
-     * @param {String} name The name of the target method.
-     * @return {Function} The aliased method
-     * @api private
-     */
-    function alias(name) {
-        return function aliasClosure() {
-            return this[name].apply(this, arguments);
-        };
-    }
-
-    /**
-     * Returns the listener array for the specified event.
-     * Will initialise the event object and listener arrays if required.
-     * Will return an object if you use a regex search. The object contains keys for each matched event. So /ba[rz]/ might return an object containing bar and baz. But only if you have either defined them with defineEvent or added some listeners to them.
-     * Each property in the object response is an array of listener functions.
-     *
-     * @param {String|RegExp} evt Name of the event to return the listeners from.
-     * @return {Function[]|Object} All listener functions for the event.
-     */
-    proto.getListeners = function getListeners(evt) {
-        var events = this._getEvents();
-        var response;
-        var key;
-
-        // Return a concatenated array of all matching events if
-        // the selector is a regular expression.
-        if (evt instanceof RegExp) {
-            response = {};
-            for (key in events) {
-                if (events.hasOwnProperty(key) && evt.test(key)) {
-                    response[key] = events[key];
-                }
-            }
-        }
-        else {
-            response = events[evt] || (events[evt] = []);
-        }
-
-        return response;
-    };
-
-    /**
-     * Takes a list of listener objects and flattens it into a list of listener functions.
-     *
-     * @param {Object[]} listeners Raw listener objects.
-     * @return {Function[]} Just the listener functions.
-     */
-    proto.flattenListeners = function flattenListeners(listeners) {
-        var flatListeners = [];
-        var i;
-
-        for (i = 0; i < listeners.length; i += 1) {
-            flatListeners.push(listeners[i].listener);
-        }
-
-        return flatListeners;
-    };
-
-    /**
-     * Fetches the requested listeners via getListeners but will always return the results inside an object. This is mainly for internal use but others may find it useful.
-     *
-     * @param {String|RegExp} evt Name of the event to return the listeners from.
-     * @return {Object} All listener functions for an event in an object.
-     */
-    proto.getListenersAsObject = function getListenersAsObject(evt) {
-        var listeners = this.getListeners(evt);
-        var response;
-
-        if (listeners instanceof Array) {
-            response = {};
-            response[evt] = listeners;
-        }
-
-        return response || listeners;
-    };
-
-    /**
-     * Adds a listener function to the specified event.
-     * The listener will not be added if it is a duplicate.
-     * If the listener returns true then it will be removed after it is called.
-     * If you pass a regular expression as the event name then the listener will be added to all events that match it.
-     *
-     * @param {String|RegExp} evt Name of the event to attach the listener to.
-     * @param {Function} listener Method to be called when the event is emitted. If the function returns true then it will be removed after calling.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.addListener = function addListener(evt, listener) {
-        var listeners = this.getListenersAsObject(evt);
-        var listenerIsWrapped = typeof listener === 'object';
-        var key;
-
-        for (key in listeners) {
-            if (listeners.hasOwnProperty(key) && indexOfListener(listeners[key], listener) === -1) {
-                listeners[key].push(listenerIsWrapped ? listener : {
-                    listener: listener,
-                    once: false
-                });
-            }
-        }
-
-        return this;
-    };
-
-    /**
-     * Alias of addListener
-     */
-    proto.on = alias('addListener');
-
-    /**
-     * Semi-alias of addListener. It will add a listener that will be
-     * automatically removed after its first execution.
-     *
-     * @param {String|RegExp} evt Name of the event to attach the listener to.
-     * @param {Function} listener Method to be called when the event is emitted. If the function returns true then it will be removed after calling.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.addOnceListener = function addOnceListener(evt, listener) {
-        return this.addListener(evt, {
-            listener: listener,
-            once: true
+        var storesCycles = this.stores.map(function (store) {
+          return store.runCycle.apply(store, [_this.name].concat(args));
         });
-    };
+        return Promise.all(storesCycles);
+      }
+    },
+    addStore: {
+      value: function addStore(store) {
+        this.stores.push(store);
+      }
+    }
+  });
 
-    /**
-     * Alias of addOnceListener.
-     */
-    proto.once = alias('addOnceListener');
+  return Action;
+})();
 
-    /**
-     * Defines an event name. This is required if you want to use a regex to add a listener to multiple events at once. If you don't do this then how do you expect it to know what event to add to? Should it just add to every possible match for a regex? No. That is scary and bad.
-     * You need to tell it what event names should be matched by a regex.
-     *
-     * @param {String} evt Name of the event to create.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.defineEvent = function defineEvent(evt) {
-        this.getListeners(evt);
-        return this;
-    };
+var Actions = exports.Actions = (function () {
+  function Actions(actions) {
+    var _this = this;
 
-    /**
-     * Uses defineEvent to define multiple events.
-     *
-     * @param {String[]} evts An array of event names to define.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.defineEvents = function defineEvents(evts) {
-        for (var i = 0; i < evts.length; i += 1) {
-            this.defineEvent(evts[i]);
-        }
-        return this;
-    };
+    _classCallCheck(this, Actions);
 
-    /**
-     * Removes a listener function from the specified event.
-     * When passed a regular expression as the event name, it will remove the listener from all events that match it.
-     *
-     * @param {String|RegExp} evt Name of the event to remove the listener from.
-     * @param {Function} listener Method to remove from the event.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.removeListener = function removeListener(evt, listener) {
-        var listeners = this.getListenersAsObject(evt);
-        var index;
-        var key;
+    this.all = [];
+    if (Array.isArray(actions)) {
+      actions.forEach(function (action) {
+        return _this.addAction(action);
+      }, this);
+    }
+    // return this.getter = {};
+  }
 
-        for (key in listeners) {
-            if (listeners.hasOwnProperty(key)) {
-                index = indexOfListener(listeners[key], listener);
-
-                if (index !== -1) {
-                    listeners[key].splice(index, 1);
-                }
-            }
+  _createClass(Actions, {
+    addAction: {
+      value: function addAction(item, noOverride) {
+        var action = noOverride ? false : this.detectAction(item);
+        if (!noOverride) {
+          var old = undefined;
+          if (old = this[action.name]) this.removeAction(old);
+          this.all.push(action);
+          this[action.name] = action.run.bind(action);
         }
 
-        return this;
-    };
-
-    /**
-     * Alias of removeListener
-     */
-    proto.off = alias('removeListener');
-
-    /**
-     * Adds listeners in bulk using the manipulateListeners method.
-     * If you pass an object as the second argument you can add to multiple events at once. The object should contain key value pairs of events and listeners or listener arrays. You can also pass it an event name and an array of listeners to be added.
-     * You can also pass it a regular expression to add the array of listeners to all events that match it.
-     * Yeah, this function does quite a bit. That's probably a bad thing.
-     *
-     * @param {String|Object|RegExp} evt An event name if you will pass an array of listeners next. An object if you wish to add to multiple events at once.
-     * @param {Function[]} [listeners] An optional array of listener functions to add.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.addListeners = function addListeners(evt, listeners) {
-        // Pass through to manipulateListeners
-        return this.manipulateListeners(false, evt, listeners);
-    };
-
-    /**
-     * Removes listeners in bulk using the manipulateListeners method.
-     * If you pass an object as the second argument you can remove from multiple events at once. The object should contain key value pairs of events and listeners or listener arrays.
-     * You can also pass it an event name and an array of listeners to be removed.
-     * You can also pass it a regular expression to remove the listeners from all events that match it.
-     *
-     * @param {String|Object|RegExp} evt An event name if you will pass an array of listeners next. An object if you wish to remove from multiple events at once.
-     * @param {Function[]} [listeners] An optional array of listener functions to remove.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.removeListeners = function removeListeners(evt, listeners) {
-        // Pass through to manipulateListeners
-        return this.manipulateListeners(true, evt, listeners);
-    };
-
-    /**
-     * Edits listeners in bulk. The addListeners and removeListeners methods both use this to do their job. You should really use those instead, this is a little lower level.
-     * The first argument will determine if the listeners are removed (true) or added (false).
-     * If you pass an object as the second argument you can add/remove from multiple events at once. The object should contain key value pairs of events and listeners or listener arrays.
-     * You can also pass it an event name and an array of listeners to be added/removed.
-     * You can also pass it a regular expression to manipulate the listeners of all events that match it.
-     *
-     * @param {Boolean} remove True if you want to remove listeners, false if you want to add.
-     * @param {String|Object|RegExp} evt An event name if you will pass an array of listeners next. An object if you wish to add/remove from multiple events at once.
-     * @param {Function[]} [listeners] An optional array of listener functions to add/remove.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.manipulateListeners = function manipulateListeners(remove, evt, listeners) {
-        var i;
-        var value;
-        var single = remove ? this.removeListener : this.addListener;
-        var multiple = remove ? this.removeListeners : this.addListeners;
-
-        // If evt is an object then pass each of its properties to this method
-        if (typeof evt === 'object' && !(evt instanceof RegExp)) {
-            for (i in evt) {
-                if (evt.hasOwnProperty(i) && (value = evt[i])) {
-                    // Pass the single listener straight through to the singular method
-                    if (typeof value === 'function') {
-                        single.call(this, i, value);
-                    }
-                    else {
-                        // Otherwise pass back to the multiple function
-                        multiple.call(this, i, value);
-                    }
-                }
-            }
-        }
-        else {
-            // So evt must be a string
-            // And listeners must be an array of listeners
-            // Loop over it and pass each one to the multiple method
-            i = listeners.length;
-            while (i--) {
-                single.call(this, evt, listeners[i]);
-            }
-        }
-
-        return this;
-    };
-
-    /**
-     * Removes all listeners from a specified event.
-     * If you do not specify an event then all listeners will be removed.
-     * That means every event will be emptied.
-     * You can also pass a regex to remove all events that match it.
-     *
-     * @param {String|RegExp} [evt] Optional name of the event to remove all listeners for. Will remove from every event if not passed.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.removeEvent = function removeEvent(evt) {
-        var type = typeof evt;
-        var events = this._getEvents();
-        var key;
-
-        // Remove different things depending on the state of evt
-        if (type === 'string') {
-            // Remove all listeners for the specified event
-            delete events[evt];
-        }
-        else if (evt instanceof RegExp) {
-            // Remove all events matching the regex.
-            for (key in events) {
-                if (events.hasOwnProperty(key) && evt.test(key)) {
-                    delete events[key];
-                }
-            }
-        }
-        else {
-            // Remove all listeners in all events
-            delete this._events;
-        }
-
-        return this;
-    };
-
-    /**
-     * Alias of removeEvent.
-     *
-     * Added to mirror the node API.
-     */
-    proto.removeAllListeners = alias('removeEvent');
-
-    /**
-     * Emits an event of your choice.
-     * When emitted, every listener attached to that event will be executed.
-     * If you pass the optional argument array then those arguments will be passed to every listener upon execution.
-     * Because it uses `apply`, your array of arguments will be passed as if you wrote them out separately.
-     * So they will not arrive within the array on the other side, they will be separate.
-     * You can also pass a regular expression to emit to all events that match it.
-     *
-     * @param {String|RegExp} evt Name of the event to emit and execute listeners for.
-     * @param {Array} [args] Optional array of arguments to be passed to each listener.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.emitEvent = function emitEvent(evt, args) {
-        var listeners = this.getListenersAsObject(evt);
-        var listener;
-        var i;
-        var key;
-        var response;
-
-        for (key in listeners) {
-            if (listeners.hasOwnProperty(key)) {
-                i = listeners[key].length;
-
-                while (i--) {
-                    // If the listener returns true then it shall be removed from the event
-                    // The function is executed either with a basic call or an apply if there is an args array
-                    listener = listeners[key][i];
-
-                    if (listener.once === true) {
-                        this.removeListener(evt, listener.listener);
-                    }
-
-                    response = listener.listener.apply(this, args || []);
-
-                    if (response === this._getOnceReturnValue()) {
-                        this.removeListener(evt, listener.listener);
-                    }
-                }
-            }
-        }
-
-        return this;
-    };
-
-    /**
-     * Alias of emitEvent
-     */
-    proto.trigger = alias('emitEvent');
-
-    /**
-     * Subtly different from emitEvent in that it will pass its arguments on to the listeners, as opposed to taking a single array of arguments to pass on.
-     * As with emitEvent, you can pass a regex in place of the event name to emit to all events that match it.
-     *
-     * @param {String|RegExp} evt Name of the event to emit and execute listeners for.
-     * @param {...*} Optional additional arguments to be passed to each listener.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.emit = function emit(evt) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        return this.emitEvent(evt, args);
-    };
-
-    /**
-     * Sets the current value to check against when executing listeners. If a
-     * listeners return value matches the one set here then it will be removed
-     * after execution. This value defaults to true.
-     *
-     * @param {*} value The new value to check for when executing listeners.
-     * @return {Object} Current instance of EventEmitter for chaining.
-     */
-    proto.setOnceReturnValue = function setOnceReturnValue(value) {
-        this._onceReturnValue = value;
-        return this;
-    };
-
-    /**
-     * Fetches the current value to check against when executing listeners. If
-     * the listeners return value matches this one then it should be removed
-     * automatically. It will return true by default.
-     *
-     * @return {*|Boolean} The current value to check for or the default, true.
-     * @api private
-     */
-    proto._getOnceReturnValue = function _getOnceReturnValue() {
-        if (this.hasOwnProperty('_onceReturnValue')) {
-            return this._onceReturnValue;
-        }
-        else {
-            return true;
-        }
-    };
-
-    /**
-     * Fetches the events object and creates one if required.
-     *
-     * @return {Object} The events storage object.
-     * @api private
-     */
-    proto._getEvents = function _getEvents() {
-        return this._events || (this._events = {});
-    };
-
-    /**
-     * Reverts the global {@link EventEmitter} to its previous value and returns a reference to this version.
-     *
-     * @return {Function} Non conflicting EventEmitter class.
-     */
-    EventEmitter.noConflict = function noConflict() {
-        EventEmitter = originalGlobalValue;
-        return EventEmitter;
-    };
-
-    // Expose the class either via AMD, CommonJS or the global object
-    if (typeof define === 'function' && define.amd) {
-        define(function () {
-            return EventEmitter;
+        return action;
+      }
+    },
+    removeAction: {
+      value: function removeAction(item) {
+        var action = this.detectAction(item, true);
+        var index = this.all.indexOf(action);
+        if (index !== -1) this.all(splice(index, 1));
+        delete this[action.name];
+      }
+    },
+    addStore: {
+      value: function addStore(store) {
+        this.all.forEach(function (action) {
+          return action.addStore(store);
         });
-    }
-    else if (typeof module === 'object' && module.exports){
-        module.exports.EventEmitter = EventEmitter;
-    }
-    else {
-        window.EventEmitter = EventEmitter;
-    }
-}.call(this));
-var utils = {}
-
-utils.isObjectOrFunction = function(obj) {
-    var type = typeof obj;
-    return type === 'function' || type === 'object' && !!obj;
-};
-
-utils.extend = function(obj) {
-    if (!utils.isObjectOrFunction(obj)) {
-        return obj;
-    }
-    var source, kl;'//';
-    for (var i = 1, length = arguments.length; i < length; i++) {
-        source = arguments[i];
-        for (var prop in source) {
-            obj[prop] = source[prop];
-        }
-    }
-    return obj;
-};
-
-// Expose the class either via AMD, CommonJS or the global object
-if (typeof define === 'function' && define.amd) {
-  utils.EventEmitter = require('EventEmitter')
-}
-else if (typeof module === 'object' && module.exports){
-  utils.EventEmitter = module.exports.EventEmitter;
-}
-else {
-  utils.EventEmitter = window.EventEmitter;
-}
-
-utils.isFunction = function(value) {
-  return typeof value === 'function';
-};
-
-utils.nextTick = function(callback) {
-  setTimeout(callback, 0);
-};
-
-utils.capitalize = function(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
-utils.inheritMixins = function (target, mixins) {
-  if (mixins) {
-    mixins.forEach(function (mixin) {
-      utils.extend(target.prototype, mixin);
-    })
-  }
-};
-
-utils.lookupCallback = function(store, name, prefix) {
-  if (typeof store[name] === 'object') {
-    if (!prefix) prefix = 'on';
-    return store[name][prefix];
-  } else {
-    if (!prefix) {
-      var prefixedName = 'on' + utils.capitalize(name);
-      return store[name] || store[prefixedName];
-    } else {
-      return store[prefix + utils.capitalize(name)];
-    }
-  }
-};
-
-utils.object = function(keys,vals){
-  var o={}, i=0;
-  for(;i<keys.length;i++){
-      o[keys[i]] = vals[i];
-  }
-  return o;
-};
-
-utils.clone = function (orig) {
-    var copy;
-
-    if (null == orig || "object" != typeof orig) {
-        return orig;
-    }
-
-    if (orig instanceof Date) {
-        copy = new Date();
-        copy.setTime(orig.getTime());
-        return copy;
-    }
-
-    if (orig instanceof Array) {
-        copy = [];
-        for (var i = 0, len = orig.length; i < len; i++) {
-            copy[i] = utils.clone(orig[i]);
-        }
-        return copy;
-    }
-
-    if (orig instanceof Object) {
-        copy = {};
-        for (var key in orig) {
-            if (orig.hasOwnProperty(key)) {
-                copy[key] = utils.clone(orig[key]);
-            }
-        }
-        return copy;
-    }
-
-    throw new Error("Unable to copy!");
-}
-
-utils.isArguments = function(value) {
-    return value && typeof value == 'object' && typeof value.length == 'number' &&
-      (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
-};
-
-utils.throwIf = function(val,msg){
-    if (val){
-        throw Error(msg||val);
-    }
-};
-/**
- * Internal module used to create static and instance join methods
- */
-
-var slice = Array.prototype.slice,
-    strategyMethodNames = {
-        strict: "joinStrict",
-        first: "joinLeading",
-        last: "joinTrailing",
-        all: "joinConcat"
-    };
-
-/**
- * Used in `index.js` to create the static join methods
- * @param {String} strategy Which strategy to use when tracking listenable trigger arguments
- * @returns {Function} A static function which returns a store with a join listen on the given listenables using the given strategy
- */
-var staticJoinCreator = function (strategy) {
-    return function(/* listenables... */) {
-        var listenables = slice.call(arguments);
-        return createStore({
-            init: function(){
-                this[strategyMethodNames[strategy]].apply(this,listenables.concat("triggerAsync"));
-            }
-        });
-    };
-};
-
-/**
- * Used in `ListenerMethods.js` to create the instance join methods
- * @param {String} strategy Which strategy to use when tracking listenable trigger arguments
- * @returns {Function} An instance method which sets up a join listen on the given listenables using the given strategy
- */
-var instanceJoinCreator = function (strategy) {
-    return function(/* listenables..., callback*/) {
-        var listenables = slice.call(arguments),
-            callback = listenables.pop(),
-            numberOfListenables = listenables.length,
-            join = {
-                numberOfListenables: numberOfListenables,
-                callback: this[callback]||callback,
-                listener: this,
-                strategy: strategy
-            };
-        for (var i = 0; i < numberOfListenables; i++) {
-            this.listenTo(listenables[i],newListener(i,join));
-        }
-        reset(join);
-    };
-};
-
-// ---- internal join functions ----
-
-function reset (join) {
-    join.listenablesEmitted = new Array(join.numberOfListenables);
-    join.args = new Array(join.numberOfListenables);
-}
-
-function newListener (i,join) {
-    return function() {
-        var callargs = slice.call(arguments);
-        if (join.listenablesEmitted[i]){
-            switch(join.strategy){
-                case "strict": throw new Error("Strict join failed because listener triggered twice.");
-                case "last": join.args[i] = callargs; break;
-                case "all": join.args[i].push(callargs);
-            }
-        } else {
-            join.listenablesEmitted[i] = true;
-            join.args[i] = (join.strategy==="all"?[callargs]:callargs);
-        }
-        emitIfAllListenablesEmitted(join);
-    };
-}
-
-function emitIfAllListenablesEmitted (join) {
-    for (var i = 0; i < join.numberOfListenables; i++) {
-        if (!join.listenablesEmitted[i]) {
-            return;
-        }
-    }
-    join.callback.apply(join.listener,join.args);
-    reset(join);
-}
-// var _ = require('./utils'),
-//     maker = require('./joins').instanceJoinCreator;
-
-/**
- * A module of methods related to listening.
- */
-var maker = instanceJoinCreator;
-
-Reflux.ListenerMethods = {
-
-    /**
-     * An internal utility function used by `validateListening`
-     *
-     * @param {Action|Store} listenable The listenable we want to search for
-     * @returns {Boolean} The result of a recursive search among `this.subscriptions`
-     */
-    hasListener: function(listenable) {
-        var i = 0,
-            listener;
-        for (;i < (this.subscriptions||[]).length; ++i) {
-            listener = this.subscriptions[i].listenable;
-            if (listener === listenable || listener.hasListener && listener.hasListener(listenable)) {
-                return true;
-            }
-        }
-        return false;
+      }
     },
-
-    /**
-     * A convenience method that listens to all listenables in the given object.
-     *
-     * @param {Object} listenables An object of listenables. Keys will be used as callback method names.
-     */
-    listenToMany: function(listenables) {
-        for(var key in listenables){
-            this.listenTo(listenables[key], key, this[key + 'Default'] || key);
+    detectAction: {
+      value: function detectAction(action, isOld) {
+        if (action.constructor === Action) {
+          return action;
+        } else if (typeof action === "string") {
+          return isOld ? this[action] : new Action({ name: action });
         }
-    },
-
-    /**
-     * Checks if the current context can listen to the supplied listenable
-     *
-     * @param {Action|Store} listenable An Action or Store that should be
-     *  listened to.
-     * @returns {String|Undefined} An error message, or undefined if there was no problem.
-     */
-    validateListening: function(listenable){
-        if (listenable === this) {
-            return "Listener is not able to listen to itself";
-        }
-        if (!utils.isFunction(listenable.listen)) {
-            return listenable + " is missing a listen method";
-        }
-        if (listenable.hasListener && listenable.hasListener(this)) {
-            return "Listener cannot listen to this listenable because of circular loop";
-        }
-    },
-
-    /**
-     * Sets up a subscription to the given listenable for the context object
-     *
-     * @param {Action|Store} listenable An Action or Store that should be
-     *  listened to.
-     * @param {Function|String} callback The callback to register as event handler
-     * @param {Function|String} defaultCallback The callback to register as default handler
-     * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
-     */
-    listenTo: function(listenable, callback, defaultCallback) {
-        var isPromise = function (target) {
-            return typeof Promise !== 'undefined' && typeof target !== 'undefined' && target.constructor === Promise;
-        }
-
-        var desub, unsubscriber, catchError, cb, subscriptionobj,
-            subs = this.subscriptions = this.subscriptions || [];
-
-        utils.throwIf(this.validateListening(listenable));
-        this.fetchDefaultData(listenable, defaultCallback);
-
-        cb = function () {
-            if (typeof callback === 'function') return callback.apply(this, arguments);
-
-            var prevResult, isPrevPromise;
-
-            var prevFn = utils.lookupCallback(this, callback, 'will');
-            var whileFn = utils.lookupCallback(this, callback, 'while');
-            var nextFn = utils.lookupCallback(this, callback, 'did');
-            var errorFn = utils.lookupCallback(this, callback, 'didNot');
-
-            if (prevFn) {
-                try {
-                    prevResult = prevFn.apply(this, arguments);
-                } catch (e) {
-                    console.error(e);
-                    return errorFn ? errorFn.call(this, e) : null;
-                }
-                isPrevPromise = isPromise(prevResult);
-            }
-
-            if (whileFn) {
-                whileFn.call(this, true);
-            }
-
-            var fn = utils.lookupCallback(this, callback);
-            var fnArguments = prevResult && !isPrevPromise ? [prevResult] : arguments;
-            var fnResult = prevFn && isPrevPromise ? prevResult.then(fn.bind(this)) :  fn.apply(this, fnArguments);
-            var isCurrentPromise = isPromise(fnResult);
-            var self = this;
-
-            var nextCb = function (fn) {
-                return function () {
-                    if (whileFn) whileFn.call(self, false);
-                    if (fn) {
-                        return fn.apply(self, arguments);
-                    }
-                }
-            };
-
-            if (nextFn) {
-                if (isCurrentPromise) {
-                    fnResult.then(nextCb(nextFn), nextCb(errorFn));
-                } else {
-                    nextCb(nextFn).call(this, fnResult);
-                }
-            } else if (whileFn) {
-                whileFn.call(this, false);
-            }
-        };
-        desub = listenable.listen(cb, this);
-        unsubscriber = function() {
-            var index = subs.indexOf(subscriptionobj);
-            utils.throwIf(index === -1,'Tried to remove listen already gone from subscriptions list!');
-            subs.splice(index, 1);
-            desub();
-        };
-        subscriptionobj = {
-            stop: unsubscriber,
-            listenable: listenable
-        };
-        subs.push(subscriptionobj);
-        return subscriptionobj;
-    },
-
-    /**
-     * Stops listening to a single listenable
-     *
-     * @param {Action|Store} listenable The action or store we no longer want to listen to
-     * @returns {Boolean} True if a subscription was found and removed, otherwise false.
-     */
-    stopListeningTo: function(listenable){
-        var sub, i = 0, subs = this.subscriptions || [];
-        for(;i < subs.length; i++){
-            sub = subs[i];
-            if (sub.listenable === listenable){
-                sub.stop();
-                utils.throwIf(subs.indexOf(sub)!==-1,'Failed to remove listen from subscriptions list!');
-                return true;
-            }
-        }
-        return false;
-    },
-
-    /**
-     * Stops all subscriptions and empties subscriptions array
-     */
-    stopListeningToAll: function(){
-        var remaining, subs = this.subscriptions || [];
-        while((remaining=subs.length)){
-            subs[0].stop();
-            utils.throwIf(subs.length!==remaining-1,'Failed to remove listen from subscriptions list!');
-        }
-    },
-
-    /**
-     * Used in `listenTo`. Fetches initial data from a publisher if it has a `getDefaultData` method.
-     * @param {Action|Store} listenable The publisher we want to get default data from
-     * @param {Function|String} defaultCallback The method to receive the data
-     */
-    fetchDefaultData: function (listenable, defaultCallback) {
-        defaultCallback = (defaultCallback && this[defaultCallback]) || defaultCallback;
-        var me = this;
-        if (utils.isFunction(defaultCallback) && utils.isFunction(listenable.getDefaultData)) {
-            data = listenable.getDefaultData();
-            if (data && utils.isFunction(data.then)) {
-                data.then(function() {
-                    defaultCallback.apply(me, arguments);
-                });
-            } else {
-                defaultCallback.call(this, data);
-            }
-        }
-    },
-
-    /**
-     * The callback will be called once all listenables have triggered at least once.
-     * It will be invoked with the last emission from each listenable.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinTrailing: maker("last"),
-
-    /**
-     * The callback will be called once all listenables have triggered at least once.
-     * It will be invoked with the first emission from each listenable.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinLeading: maker("first"),
-
-    /**
-     * The callback will be called once all listenables have triggered at least once.
-     * It will be invoked with all emission from each listenable.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinConcat: maker("all"),
-
-    /**
-     * The callback will be called once all listenables have triggered.
-     * If a callback triggers twice before that happens, an error is thrown.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinStrict: maker("strict"),
-};
-
-
-
-/**
- * A module of methods for object that you want to be able to listen to.
- * This module is consumed by `createStore` and `createAction`
- */
-Reflux.PublisherMethods = {
-
-    /**
-     * Hook used by the publisher that is invoked before emitting
-     * and before `shouldEmit`. The arguments are the ones that the action
-     * is invoked with. If this function returns something other than
-     * undefined, that will be passed on as arguments for shouldEmit and
-     * emission.
-     */
-    preEmit: function() {},
-
-    /**
-     * Hook used by the publisher after `preEmit` to determine if the
-     * event should be emitted with given arguments. This may be overridden
-     * in your application, default implementation always returns true.
-     *
-     * @returns {Boolean} true if event should be emitted
-     */
-    shouldEmit: function() { return true; },
-
-    /**
-     * Subscribes the given callback for action triggered
-     *
-     * @param {Function} callback The callback to register as event handler
-     * @param {Mixed} [optional] bindContext The context to bind the callback with
-     * @returns {Function} Callback that unsubscribes the registered event handler
-     */
-    listen: function(callback, bindContext) {
-        var eventHandler = function(args) {
-            callback.apply(bindContext, args);
-        }, me = this;
-        this.emitter.addListener(this.eventLabel, eventHandler);
-        return function() {
-            me.emitter.removeListener(me.eventLabel, eventHandler);
-        };
-    },
-
-    /**
-     * Publishes an event using `this.emitter` (if `shouldEmit` agrees)
-     */
-    trigger: function() {
-        var args = arguments,
-            pre = this.preEmit.apply(this, args);
-        args = pre === undefined ? args : utils.isArguments(pre) ? pre : [].concat(pre);
-        if (this.shouldEmit.apply(this, args)) {
-            this.emitter.emit(this.eventLabel, args);
-        }
-    },
-
-    /**
-     * Tries to publish the event on the next tick
-     */
-    triggerAsync: function(){
-        var args = arguments,me = this;
-        utils.nextTick(function() {
-            me.trigger.apply(me, args);
-        });
+      }
     }
-};
-// var _ = require('./utils'),
-//     Reflux = require('../src'),
-//     Keep = require('./Keep'),
-//
+  });
 
-/**
- * Creates an action functor object. It is mixed in with functions
- * from the `PublisherMethods` mixin. `preEmit` and `shouldEmit` may
- * be overridden in the definition object.
- *
- * @param {Object} definition The action object definition
- */
+  return Actions;
+})();
 
-var allowed = {preEmit:1,shouldEmit:1};
+},{"./Class":3}],3:[function(require,module,exports){
+"use strict";
 
-Reflux.createAction = function (definition) {
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-  definition = definition || {};
-
-  for (var d in definition) {
-    if (!allowed[d] && Reflux.PublisherMethods[d]) {
-      throw new Error("Cannot override API method " + d +
-        " in action creation. Use another method name or override it on Reflux.PublisherMethods instead."
-      );
-    }
-  }
-
-  var context = utils.extend({
-      eventLabel: "action",
-      emitter: new utils.EventEmitter(),
-      _isAction: true
-  },Reflux.PublisherMethods,definition);
-
-  var functor = function() {
-    functor[functor.sync?"trigger":"triggerAsync"].apply(functor, arguments);
+var _default = (function () {
+  var _class = function _default() {
+    _classCallCheck(this, _class);
   };
 
-  utils.extend(functor,context);
+  return _class;
+})();
 
-  Keep.createdActions.push(functor);
+module.exports = _default;
 
-  return functor;
+// find(type, key, value, multiple) {
+//   var result;
+//   const items = this[type];
 
-};
-// var _ = require('./utils'),
-//     Reflux = require('../src'),
-//     Keep = require('./Keep'),
+//   if (!Array.isArray(items)) throw Error `${key} must be an array`
+//   result = items.filter(item => item[key] === value)
+//   return multiple ? result : result[0]
+// }
 
+},{}],4:[function(require,module,exports){
+"use strict";
 
-/**
- * Creates an event emitting Data Store. It is mixed in with functions
- * from the `ListenerMethods` and `PublisherMethods` mixins. `preEmit`
- * and `shouldEmit` may be overridden in the definition object.
- *
- * @param {Object} definition The data store object definition
- * @returns {Store} A data store instance
- */
-var allowed = {preEmit:1,shouldEmit:1};
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-Reflux.createStore = function(definition) {
+exports.createView = createView;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-    var _store = {};
-    definition = definition || {};
-    var privateMethods = ['set', 'update', 'trigger', 'distribute', 'triggerAsync'];
+var utils = _interopRequire(require("./utils"));
 
-    for(var d in definition){
-        if (!allowed[d] && (Reflux.PublisherMethods[d] || Reflux.ListenerMethods[d])){
-            throw new Error("Cannot override API method " + d +
-                " in store creation. Use another method name or override it on Reflux.PublisherMethods / Reflux.ListenerMethods instead."
-            );
-        }
+function getRouter() {
+  var Router = {};
+  if (typeof ReactRouter !== "undefined") {
+    var routerElements = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Link", "Redirect"],
+        routerMixins = ["Navigation", "State"],
+        routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"],
+        routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"],
+        copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+
+    for (var i in routerElements) {
+      var itemName = routerElements[i];
+      Router[itemName] = React.createElement.bind(React.createElement, ReactRouter[itemName]);
     }
 
-    function Store() {
-        var i=0, arr;
-        this.subscriptions = [];
-        this.emitter = new utils.EventEmitter();
-        this.eventLabel = "change";
-
-        if (this.getInitial) {
-            var initial = this.getInitial();
-            for (var key in initial) {
-                _store[key] = initial[key];
-            }
-        }
-
-        if (Array.isArray(this.privateMethods)) {
-            this.privateMethods.forEach(function (method) {
-                privateMethods.push(method);
-            });
-        }
-
-        if (this.init && utils.isFunction(this.init)) {
-            this.init();
-        }
-
-        if (this.actions){
-            if (this.actions.length) {
-              this.actions = Exim.createActions(this.actions)
-            }
-
-            arr = [].concat(this.actions);
-            for(;i < arr.length;i++){
-                this.listenToMany(arr[i]);
-            }
-        }
+    for (var i in copyItems) {
+      var itemName = copyItems[i];
+      Router[itemName] = ReactRouter[itemName];
     }
+  }
+  return Router;
+}
 
-    Store.prototype.set = function (key, value) {
-        if (key.constructor === Object && !value) {
-            for (var k in key) {
-                _store[k] = key[k];
-            }
-            return key;
+function getDOM() {
+  var DOMHelpers = {};
+
+  if (typeof React !== "undefined") {
+    (function () {
+      var tag = function tag(name) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        var attributes = undefined;
+        var first = args[0] && args[0].constructor;
+        if (first === Object) {
+          attributes = args.shift();
         } else {
-            return _store[key] = value;
+          attributes = {};
         }
-    };
+        return React.DOM[name].apply(React.DOM, [attributes].concat(args));
+      };
 
-    Store.prototype.distribute = function () {
-        this.trigger(_store);
-    };
+      var bindTag = function bindTag(tagName) {
+        return DOMHelpers[tagName] = tag.bind(this, tagName);
+      };
 
-    Store.prototype.update = function (key, value) {
-        this.set(key, value);
-        this.distribute();
-    };
+      for (var tagName in React.DOM) {
+        bindTag(tagName);
+      }
 
-    Store.prototype.get = function (key) {
-        var result = key ? _store[key] : _store;
-        return utils.clone(result);
-    };
+      DOMHelpers.space = function () {
+        return React.DOM.span({
+          dangerouslySetInnerHTML: {
+            __html: "&nbsp;"
+          }
+        });
+      };
+    })();
+  }
+  return DOMHelpers;
+}
 
-    utils.inheritMixins(Store, definition.mixins);
+var Router = getRouter();
+exports.Router = Router;
+var DOM = getDOM();
 
-    utils.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
+exports.DOM = DOM;
 
-    var store = new Store();
+function createView(classArgs) {
+  var ReactClass = React.createClass(classArgs);
+  var ReactElement = React.createElement.bind(React.createElement, ReactClass);
+  return ReactElement;
+}
 
-    var storeGetter = {};
+;
 
+},{"./utils":11}],5:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var _default = (function () {
+  var _class = function _default() {
+    _classCallCheck(this, _class);
+
+    this._listeners = [];
+  };
+
+  _createClass(_class, {
+    findListenerIndex: {
+      value: function findListenerIndex(listener) {
+        return this._listeners.indexOf(listener);
+      }
+    },
+    _addListener: {
+      value: function _addListener(listener, context) {
+        var found = this.findListenerIndex(listener) >= 0;
+        if (!found) {
+          if (context) listener._ctx = context;
+          this._listeners.push(listener);
+        }
+        return this;
+      }
+    },
+    _removeListener: {
+      value: function _removeListener(listener) {
+        var index = undefined,
+            found = (index = this.findListenerIndex(listener)) >= 0;
+        if (found) {
+          this._listeners.splice(index, 1);
+        }
+        return this;
+      }
+    },
+    emit: {
+      value: function emit() {
+        this._listeners.forEach(function (listener) {
+          return listener._ctx ? listener.call(listener._ctx) : listener();
+        });
+      }
+    }
+  });
+
+  return _class;
+})();
+
+module.exports = _default;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _slicedToArray = function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { var _arr = []; for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { _arr.push(_step.value); if (i && _arr.length === i) break; } return _arr; } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } };
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Emitter = _interopRequire(require("./Emitter"));
+
+var config = _interopRequire(require("./config"));
+
+var getConnectMixin = _interopRequire(require("./mixins/connect"));
+
+var Getter = (function (_Emitter) {
+  function Getter(store) {
+    _classCallCheck(this, Getter);
+
+    _get(Object.getPrototypeOf(Getter.prototype), "constructor", this).call(this);
+    // this[__store] = store;
     for (var key in store) {
-        if (!~privateMethods.indexOf(key)) {
-            storeGetter[key] = store[key];
-        }
+      var commonPrivate = config.privateMethods;
+      var itemPrivate = store.privateMethods;
+      if (!commonPrivate.has(key) && !(itemPrivate && itemPrivate.has(key))) this[key] = store[key];
+    }
+
+    var _ref = [this._addListener, this._removeListener];
+
+    var _ref2 = _slicedToArray(_ref, 2);
+
+    this.onChange = _ref2[0];
+    this.offChange = _ref2[1];
+
+    this.connect = function () {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return getConnectMixin.apply(null, [this].concat(args));
+    };
+  }
+
+  _inherits(Getter, _Emitter);
+
+  return Getter;
+})(Emitter);
+
+module.exports = Getter;
+
+},{"./Emitter":5,"./config":8,"./mixins/connect":10}],7:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var Actions = require("./Actions").Actions;
+
+var connect = _interopRequire(require("./mixins/connect"));
+
+var Getter = _interopRequire(require("./Getter"));
+
+var utils = _interopRequire(require("./utils"));
+
+var Store = (function () {
+  function Store() {
+    var args = arguments[0] === undefined ? {} : arguments[0];
+
+    _classCallCheck(this, Store);
+
+    var actions = args.actions;
+    var initial = args.initial;
+
+    initial = typeof initial === "function" ? initial() : initial;
+    var store = initial || {};
+
+    var privateMethods = undefined;
+    if (!args.privateMethods) {
+      privateMethods = new Set();
+    } else if (Array.isArray(args.privateMethods)) {
+      privateMethods = new Set();
+      args.privateMethods.forEach(function (m) {
+        return privateSet.add(m);
+      });
+      args.privateMethods = privateSet;
+    } else if (args.privateMethods.constructor === Set) {
+      privateMethods = args.privateMethods;
+    }
+    this.privateMethods = privateMethods;
+
+    this.handlers = args.handlers || utils.getWithoutFields(["actions"], args) || {};
+
+    if (Array.isArray(actions)) {
+      this.actions = actions = new Actions(actions);
+      this.actions.addStore(this);
+    }
+
+    var _this = this;
+
+    var setValue = function setValue(key, value) {
+      var correctArgs = ["key", "value"].every(function (item) {
+        return typeof item === "string";
+      });
+      return correctArgs ? store[key] = value : false;
     };
 
-    Keep.createdStores.push(store);
+    var getValue = function getValue(key) {
+      return key ? store[key] : store;
+    };
 
-    return storeGetter;
-};
-var Keep = {};
+    var set = function set(item, value) {
+      var options = arguments[2] === undefined ? {} : arguments[2];
 
-Keep.createdStores = [];
+      if (utils.isObject(item)) {
+        if (utils.isObject(value)) options = value;
+        for (var key in item) {
+          setValue(key, item[key], options);
+        }
+      } else {
+        setValue(item, value, options);
+      }
+      if (!options.silent) {
+        _this.getter.emit();
+      }
+    };
 
-Keep.createdActions = [];
+    var get = function get(item) {
+      if (typeof item === "string" || typeof item === "number") {
+        return getValue(item);
+      } else if (Array.isArray(item)) {
+        return item.map(function (key) {
+          return getValue(key);
+        });
+      } else if (!item) {
+        return getValue();
+      } else if (typeof item === "object") {
+        var result = {};
+        for (var key in item) {
+          var val = item[key];
+          var type = typeof val;
+          if (type === "function") {
+            result[key] = item[key](getValue(key));
+          } else if (type === "sting") {
+            result[key] = getValue(key)[val];
+          }
+        }
+        return result;
+      }
+    };
 
-Keep.reset = function() {
-    while(exports.createdStores.length) {
-        createdStores.pop();
+    this.set = set;
+    this.get = get;
+
+    this.stateProto = { set: set, get: get, actions: actions };
+
+    return this.getter = new Getter(this);
+  }
+
+  _createClass(Store, {
+    addAction: {
+      value: function addAction(item) {
+        if (Array.isArray(item)) {
+          this.actions = this.actions.concat(actions);
+        } else if (typeof item === "object") {
+          this.actions.push(item);
+        }
+      }
+    },
+    removeAction: {
+      value: function removeAction(item) {
+        var action;
+        if (typeof item === "string") {
+          action = this.findByName("actions", "name", item);
+          if (action) action.removeStore(this);
+        } else if (typeof item === "object") {
+          action = item;
+          index = this.actions.indexOf(action);
+          if (index !== -1) {
+            action.removeStore(this);
+            this.actions = this.actions.splice(index, 1);
+          }
+        }
+      }
+    },
+    getActionCycle: {
+      value: function getActionCycle(actionName) {
+        var prefix = arguments[1] === undefined ? "on" : arguments[1];
+
+        var capitalized = utils.capitalize(actionName);
+        var fullActionName = "" + prefix + "" + capitalized;
+        var handler = this.handlers[fullActionName] || this.handlers[actionName];
+        if (!handler) {
+          throw new Error("No handlers for " + actionName + " action defined in current store");
+        }
+        var actions = undefined;
+        // if (Array.isArray(handler)) {
+        //   actions = handlers;
+        // } else
+        if (typeof handler === "object") {
+          // actions = utils.mapActionNames(handler);
+          actions = handler;
+        } else if (typeof handler === "function") {
+          actions = { on: handler };
+        } else {
+          throw new Error("" + handler + " must be an object or function");
+        }
+        return actions;
+      }
+    },
+    runCycle: {
+
+      // 1. will(initial) => willResult
+      // 2. while(true)
+      // 3. on(willResult || initial) => onResult
+      // 4. while(false)
+      // 5. did(onResult)
+
+      value: function runCycle(actionName) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        // new Promise(resolve => resolve(true))
+        var cycle = this.getActionCycle(actionName);
+        var promise = Promise.resolve();
+        var will = cycle.will,
+            while_ = cycle["while"],
+            on_ = cycle.on;
+        var did = cycle.did,
+            didNot = cycle.didNot;
+
+        // Local state for this cycle.
+        var state = Object.create(this.stateProto);
+
+        // Pre-check & preparations.
+        if (will) promise = promise.then(function () {
+          // console.log(actionName, 'will');
+          return will.apply(state, args);
+        });
+
+        // Start while()..
+        if (while_) promise.then(function () {
+          // console.log(actionName, 'while', true);
+          return while_.apply(state, [true].concat(args));
+        });
+
+        // Actual execution.
+        promise = promise.then(function (willResult) {
+          // console.log(actionName, 'on');
+          if (willResult == null) {
+            return on_.apply(state, args);
+          } else {
+            return on_.call(state, willResult);
+          }
+        });
+
+        // Stop while().
+        if (while_) promise.then(function () {
+          // console.log(actionName, 'while', false);
+          return while_.apply(state, [false].concat(args));
+        });
+
+        // Handle the result.
+        if (did) promise = promise.then(function (onResult) {
+          // console.log(actionName, 'did');
+          return did.call(state, onResult);
+        });
+        if (didNot) {
+          promise["catch"](function (error) {
+            // console.log(actionName, 'didNot');
+            return didNot.call(state, error);
+          });
+        } else {
+          promise["catch"](function (error) {
+            // TODO: Handle error
+            throw error;
+          });
+        }
+        promise.then(function () {
+          Object.freeze(state);
+        });
+      }
     }
-    while(exports.createdActions.length) {
-        createdActions.pop();
-    }
-};
-Reflux.connect = function (listenable, key) {
-  var key = arguments.length > 2 ? [].slice.call(arguments, 1) : key;
+  });
 
-  var getStateFromArray = function (source, arr) {
+  return Store;
+})();
+
+module.exports = Store;
+
+},{"./Actions":2,"./Getter":6,"./mixins/connect":10,"./utils":11}],8:[function(require,module,exports){
+"use strict";
+
+var config = {
+  privateMethods: new Set("set", "update", "trigger", "distribute", "triggerAsync")
+};
+
+module.exports = config;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  cx: function cx(classNames) {
+    if (typeof classNames == "object") {
+      return Object.keys(classNames).filter(function (className) {
+        return classNames[className];
+      }).join(" ");
+    } else {
+      return Array.prototype.join.call(arguments, " ");
+    }
+  }
+};
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+module.exports = getConnectMixin;
+
+var utils = _interopRequire(require("../utils"));
+
+function getConnectMixin(store) {
+  for (var _len = arguments.length, key = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    key[_key - 1] = arguments[_key];
+  }
+
+  var getStateFromArray = function getStateFromArray(source, array) {
     var state = {};
-    arr.forEach(function (k) {
-      state[k] = source[k];
-    })
+    array.forEach(function (k) {
+      if (typeof k === "string") {
+        // connect('itemName')
+        state[k] = source.get(k);
+      } else if (utils.isObject(k)) {
+        Object.keys(k).forEach(function (name) {
+          if (typeof k[name] === "function") {
+            // connect({data: function (d) {return d.name}})
+            state[k] = k[name](source.get(k));
+          } else if (typeof k[name] === "string") {
+            // connect({nameInStore: nameInComponent})
+            state[k[name]] = source.get(name);
+          }
+        });
+      }
+    });
     return state;
   };
 
-  return {
-    getInitialState: function () {
-      var initialData;
-      if (Array.isArray(key)) {
-        initialData = listenable.get()
-        var state = getStateFromArray(initialData, key)
-        return state
-      } else if (!key) {
-        return (initialData = listenable.get()) ? initialData : {}
-      } else if (typeof key === 'string') {
-        initialData = listenable.get();
-        var state = {};
-        state[key] = initialData[key];
-        return state;
-      }
-    },
-    componentDidMount: function() {
-      for(var m in Reflux.ListenerMethods) {
-        if (this[m] !== Reflux.ListenerMethods[m]){
-          if (this[m]) {
-            throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
-          }
-          this[m] = Reflux.ListenerMethods[m];
-        }
-      }
-      var me = this;
-
-      if (key === undefined) {
-        var cb = this.setState
-      } else {
-        var cb = function(v) {
-          var state = {};
-          if (Array.isArray(key)) {
-            key.forEach(function (k) {
-              state[k] = v[k]
-            });
-          } else {
-            state[key] = utils.isObjectOrFunction(v) ? v[key] : v;
-          }
-          me.setState(state);
-        }
-      }
-      this.listenTo(listenable,cb,cb);
-    },
-    componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
-  };
-};
-// var _ = require('./utils'),
-//     ListenerMethods = require('./ListenerMethods');
-
-/**
- * A module meant to be consumed as a mixin by a React component. Supplies the methods from
- * `ListenerMethods` mixin and takes care of teardown of subscriptions.
- */
-Reflux.ListenerMixin = utils.extend({
-
-    /**
-     * Cleans up all listener previously registered.
-     */
-    componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
-
-}, Reflux.ListenerMethods);
-// var Reflux = require('../src');
-
-
-/**
- * A mixin factory for a React component. Meant as a more convenient way of using the `ListenerMixin`,
- * without having to manually set listeners in the `componentDidMount` method.
- *
- * @param {Action|Store} listenable An Action or Store that should be
- *  listened to.
- * @param {Function|String} callback The callback to register as event handler
- * @param {Function|String} defaultCallback The callback to register as default handler
- * @returns {Object} An object to be used as a mixin, which sets up the listener for the given listenable.
- */
-Reflux.listenTo = function(listenable,callback,initial){
-    return {
-        /**
-         * Set up the mixin before the initial rendering occurs. Import methods from `ListenerMethods`
-         * and then make the call to `listenTo` with the arguments provided to the factory function
-         */
-        componentDidMount: function() {
-            for(var m in Reflux.ListenerMethods){
-                if (this[m] !== Reflux.ListenerMethods[m]){
-                    if (this[m]){
-                        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
-                    }
-                    this[m] = Reflux.ListenerMethods[m];
-                }
-            }
-            this.listenTo(listenable,callback,initial);
-        },
-        /**
-         * Cleans up all listener previously registered.
-         */
-        componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
-    };
-};
-// var Reflux = require('../src');
-
-/**
- * A mixin factory for a React component. Meant as a more convenient way of using the `listenerMixin`,
- * without having to manually set listeners in the `componentDidMount` method. This version is used
- * to automatically set up a `listenToMany` call.
- *
- * @param {Object} listenables An object of listenables
- * @returns {Object} An object to be used as a mixin, which sets up the listeners for the given listenables.
- */
-Reflux.listenToMany = function(listenables){
-    return {
-        /**
-         * Set up the mixin before the initial rendering occurs. Import methods from `ListenerMethods`
-         * and then make the call to `listenTo` with the arguments provided to the factory function
-         */
-        componentDidMount: function() {
-            for(var m in Reflux.ListenerMethods){
-                if (this[m] !== Reflux.ListenerMethods[m]){
-                    if (this[m]){
-                        throw "Can't have other property '"+m+"' when using Reflux.listenToMany!";
-                    }
-                    this[m] = Reflux.ListenerMethods[m];
-                }
-            }
-            this.listenToMany(listenables);
-        },
-        /**
-         * Cleans up all listener previously registered.
-         */
-        componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
-    };
-};
-
-
-/**
- * Convenience function for creating a set of actions
- *
- * @param actionNames the names for the actions to be created
- * @returns an object with actions of corresponding action names
- */
-
-var maker = staticJoinCreator;
-
-Reflux.joinTrailing = Reflux.all = maker('last');
-
-Reflux.joinLeading = maker('first');
-
-Reflux.joinStrict = maker('strict');
-
-Reflux.joinConcat = maker('all');
-
-
-
-Reflux.createActions = function(actionNames) {
-    var i = 0, actions = {};
-    for (; i < actionNames.length; i++) {
-        actions[actionNames[i]] = Reflux.createAction();
-    }
-    return actions;
-};
-
-/**
- * Sets the eventmitter that Reflux uses
- */
-Reflux.setEventEmitter = function(ctx) {
-    var _ = utils;
-    _.EventEmitter = ctx;
-};
-
-/**
- * Sets the method used for deferring actions and stores
- */
-Reflux.nextTick = function(nextTick) {
-    var _ = utils;
-    _.nextTick = nextTick;
-};
-
-/**
- * Provides the set of created actions and stores for introspection
- */
-Reflux.__keep = Keep;
-var Exim = Reflux;
-
-Exim.cx = function (classNames) {
-  console.log('`Exim.cx` is deprecated and will be removed in next versions. Use `Exim.helpers.cx` instead');
-  if (typeof classNames == 'object') {
-    return Object.keys(classNames).filter(function(className) {
-      return classNames[className];
-    }).join(' ');
-  } else {
-    return Array.prototype.join.call(arguments, ' ');
-  }
-};
-
-var helpers = {};
-
-helpers.cx = function (classNames) {
-  if (typeof classNames == 'object') {
-    return Object.keys(classNames).filter(function(className) {
-      return classNames[className];
-    }).join(' ');
-  } else {
-    return Array.prototype.join.call(arguments, ' ');
-  }
-};
-
-Exim.helpers = helpers;
-
-if (typeof React !== 'undefined') {
-  var domHelpers = {};
-
-  var tag = function (name) {
-    var args, attributes, name;
-    args = [].slice.call(arguments, 1);
-    var first = args[0] && args[0].constructor;
-    if (first === Object) {
-      attributes = args.shift();
+  var getState = function getState() {
+    if (key.length) {
+      // get values from array
+      return getStateFromArray(store, key);
     } else {
-      attributes = {};
+      // get all values
+      return store.get();
     }
-    return React.DOM[name].apply(React.DOM, [attributes].concat(args))
   };
 
-  var bindTag = function(tagName) {
-    return domHelpers[tagName] = tag.bind(this, tagName);
+  var changeCallback = function changeCallback() {
+    this.setState(getState());
   };
 
-  for (var tagName in React.DOM) {
-    bindTag(tagName);
-  }
+  return {
+    getInitialState: function getInitialState() {
+      return getState();
+    },
 
-  domHelpers['space'] = function() {
-    return React.DOM.span({
-      dangerouslySetInnerHTML: {
-        __html: '&nbsp;'
-      }
-    });
+    componentDidMount: function componentDidMount() {
+      store.onChange(changeCallback, this);
+    },
+
+    componentWillUnmount: function componentWillUnmount() {
+      store.offChange(changeCallback);
+    }
   };
-
-  Exim.DOM = domHelpers;
-
-  Exim.addTag = function (name, tag) {
-    this.DOM[name] = tag;
-  }
 }
 
-  var toS = Object.prototype.toString;
+},{"../utils":11}],11:[function(require,module,exports){
+"use strict";
 
-  if (typeof ReactRouter === "object") {
-    var routerElements, routerMixins, routerFunctions, routerObjects, copyItems;
+var utils = {};
 
-    routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'];
-    routerMixins = ['Navigation', 'State'];
-    routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'];
-    routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'];
-    copyItems = routerMixins.concat(routerFunctions).concat(routerObjects);
-
-    Exim.Router = {
-      match: function(name, View) {
-        var options = {};
-
-        var routes = [].slice.call(arguments, 2);
-        if (typeof name !== 'string') {
-          routes = [View].concat(routes);
-          View = name;
-          name = null;
-        }
-
-        var firstRouteIsOptions = !(routes[0] && 'props' in routes[0]);
-        if (routes[0] && firstRouteIsOptions) {
-          options = routes[0];
-          routes = routes.slice(1);
-        }
-
-        var opts = {handler: View};
-        if (name) opts.name = name;
-        if (options.path) opts.path = options.path;
-        var args = [opts].concat(routes);
-
-        return ReactRouter.Route.apply(ReactRouter.Route, args);
-      },
-      startRouting: function(routes, element) {
-        return ReactRouter.run(routes, ReactRouter.HistoryLocation, function(Handler) {
-          React.render(React.createElement(Handler, null), element)
-        });
-      },
-      defaultTo: function(View) {
-        return ReactRouter.DefaultRoute({handler: View});
-      }
-    };
-
-    for (var i = 0; i < routerElements.length; i++) {
-      var elementName = routerElements[i];
-      Exim.Router[elementName] = React.createElement.bind(React.createElement, ReactRouter[elementName]);
+utils.getWithoutFields = function (outcast, target) {
+  if (!target) throw new Error("TypeError: target is not an object.");
+  var result = {};
+  if (typeof outcast === "string") outcast = [outcast];
+  for (var fieldName in outcast) {
+    for (var key in target) {
+      if (target.hasOwnProperty(key) && key !== fieldName) result[key] = target[key];
     }
+  }return result;
+};
 
-    for (var i = 0; i < copyItems.length; i++) {
-      var itemName = copyItems[i];
-      Exim.Router[itemName] = ReactRouter[itemName];
+utils.objectToArray = function (object) {
+  return Object.keys(object).map(function (key) {
+    return object[key];
+  });
+};
+
+utils.classWithArgs = function (Item, args) {
+  return Item.bind.apply(Item, [Item].concat(args));
+};
+
+// 1. will
+// 2. while(true)
+// 3. on
+// 4. while(false)
+// 5. did or didNot
+utils.mapActionNames = function (object) {
+  var list = [];
+  var prefixes = ["will", "whileStart", "on", "whileEnd", "did", "didNot"];
+  prefixes.forEach(function (item) {
+    var name = item;
+    if (item === "whileStart" || item === "whileEnd") {
+      name = "while";
     }
-  }
+    if (object[name]) {
+      list.push([item, object[name]]);
+    }
+  });
+  return list;
+};
 
-  Exim.createView = function (classArgs) {
-    var ReactClass = React.createClass(classArgs);
-    var ReactElement = React.createElement.bind(React.createElement, ReactClass);
-    return ReactElement;
-  };
+utils.isObject = function (targ) {
+  return targ ? targ.toString().slice(8, 14) === "Object" : false;
+};
 
-  Exim.createAction = Reflux.createAction;
-  Exim.createActions = Reflux.createActions;
-  Exim.createStore = Reflux.createStore;
+utils.capitalize = function (str) {
+  var first = str.charAt(0).toUpperCase();
+  var rest = str.slice(1);
+  return "" + first + "" + rest;
+};
 
-  return Exim;
-});
+module.exports = utils;
+
+},{}]},{},[1]);

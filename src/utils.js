@@ -1,118 +1,52 @@
-var utils = {}
+const utils = {}
 
-utils.isObjectOrFunction = function(obj) {
-    var type = typeof obj;
-    return type === 'function' || type === 'object' && !!obj;
+utils.getWithoutFields = function (outcast, target) {
+  if (!target) throw new Error('TypeError: target is not an object.');
+  var result = {};
+  if (typeof outcast === 'string') outcast = [outcast];
+  for (let fieldName in outcast)
+    for (let key in target)
+      if (target.hasOwnProperty(key) && key !== fieldName)
+        result[key] = target[key];
+  return result;
 };
 
-utils.extend = function(obj) {
-    if (!utils.isObjectOrFunction(obj)) {
-        return obj;
-    }
-    var source, kl;'//';
-    for (var i = 1, length = arguments.length; i < length; i++) {
-        source = arguments[i];
-        for (var prop in source) {
-            obj[prop] = source[prop];
-        }
-    }
-    return obj;
-};
-
-// Expose the class either via AMD, CommonJS or the global object
-if (typeof define === 'function' && define.amd) {
-  utils.EventEmitter = require('EventEmitter')
-}
-else if (typeof module === 'object' && module.exports){
-  utils.EventEmitter = module.exports.EventEmitter;
-}
-else {
-  utils.EventEmitter = window.EventEmitter;
+utils.objectToArray = function (object) {
+  return Object.keys(object).map(key => object[key])
 }
 
-utils.isFunction = function(value) {
-  return typeof value === 'function';
-};
-
-utils.nextTick = function(callback) {
-  setTimeout(callback, 0);
-};
-
-utils.capitalize = function(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
-utils.inheritMixins = function (target, mixins) {
-  if (mixins) {
-    mixins.forEach(function (mixin) {
-      utils.extend(target.prototype, mixin);
-    })
-  }
-};
-
-utils.lookupCallback = function(store, name, prefix) {
-  if (typeof store[name] === 'object') {
-    if (!prefix) prefix = 'on';
-    return store[name][prefix];
-  } else {
-    if (!prefix) {
-      var prefixedName = 'on' + utils.capitalize(name);
-      return store[name] || store[prefixedName];
-    } else {
-      return store[prefix + utils.capitalize(name)];
-    }
-  }
-};
-
-utils.object = function(keys,vals){
-  var o={}, i=0;
-  for(;i<keys.length;i++){
-      o[keys[i]] = vals[i];
-  }
-  return o;
-};
-
-utils.clone = function (orig) {
-    var copy;
-
-    if (null == orig || "object" != typeof orig) {
-        return orig;
-    }
-
-    if (orig instanceof Date) {
-        copy = new Date();
-        copy.setTime(orig.getTime());
-        return copy;
-    }
-
-    if (orig instanceof Array) {
-        copy = [];
-        for (var i = 0, len = orig.length; i < len; i++) {
-            copy[i] = utils.clone(orig[i]);
-        }
-        return copy;
-    }
-
-    if (orig instanceof Object) {
-        copy = {};
-        for (var key in orig) {
-            if (orig.hasOwnProperty(key)) {
-                copy[key] = utils.clone(orig[key]);
-            }
-        }
-        return copy;
-    }
-
-    throw new Error("Unable to copy!");
+utils.classWithArgs = function (Item, args) {
+  return Item.bind.apply(Item,[Item].concat(args));
 }
 
-utils.isArguments = function(value) {
-    return value && typeof value == 'object' && typeof value.length == 'number' &&
-      (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
+// 1. will
+// 2. while(true)
+// 3. on
+// 4. while(false)
+// 5. did or didNot
+utils.mapActionNames = function(object) {
+  const list = [];
+  const prefixes = ['will', 'whileStart', 'on', 'whileEnd', 'did', 'didNot']
+  prefixes.forEach(item => {
+    let name = item;
+    if (item === 'whileStart' || item === 'whileEnd') {
+      name = 'while';
+    }
+    if (object[name]) {
+      list.push([item, object[name]]);
+    }
+  });
+  return list;
 };
 
-utils.throwIf = function(val,msg){
-    if (val){
-        throw Error(msg||val);
-    }
-};
+utils.isObject = function (targ) {
+  return targ ? targ.toString().slice(8,14) === 'Object' : false
+}
+
+utils.capitalize = function (str) {
+  const first = str.charAt(0).toUpperCase();
+  const rest = str.slice(1);
+  return `${first}${rest}`;
+}
+
+export default utils
