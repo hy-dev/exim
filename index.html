@@ -25,29 +25,32 @@
       actions: ['fetch'],
       initial: {
         items: [],
-        fetching: false
+        fetching: false,
+        error: null,
+        data: null
       },
       fetch: {
         while: function(state) {
-          console.log(state, 'while');
+          // console.log(state, 'while');
           this.set('fetching', state);
         },
         will: function() {
           // console.log('will')
-          return new Promise(function(res){
-            setTimeout(res, 500, 'willResult');
-          })
+          this.set('error', null);
         },
         on: function() {
-          return fetch('/package.json').then(function(response) {
+          // console.log('on')
+          return fetch('package.json').then(function(response) {
+            console.log(response.status >= 200)
             return response.json();
           });
         },
         did: function(data) {
           // console.log('did')
-          return new Promise(function(res) {
-            setTimeout(res, 500, 'didResult');
-          });
+          this.set({data: data})
+        },
+        didNot: function (xhr) {
+          this.set('error', xhr.message);
         }
       }
     })
@@ -59,18 +62,17 @@
     });
 
     var El = Exim.createView({
-      mixins: [store.connect('fetching')],
+      mixins: [store.connect('fetching', 'error', 'data')],
       fetch: function () {
         store.actions.fetch()
       },
       render: function () {
-        console.log(this.state);
+        var data = this.state.data
         return Exim.DOM.div({className: 'test-cls'},
           'HELLO',
           Ell(),
-          Exim.DOM.i('!!!'),
-          [1,2,3],
-          Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH')
+          Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH'),
+          Exim.DOM.div(this.state.error || data || '')
         )
       }
     });
