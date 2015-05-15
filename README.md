@@ -27,6 +27,13 @@ Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
 
+### Exim 0.6.1 (16 May 2015)
+
+1. Implement **store.reset()** / **store.reset(prop)**.
+2. Getter: Revert logic. Fix allowed methods bug.
+3. while[Action]: Fix `didNot` case bug.
+4. Fix *Unhandled rejection* error.
+
 ### Exim 0.6.0 (15 May 2015)
 
 1. Massive reduce in size. Exim is only 4K now (when gzipped).
