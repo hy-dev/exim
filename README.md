@@ -46,6 +46,8 @@ Initial release.
 
 ## License
 
+Exim is currently maintained by Paul Miller and Artem Yavorsky.
+
 The MIT License (MIT)
 
 Copyright (c) 2014 Hellyeah LLC http://hellyeah.is
