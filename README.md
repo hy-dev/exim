@@ -27,6 +27,13 @@ Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
 
+### Exim 0.6.0 (15 May 2015)
+
+1. Massive reduce in size. Exim is only 4K now (when gzipped).
+2. Dropped all dependencies. But of course you'll need to include React.
+3. Massive simplification.
+4. Rewritten in ES6.
+
 ### Exim 0.5.0 (6 May 2015)
 
 1. Implement **Exim.createView**.
