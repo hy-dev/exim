@@ -400,7 +400,7 @@ var Store = (function () {
     var initial = args.initial;
 
     this.initial = initial = typeof initial === "function" ? initial() : initial;
-    var store = Object.create(initial) || {};
+    var store = initial ? Object.create(initial) : {};
 
     var privateMethods = undefined;
     if (!args.privateMethods) {

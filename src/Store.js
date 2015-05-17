@@ -7,7 +7,7 @@ export default class Store {
   constructor(args={}) {
     let {actions, initial} = args;
     this.initial = initial = typeof initial === 'function' ? initial() : initial;
-    const store = Object.create(initial) || {};
+    const store = initial ? Object.create(initial) : {};
 
     let privateMethods;
     if (!args.privateMethods) {
