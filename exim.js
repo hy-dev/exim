@@ -631,6 +631,8 @@ var Store = (function () {
             throw error;
           }
         });
+
+        return promise;
       }
     }
   });

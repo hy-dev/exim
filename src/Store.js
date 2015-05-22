@@ -212,5 +212,7 @@ export default class Store {
         throw error
       }
     });
+
+    return promise;
   }
 }
