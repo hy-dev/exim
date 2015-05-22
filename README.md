@@ -27,6 +27,10 @@ Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
 
+### Exim 0.6.2 (22 May 2015)
+
+1. Fix action's chain bug.
+
 ### Exim 0.6.1 (16 May 2015)
 
 1. Implement **store.reset()** / **store.reset(prop)**.
