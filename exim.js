@@ -1,4 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -32,12 +33,18 @@ Exim.createStore = function (args) {
   return new Store(args);
 };
 
-if (typeof window === "undefined") {
-  module.exports = Exim;
+var root = typeof self === "object" && self.self === self && self || typeof global === "object" && global.global === global && global;
+
+if (typeof root.exports !== "undefined") {
+  if (typeof module !== "undefined" && module.exports) {
+    exports = module.exports = Exim;
+  }
+  exports.Exim = Exim;
 } else {
-  window.Exim = Exim;
+  root.Exim = Exim;
 }
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./Actions":2,"./DOMHelpers":4,"./Store":7,"./helpers":9}],2:[function(require,module,exports){
 "use strict";
 

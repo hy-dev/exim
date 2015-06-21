@@ -17,8 +17,13 @@ Exim.createStore = function (args) {
   return new Store(args);
 }
 
-if (typeof window === 'undefined') {
-  module.exports = Exim;
+const root = typeof self === 'object' && self.self === self && self || typeof global === 'object' && global.global === global && global;
+
+if (typeof root.exports !== 'undefined') {
+  if (typeof module !== 'undefined' && module.exports) {
+    exports = module.exports = Exim;
+  }
+  exports.Exim = Exim;
 } else {
-  window.Exim = Exim;
+  root.Exim = Exim;
 }
