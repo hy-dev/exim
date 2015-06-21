@@ -27,6 +27,10 @@ Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
 
+### Exim 0.6.3 (21 Jun 2015)
+
+1. Fix NPM support.
+
 ### Exim 0.6.2 (22 May 2015)
 
 1. Fix action's chain bug.
