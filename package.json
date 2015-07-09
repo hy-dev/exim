@@ -2,12 +2,15 @@
   "name": "exim",
   "version": "0.6.3",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
-  "main": "exim.js",
+  "main": "./lib",
   "scripts": {
     "watch": "watchify src/ -o exim.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm run build",
+    "build": "node build.js && babel --stage 1 ./src --out-dir ./lib"
   },
   "devDependencies": {
+    "babel": "^5.4.3",
     "browserify": "^8.1.0",
     "watchify": "^3.2.0",
     "babelify": "^5.0.3",

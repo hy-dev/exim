@@ -19,11 +19,4 @@ Exim.createStore = function (args) {
 
 const root = typeof self === 'object' && self.self === self && self || typeof global === 'object' && global.global === global && global;
 
-if (typeof root.exports !== 'undefined') {
-  if (typeof module !== 'undefined' && module.exports) {
-    exports = module.exports = Exim;
-  }
-  exports.Exim = Exim;
-} else {
-  root.Exim = Exim;
-}
+export default Exim;
