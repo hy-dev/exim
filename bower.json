@@ -6,7 +6,7 @@
     "Paul Miller <paul@paulmillr.com>"
   ],
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library.",
-  "main": "exim.js",
+  "main": "dist/exim.js",
   "devDependencies": {
     "qunit": "~1"
   },
