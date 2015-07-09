@@ -1,12 +1,12 @@
-import utils from '../utils'
+import utils from '../utils';
 
 export default function getConnectMixin (store, ...key) {
   let getStateFromArray = function (source, array) {
-    let state = {}
+    let state = {};
     array.forEach(k => {
       if (typeof k === 'string') {
         // connect('itemName')
-        state[k] = source.get(k)
+        state[k] = source.get(k);
       } else if (utils.isObject(k)) {
         Object.keys(k).forEach(name => {
           if (typeof k[name] === 'function') {
@@ -14,31 +14,31 @@ export default function getConnectMixin (store, ...key) {
             state[k] = k[name](source.get(k));
           } else if (typeof k[name] === 'string') {
             // connect({nameInStore: nameInComponent})
-            state[k[name]] = source.get(name)
+            state[k[name]] = source.get(name);
           }
-        })
+        });
       }
     });
     return state;
-  }
+  };
 
   let getState = function () {
     if (key.length) {
-        // get values from array
+        // get values from arrayl
       return getStateFromArray(store, key);
     } else {
       // get all values
-      return store.get()
+      return store.get();
     }
-  }
+  };
 
   let changeCallback = function () {
     this.setState(getState());
-  }
+  };
 
   return {
     getInitialState: function () {
-      return getState()
+      return getState();
     },
 
     componentDidMount: function () {
@@ -48,5 +48,5 @@ export default function getConnectMixin (store, ...key) {
     componentWillUnmount: function () {
       store.offChange(changeCallback);
     }
-  }
+  };
 }

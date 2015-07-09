@@ -8,4 +8,4 @@ export default {
       return Array.prototype.join.call(arguments, ' ');
     }
   }
-}
+};
