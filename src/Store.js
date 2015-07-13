@@ -1,7 +1,6 @@
-import {Actions} from './Actions'
-import connect from './mixins/connect'
-import Getter from './Getter'
-import utils from './utils'
+import {Actions} from './Actions';
+import Getter from './Getter';
+import utils from './utils';
 
 export default class Store {
   constructor(args={}) {
@@ -11,11 +10,12 @@ export default class Store {
 
     let privateMethods;
     if (!args.privateMethods) {
-      privateMethods = new Set()
+      privateMethods = new Set();
     } else if (Array.isArray(args.privateMethods)) {
       privateMethods = new Set();
-      args.privateMethods.forEach(m => privateSet.add(m));
-      args.privateMethods = privateSet;
+      // private set is undefined
+      // args.privateMethods.forEach(m => privateSet.add(m));
+      // args.privateMethods = privateSet;
     } else if (args.privateMethods.constructor === Set) {
       privateMethods = args.privateMethods;
     }
@@ -33,11 +33,11 @@ export default class Store {
     const setValue = function (key, value) {
       const correctArgs = ['key', 'value'].every(item => typeof item === 'string');
       return (correctArgs) ? store[key] = value : false;
-    }
+    };
 
     const getValue = function (key) {
       return key ? store[key] : Object.create(store);
-    }
+    };
 
     const removeValue = function (key) {
       let success = false;
@@ -49,7 +49,7 @@ export default class Store {
        success = store[key] && delete store[key];
       }
       return success;
-    }
+    };
 
     const set = function (item, value, options={}) {
       if (utils.isObject(item)) {
@@ -63,13 +63,13 @@ export default class Store {
       if (!options.silent) {
         _this.getter.emit();
       }
-    }
+    };
 
     const get = function (item) {
       if (typeof item === 'string' || typeof item === 'number') {
         return getValue(item);
       } else if (Array.isArray(item)) {
-        return item.map(key => getValue(key))
+        return item.map(key => getValue(key));
       } else if (!item) {
         return getValue();
       } else if (typeof item === 'object') {
@@ -80,12 +80,12 @@ export default class Store {
           if (type === 'function') {
             result[key] = item[key](getValue(key));
            } else if (type === 'sting') {
-            result[key] = getValue(key)[val]
+            result[key] = getValue(key)[val];
           }
         }
         return result;
       }
-    }
+    };
 
     const reset = function (item, options={}) {
       if (item) {
@@ -96,22 +96,21 @@ export default class Store {
       if (!options.silent) {
         _this.getter.emit();
       }
-    }
+    };
 
     this.set = set;
     this.get = get;
     this.reset = reset;
 
     this.stateProto = {set, get, reset, actions};
-
-    return this.getter = new Getter(this);
+    this.getter = new Getter(this);
   }
 
   addAction(item) {
     if (Array.isArray(item)) {
-      this.actions = this.actions.concat(actions)
+      this.actions = this.actions.concat(this.actions);
     } else if (typeof item === 'object') {
-      this.actions.push(item)
+      this.actions.push(item);
     }
   }
 
@@ -122,7 +121,7 @@ export default class Store {
       if (action) action.removeStore(this);
     } else if (typeof item === 'object') {
       action = item;
-      index = this.actions.indexOf(action);
+      let index = this.actions.indexOf(action);
       if (index !== -1) {
         action.removeStore(this);
         this.actions = this.actions.splice(index, 1);
@@ -132,20 +131,17 @@ export default class Store {
 
   getActionCycle(actionName, prefix='on') {
     const capitalized = utils.capitalize(actionName);
-    const fullActionName = `${prefix}${capitalized}`
+    const fullActionName = `${prefix}${capitalized}`;
     const handler = this.handlers[fullActionName] || this.handlers[actionName];
     if (!handler) {
-      throw new Error(`No handlers for ${actionName} action defined in current store`)
+      throw new Error(`No handlers for ${actionName} action defined in current store`);
     }
+
     let actions;
-    // if (Array.isArray(handler)) {
-    //   actions = handlers;
-    // } else
     if (typeof handler === 'object') {
-      // actions = utils.mapActionNames(handler);
       actions = handler;
     } else if (typeof handler === 'function') {
-      actions = {on: handler}
+      actions = {on: handler};
     } else {
       throw new Error(`${handler} must be an object or function`);
     }
@@ -169,7 +165,7 @@ export default class Store {
 
     // Pre-check & preparations.
     if (will) promise = promise.then(() => {
-      return will.apply(state, args)
+      return will.apply(state, args);
     });
 
     // Start while().
@@ -181,7 +177,7 @@ export default class Store {
     // Actual execution.
     promise = promise.then((willResult) => {
       if (willResult == null) {
-        return on_.apply(state, args)
+        return on_.apply(state, args);
       } else {
         return on_.call(state, willResult);
       }
@@ -201,15 +197,15 @@ export default class Store {
 
     // Handle the result.
     if (did) promise = promise.then(onResult => {
-      return did.call(state, onResult)
+      return did.call(state, onResult);
     });
 
     promise.catch(error => {
       if (while_) while_.call(state, false);
       if (didNot) {
-        didNot.call(state, error)
+        didNot.call(state, error);
       } else {
-        throw error
+        throw error;
       }
     });
 

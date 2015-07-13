@@ -1,4 +1,5 @@
-import utils from './utils'
+import React from 'react';
+import ReactRouter from 'react-router';
 
 function getRouter () {
   const Router = {};
@@ -32,18 +33,14 @@ function getDOM () {
       } else {
         attributes = {};
       }
-      return React.DOM[name].apply(React.DOM, [attributes].concat(args))
-    };
-
-    let bindTag = function(tagName) {
-      return DOMHelpers[tagName] = tag.bind(this, tagName);
+      return React.DOM[name].apply(React.DOM, [attributes].concat(args));
     };
 
     for (let tagName in React.DOM) {
-      bindTag(tagName);
+      DOMHelpers[tagName] = tag.bind(this, tagName);
     }
 
-    DOMHelpers['space'] = function() {
+    DOMHelpers.space = function() {
       return React.DOM.span({
         dangerouslySetInnerHTML: {
           __html: '&nbsp;'
@@ -61,4 +58,4 @@ export function createView (classArgs) {
   let ReactClass = React.createClass(classArgs);
   let ReactElement = React.createElement.bind(React.createElement, ReactClass);
   return ReactElement;
-};
+}
