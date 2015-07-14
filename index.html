@@ -28,7 +28,11 @@
         fetching: false,
         error: null,
         data: null,
-        word: 'Hello'
+        word: 'Hello',
+        user: {
+          email:'test',
+          location:{}
+        }
       },
       fetch: {
         while: function(state) {
@@ -68,6 +72,7 @@
         store.actions.fetch()
       },
       render: function () {
+        console.log(this.state.user.email);
         var data = this.state.data;
         return Exim.DOM.div({className: 'test-cls'},
           this.state.word,
