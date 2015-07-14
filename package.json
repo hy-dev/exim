@@ -16,6 +16,7 @@
     "babelify": "^5.0.3",
     "browserify": "^8.1.0",
     "eslint": "^0.24.0",
+    "exposify": "^0.4.3",
     "phantomjs": "~1.9.2",
     "watchify": "^3.2.0"
   },

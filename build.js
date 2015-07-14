@@ -1,12 +1,17 @@
 var fs = require("fs");
 var browserify = require("browserify");
 var babelify = require("babelify");
-var bro = browserify({ debug: true, cache: {}, packageCache: {}});
+var bro = browserify({ debug: true, cache: {}, packageCache: {}, standalone: 'Exim'});
 
 function update () {
   bro
     .transform(babelify)
-    .external(['react', 'react-router'])
+	.transform('exposify', {
+		expose:{
+			'react':'React',
+			'react-router':'ReactRouter'
+		}
+	})
     .require("./src", { entry: true })
     .bundle()
     .on("error", function (err) { console.log("Error : " + err.message); })
