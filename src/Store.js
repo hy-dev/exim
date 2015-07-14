@@ -104,6 +104,7 @@ export default class Store {
 
     this.stateProto = {set, get, reset, actions};
     this.getter = new Getter(this);
+    return this.getter;
   }
 
   addAction(item) {
