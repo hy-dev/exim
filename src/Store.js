@@ -6,7 +6,7 @@ export default class Store {
   constructor(args={}) {
     let {actions, initial} = args;
     this.initial = initial = typeof initial === 'function' ? initial() : initial;
-    const store = initial ? Object.create(initial) : {};
+    const store = initial ? Object.assign(initial) : {};
 
     let privateMethods;
     if (!args.privateMethods) {
@@ -35,7 +35,9 @@ export default class Store {
     };
 
     const getValue = function (key) {
-      return key ? store[key] : store;
+      return Object.assign(
+        (key ? store[key] : store)
+      );
     };
 
     const removeValue = function (key) {
