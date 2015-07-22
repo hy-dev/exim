@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "npm run build && make",
     "lint": "eslint src",
-    "build": "npm run lint && node build.js && babel --stage 1 ./src --out-dir ./lib"
+    "build": "npm run lint && node build.js && babel --optional runtime --stage 1 ./src --out-dir ./lib"
   },
   "devDependencies": {
     "babel": "^5.4.3",

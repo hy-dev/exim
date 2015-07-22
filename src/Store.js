@@ -6,7 +6,7 @@ export default class Store {
   constructor(args={}) {
     let {actions, initial} = args;
     this.initial = initial = typeof initial === 'function' ? initial() : initial;
-    const store = initial ? Object.create(initial) : {};
+    const store = initial ? Object.assign(initial) : {};
 
     let privateMethods;
     if (!args.privateMethods) {
@@ -31,29 +31,29 @@ export default class Store {
     let _this = this;
 
     const setValue = function (key, value) {
-      const correctArgs = ['key', 'value'].every(item => typeof item === 'string');
-      return (correctArgs) ? store[key] = value : false;
+      store[key] = value;
     };
 
     const getValue = function (key) {
-      return key ? store[key] : Object.create(store);
+      return Object.assign(
+        (key ? store[key] : store)
+      );
     };
 
     const removeValue = function (key) {
       let success = false;
       if (!key) {
         for (let key in store) {
-          success = store[key] && delete store[key];
+          store[key] = initial[key];
         }
       } else {
-       success = store[key] && delete store[key];
+        store[key] = initial[key];
       }
       return success;
     };
 
     const set = function (item, value, options={}) {
       if (utils.isObject(item)) {
-        if (utils.isObject(value)) options = value;
         for (let key in item) {
           setValue(key, item[key], options);
         }
