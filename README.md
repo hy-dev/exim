@@ -27,6 +27,10 @@ Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
 
+### Exim 0.7.0 (4 Aug 2015)
+1. Exim is webpack and browserify-friendly now.
+2. Fixed an issue related to `set` in stores.
+
 ### Exim 0.6.3 (21 Jun 2015)
 
 1. Fix NPM support.
