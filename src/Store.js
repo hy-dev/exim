@@ -1,25 +1,18 @@
 import {Actions} from './Actions';
-import Getter from './Getter';
 import utils from './utils';
+import Freezer from 'freezer-js';
+import getConnectMixin from './mixins/connect';
+
 
 export default class Store {
   constructor(args={}) {
     let {actions, initial} = args;
-    this.initial = initial = typeof initial === 'function' ? initial() : initial;
-    const store = initial ? Object.assign(initial) : {};
+    let init = typeof initial === 'function' ? initial() : initial;
+    let store = new Freezer(init);
 
-    let privateMethods;
-    if (!args.privateMethods) {
-      privateMethods = new Set();
-    } else if (Array.isArray(args.privateMethods)) {
-      privateMethods = new Set();
-      // private set is undefined
-      // args.privateMethods.forEach(m => privateSet.add(m));
-      // args.privateMethods = privateSet;
-    } else if (args.privateMethods.constructor === Set) {
-      privateMethods = args.privateMethods;
-    }
-    this.privateMethods = privateMethods;
+    this.connect = function (...args) {
+      return getConnectMixin(this, args.concat(args));
+    };
 
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
 
@@ -28,74 +21,16 @@ export default class Store {
       this.actions.addStore(this);
     }
 
-    let _this = this;
-
-    const setValue = function (key, value) {
-      store[key] = value;
-    };
-
-    const getValue = function (key) {
-      return Object.assign(
-        (key ? store[key] : store)
-      );
-    };
-
-    const removeValue = function (key) {
-      let success = false;
-      if (!key) {
-        for (let key in store) {
-          store[key] = initial[key];
-        }
-      } else {
-        store[key] = initial[key];
-      }
-      return success;
-    };
-
-    const set = function (item, value, options={}) {
-      if (utils.isObject(item)) {
-        for (let key in item) {
-          setValue(key, item[key], options);
-        }
-      } else {
-        setValue(item, value, options);
-      }
-      if (!options.silent) {
-        _this.getter.emit();
-      }
+    const set = function (item, value) {
+      store.get().set(item, value);
     };
 
     const get = function (item) {
-      if (typeof item === 'string' || typeof item === 'number') {
-        return getValue(item);
-      } else if (Array.isArray(item)) {
-        return item.map(key => getValue(key));
-      } else if (!item) {
-        return getValue();
-      } else if (typeof item === 'object') {
-        let result = {};
-        for (let key in item) {
-          let val = item[key];
-          let type = typeof val;
-          if (type === 'function') {
-            result[key] = item[key](getValue(key));
-           } else if (type === 'sting') {
-            result[key] = getValue(key)[val];
-          }
-        }
-        return result;
-      }
+      return store.get(item);
     };
 
-    const reset = function (item, options={}) {
-      if (item) {
-        setValue(item, initial[item]);
-      } else {
-        removeValue(item);
-      }
-      if (!options.silent) {
-        _this.getter.emit();
-      }
+    const reset = function () {
+      store.set(init);
     };
 
     this.set = set;
@@ -103,8 +38,8 @@ export default class Store {
     this.reset = reset;
 
     this.stateProto = {set, get, reset, actions};
-    this.getter = new Getter(this);
-    return this.getter;
+    //this.getter = new Getter(this);
+    return this;
   }
 
   addAction(item) {
@@ -202,7 +137,7 @@ export default class Store {
     });
 
     promise.catch(error => {
-      if (while_) while_.call(state, false);
+      if (while_) while_.call(this, state, false);
       if (didNot) {
         didNot.call(state, error);
       } else {

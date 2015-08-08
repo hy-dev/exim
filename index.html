@@ -19,8 +19,8 @@
         word: 'Hello',
         user: {
           email:'test',
-          location:{}
-        }
+          location:{},
+        },
       },
       fetch: {
         while: function(state) {
@@ -48,13 +48,13 @@
       }
     });
 
-    var Ell = Exim.createView({
+    var SubView = Exim.createView({
       render: function () {
         return Exim.DOM.span('WORLD');
       }
     });
 
-    var El = Exim.createView({
+    var View = Exim.createView({
       mixins: [window.store.connect()],
       fetch: function () {
         window.store.actions.fetch();
@@ -66,15 +66,15 @@
         var data = this.state.data;
         return Exim.DOM.div({className: 'test-cls'},
           this.state.word,
-          Ell(),
+          SubView(),
           Exim.DOM.button({onClick: this.fetch}, this.state.user.email),
           Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH'),
+          Exim.DOM.div(JSON.stringify(data)),
           Exim.DOM.div(this.state.error || data || '')
         );
       }
     });
-    React.render(El(), document.body);
-
+    React.render(View(), document.body);
   </script>
 </body>
 </html>
