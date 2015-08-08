@@ -4,7 +4,7 @@
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
   "main": "./lib",
   "scripts": {
-    "watch": "watchify src/ -o exim.js",
+    "watch": "watchify --entry -t babelify src/ -o dist/exim.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublish": "npm run build && make",
     "lint": "eslint src",
@@ -41,5 +41,8 @@
   "bugs": {
     "url": "https://github.com/hellyeahllc/exim/issues"
   },
-  "homepage": "https://github.com/hellyeahllc/exim"
+  "homepage": "https://github.com/hellyeahllc/exim",
+  "dependencies": {
+    "freezer-js": "^0.6.0"
+  }
 }
