@@ -26,7 +26,9 @@ export default class Store {
     };
 
     const get = function (item) {
-      return store.get(item);
+      if (item)
+        return store.get().toJS()[item];
+      return store.get();
     };
 
     const reset = function () {
