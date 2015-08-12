@@ -32,7 +32,7 @@ export default class Store {
     };
 
     const reset = function () {
-      store.set(init);
+      this.set(init);
     };
 
     this.set = set;
