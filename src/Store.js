@@ -8,7 +8,7 @@ export default class Store {
   constructor(args={}) {
     let {actions, initial} = args;
     let init = typeof initial === 'function' ? initial() : initial;
-    let store = new Freezer(init);
+    let store = new Freezer(init || {});
 
     this.connect = function (...args) {
       return getConnectMixin(this, args.concat(args));
@@ -38,6 +38,7 @@ export default class Store {
     this.set = set;
     this.get = get;
     this.reset = reset;
+    this.store = store;
 
     this.stateProto = {set, get, reset, actions};
     //this.getter = new Getter(this);
