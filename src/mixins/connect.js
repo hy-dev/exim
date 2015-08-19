@@ -18,7 +18,8 @@ export default function getConnectMixin (store) {
     },
 
     componentWillUnmount: function () {
-      listener.off('update');
+      if (listener)
+        listener.off('update');
     }
   };
 }
