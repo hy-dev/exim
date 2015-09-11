@@ -3,23 +3,24 @@ export default function getConnectMixin (store) {
     this.setState(state.toJS());
   };
 
-  let listener;
+  let listener, changeCallbackBound;
 
   return {
     getInitialState: function () {
       const frozen = store.store.get(arguments);
       const state = frozen.toJS();
+      changeCallbackBound = changeCallback.bind(this);
       listener = frozen.getListener();
       return state;
     },
 
     componentDidMount: function () {
-      listener.on('update', changeCallback.bind(this));
+      listener.on('update', changeCallbackBound);
     },
 
     componentWillUnmount: function () {
       if (listener)
-        listener.off('update');
+        listener.off('update', changeCallbackBound);
     }
   };
 }
