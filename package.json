@@ -43,6 +43,6 @@
   },
   "homepage": "https://github.com/hellyeahllc/exim",
   "dependencies": {
-    "freezer-js": "^0.6.0"
+    "freezer-js": "^0.6.1"
   }
 }
