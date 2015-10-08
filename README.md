@@ -1,5 +1,3 @@
-**[[PRE-RELEASE]]. Public release is expected soon. Please don't publicly share links to Exim for now.**
-
 # Exim.js
 
 [hellyeah.is/exim](http://hellyeah.is/exim/)
