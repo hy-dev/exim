@@ -4,18 +4,17 @@
 
 An architecture for HTML5 apps using Facebook's Flux.js library.
 
-Standing on the shoulders of giants
+> Standing on the shoulders of giants.
 
-## 8 reasons why Exim
+## 7 reasons why Exim
 
 1. React.js - using the great Facebook base
 2. Flux.js - new architecture from Facebook, modern replacement for MVC.
-3. Intelligible React-based Router
-4. Tremendeously simple structure.
+3. Ultra-cool sugar for React router 
+4. Tremendeously simple structure. Just enough for 99% of everyday dev needs.
 5. First-class JS & coffeescript with support for short syntax.
 6. Lightweight, no big dependencies.
 7. Brunch, Grunt, Gulp boilerplates. Bower, NPM, Browserify, AMD & Common.js support
-8. Great conventions.
 
 ## Dependencies
 
