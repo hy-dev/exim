@@ -1,8 +1,24 @@
 import React from 'react';
 import ReactRouter from 'react-router';
 
+function getFilePath(name) {
+  let segments = name.split('-');
+  let filePath;
+  if (segments.length > 1) {
+    filePath = segments.map(function(name, i){
+      if (i>0)
+        return name.charAt(0).toUpperCase() + name.slice(1)
+      return name
+    }).join('/');
+  } else {
+    filePath = name + '/' + name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  return filePath;
+}
+
 function getRouter () {
   const Router = {};
+
   if (typeof ReactRouter !== 'undefined') {
     let routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'],
     routerMixins = ['Navigation', 'State'],
@@ -17,7 +33,43 @@ function getRouter () {
     copiedItems.forEach(function(name) {
       Router[name] = ReactRouter[name];
     });
+
+    Router['mount'] = function(path) {
+      console.log('Exim.Router.mount is not defined');
+    }
+
+    Router['match'] = function(name, handler, args, children) {
+      if (typeof args === 'undefined' && Array.isArray(handler)) {
+        children = handler;
+        args = {};
+        handler = Router.mount(getFilePath(name));
+      } else if (typeof args === 'undefined' && typeof handler === 'object'){
+        args = handler;
+        handler = Router.mount(getFilePath(name));
+      } else if (typeof handler === 'object' && Array.isArray(args)) {
+        children = args;
+        args = handler;
+        handler = Router.mount(getFilePath(name));
+      }
+      let path, key, def;
+
+      if (typeof args === 'object') {
+        path = args.path;
+        key = args.key;
+        def = args.default;
+      }
+
+      // if (typeof path === 'undefined' && (typeof def === 'undefined' || def === false))
+      //   path = name;
+
+      if (def === true) {
+        return Router['DefaultRoute']({name, path, handler, key}, children);
+      }
+
+      return Router['Route']({name, path, handler, key}, children);
+    };
   }
+
   return Router;
 }
 
@@ -57,5 +109,6 @@ export const DOM = getDOM();
 export function createView (classArgs) {
   let ReactClass = React.createClass(classArgs);
   let ReactElement = React.createElement.bind(React.createElement, ReactClass);
+
   return ReactElement;
 }
