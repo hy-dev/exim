@@ -1,4 +1,4 @@
-const utils = {};
+const utils = {}
 
 utils.getWithoutFields = function (outcast, target) {
   if (!target) throw new Error('TypeError: target is not an object.');
@@ -18,7 +18,7 @@ utils.getWithoutFields = function (outcast, target) {
 };
 
 utils.objectToArray = function (object) {
-  return Object.keys(object).map(key => object[key]);
+  return Object.keys(object).map(key => object[key])
 };
 
 utils.classWithArgs = function (Item, args) {
@@ -32,7 +32,7 @@ utils.classWithArgs = function (Item, args) {
 // 5. did or didNot
 utils.mapActionNames = function(object) {
   const list = [];
-  const prefixes = ['will', 'whileStart', 'on', 'whileEnd', 'did', 'didNot'];
+  const prefixes = ['will', 'whileStart', 'on', 'whileEnd', 'did', 'didNot']
   prefixes.forEach(item => {
     let name = item;
     if (item === 'whileStart' || item === 'whileEnd') {
@@ -46,12 +46,13 @@ utils.mapActionNames = function(object) {
 };
 
 utils.isObject = function (targ) {
-  return targ ? targ.toString().slice(8,14) === 'Object' : false;
-};
+  return targ ? targ.toString().slice(8,14) === 'Object' : false
+}
+
 utils.capitalize = function (str) {
   const first = str.charAt(0).toUpperCase();
   const rest = str.slice(1);
   return `${first}${rest}`;
-};
+}
 
-export default utils;
+export default utils

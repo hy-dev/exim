@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactRouter from 'react-router';
+import utils from './utils'
 
 function getFilePath(name) {
   let segments = name.split('-');
@@ -85,14 +84,18 @@ function getDOM () {
       } else {
         attributes = {};
       }
-      return React.DOM[name].apply(React.DOM, [attributes].concat(args));
+      return React.DOM[name].apply(React.DOM, [attributes].concat(args))
+    };
+
+    let bindTag = function(tagName) {
+      return DOMHelpers[tagName] = tag.bind(this, tagName);
     };
 
     for (let tagName in React.DOM) {
-      DOMHelpers[tagName] = tag.bind(this, tagName);
+      bindTag(tagName);
     }
 
-    DOMHelpers.space = function() {
+    DOMHelpers['space'] = function() {
       return React.DOM.span({
         dangerouslySetInnerHTML: {
           __html: '&nbsp;'
@@ -111,4 +114,4 @@ export function createView (classArgs) {
   let ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
   return ReactElement;
-}
+};

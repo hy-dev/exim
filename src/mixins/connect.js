@@ -1,31 +1,52 @@
-export default function getConnectMixin (store) {
-  let changeCallback = function (state) {
-    this.setState(state.toJS());
-  };
+import utils from '../utils'
 
-  let listener;
+export default function getConnectMixin (store, ...key) {
+  let getStateFromArray = function (source, array) {
+    let state = {}
+    array.forEach(k => {
+      if (typeof k === 'string') {
+        // connect('itemName')
+        state[k] = source.get(k)
+      } else if (utils.isObject(k)) {
+        Object.keys(k).forEach(name => {
+          if (typeof k[name] === 'function') {
+            // connect({data: function (d) {return d.name}})
+            state[k] = k[name](source.get(k));
+          } else if (typeof k[name] === 'string') {
+            // connect({nameInStore: nameInComponent})
+            state[k[name]] = source.get(name)
+          }
+        })
+      }
+    });
+    return state;
+  }
+
+  let getState = function () {
+    if (key.length) {
+        // get values from array
+      return getStateFromArray(store, key);
+    } else {
+      // get all values
+      return store.get()
+    }
+  }
+
+  let changeCallback = function () {
+    this.setState(getState());
+  }
 
   return {
     getInitialState: function () {
-      const frozen = store.store.get(arguments);
-      const state = frozen.toJS();
-
-      if (!this.boundEximChangeCallbacks)
-        this.boundEximChangeCallbacks = {};
-
-      this.boundEximChangeCallbacks[store] = changeCallback.bind(this);
-
-      listener = frozen.getListener();
-      return state;
+      return getState()
     },
 
     componentDidMount: function () {
-      listener.on('update', this.boundEximChangeCallbacks[store]);
+      store.onChange(changeCallback, this);
     },
 
     componentWillUnmount: function () {
-      if (listener)
-        listener.off('update', this.boundEximChangeCallbacks[store]);
+      store.offChange(changeCallback);
     }
-  };
+  }
 }
