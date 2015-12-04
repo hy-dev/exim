@@ -224,6 +224,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var utils = _interopRequire(require("./utils"));
 
+var helpers = _interopRequire(require("./helpers"));
+
 function getFilePath(name) {
   var segments = name.split("-");
   var filePath = undefined;
@@ -311,6 +313,12 @@ function getDOM() {
         var first = args[0] && args[0].constructor;
         if (first === Object) {
           attributes = args.shift();
+          if (attributes["class"] != null) {
+            attributes.className = attributes["class"];
+          }
+          if (typeof attributes.className === "object") {
+            attributes.className = helpers.cx(attributes.className);
+          }
         } else {
           attributes = {};
         }
@@ -352,7 +360,7 @@ function createView(classArgs) {
 
 ;
 
-},{"./utils":12}],5:[function(require,module,exports){
+},{"./helpers":10,"./utils":12}],5:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
