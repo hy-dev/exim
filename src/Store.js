@@ -11,6 +11,9 @@ export default class Store {
     this.path = path;
     GlobalStore.init(path, initial, this);
 
+
+    let stateUpdates = new Object();
+
     let privateMethods;
     if (!args.privateMethods) {
       privateMethods = new Set()
@@ -92,11 +95,28 @@ export default class Store {
       }
     }
 
+    const preserve = function(arg1, arg2) {
+      if(typeof arg2 !== 'undefined'){
+        stateUpdates[arg1] = arg2;
+      } else {
+        Object.keys(arg1).forEach(function(key) {
+          stateUpdates[key] = arg1[key];
+        });
+      }
+    }
+
+    const getPreservedState = function() {
+      var newState = new Object(stateUpdates);
+      stateUpdates = new Object();
+      return newState;
+    }
+
     this.set = set;
     this.get = get;
     this.reset = reset;
 
     this.stateProto = {set, get, reset, actions};
+    this.preserverProto = {set: preserve, get, reset, actions, getPreservedState};
 
     return this.getter = new Getter(this);
   }
@@ -160,31 +180,43 @@ export default class Store {
 
     // Local state for this cycle.
     let state = Object.create(this.stateProto);
+    let preserver =  Object.create(this.preserverProto);
 
     // Pre-check & preparations.
     if (will) promise = promise.then(() => {
       return will.apply(state, args)
     });
 
-    // Start while().
-    if (while_) promise = promise.then((willResult) => {
-      while_.call(state, true);
-      return willResult;
-    });
+    var transaction = function(body) {
+      var result = body();
+
+      if (typeof result !== 'undefined' && typeof result.then == 'function') {
+        result.then((res) => {
+          state.set(preserver.getPreservedState());
+          return Promise.resolve(res);
+        });
+      } else {
+        state.set(preserver.getPreservedState());
+      }
+      return result;
+    };
 
     // Actual execution.
-    promise = promise.then((willResult) => {
-      if (willResult == null) {
-        return on_.apply(state, args)
-      } else {
-        return on_.call(state, willResult);
-      }
-    });
-
-    // Stop while().
-    if (while_) promise = promise.then((onResult) => {
-      while_.call(state, false);
-      return onResult;
+    promise = promise.then(function (willResult) {
+      return transaction(function() {
+        try {
+          if (while_) {
+            while_.call(preserver, true);
+          }
+          if (willResult == null) {
+            return on_.apply(preserver, args);
+          } else {
+            return on_.call(preserver, willResult);
+          }
+        } catch(error) {
+          console.log('transaction/on', error);
+        }
+      });
     });
 
     // For did and didNot state is freezed.
@@ -195,7 +227,15 @@ export default class Store {
 
     // Handle the result.
     if (did) promise = promise.then(onResult => {
-      return did.call(state, onResult)
+      return transaction(function() {
+        try {
+          if (while_)
+            while_.call(preserver, false);
+          return did.call(preserver, onResult)
+        } catch(error) {
+          console.log('transaction/did', error);
+        }
+      });
     });
 
     promise.catch(error => {

@@ -595,6 +595,8 @@ var Store = (function () {
     this.path = path;
     GlobalStore.init(path, initial, this);
 
+    var stateUpdates = new Object();
+
     var privateMethods = undefined;
     if (!args.privateMethods) {
       privateMethods = new Set();
@@ -686,11 +688,28 @@ var Store = (function () {
       }
     };
 
+    var preserve = function preserve(arg1, arg2) {
+      if (typeof arg2 !== "undefined") {
+        stateUpdates[arg1] = arg2;
+      } else {
+        Object.keys(arg1).forEach(function (key) {
+          stateUpdates[key] = arg1[key];
+        });
+      }
+    };
+
+    var getPreservedState = function getPreservedState() {
+      var newState = new Object(stateUpdates);
+      stateUpdates = new Object();
+      return newState;
+    };
+
     this.set = set;
     this.get = get;
     this.reset = reset;
 
     this.stateProto = { set: set, get: get, reset: reset, actions: actions };
+    this.preserverProto = { set: preserve, get: get, reset: reset, actions: actions, getPreservedState: getPreservedState };
 
     return this.getter = new Getter(this);
   }
@@ -770,31 +789,43 @@ var Store = (function () {
 
         // Local state for this cycle.
         var state = Object.create(this.stateProto);
+        var preserver = Object.create(this.preserverProto);
 
         // Pre-check & preparations.
         if (will) promise = promise.then(function () {
           return will.apply(state, args);
         });
 
-        // Start while().
-        if (while_) promise = promise.then(function (willResult) {
-          while_.call(state, true);
-          return willResult;
-        });
+        var transaction = function transaction(body) {
+          var result = body();
+
+          if (typeof result !== "undefined" && typeof result.then == "function") {
+            result.then(function (res) {
+              state.set(preserver.getPreservedState());
+              return Promise.resolve(res);
+            });
+          } else {
+            state.set(preserver.getPreservedState());
+          }
+          return result;
+        };
 
         // Actual execution.
         promise = promise.then(function (willResult) {
-          if (willResult == null) {
-            return on_.apply(state, args);
-          } else {
-            return on_.call(state, willResult);
-          }
-        });
-
-        // Stop while().
-        if (while_) promise = promise.then(function (onResult) {
-          while_.call(state, false);
-          return onResult;
+          return transaction(function () {
+            try {
+              if (while_) {
+                while_.call(preserver, true);
+              }
+              if (willResult == null) {
+                return on_.apply(preserver, args);
+              } else {
+                return on_.call(preserver, willResult);
+              }
+            } catch (error) {
+              console.log("transaction/on", error);
+            }
+          });
         });
 
         // For did and didNot state is freezed.
@@ -805,7 +836,14 @@ var Store = (function () {
 
         // Handle the result.
         if (did) promise = promise.then(function (onResult) {
-          return did.call(state, onResult);
+          return transaction(function () {
+            try {
+              if (while_) while_.call(preserver, false);
+              return did.call(preserver, onResult);
+            } catch (error) {
+              console.log("transaction/did", error);
+            }
+          });
         });
 
         promise["catch"](function (error) {
