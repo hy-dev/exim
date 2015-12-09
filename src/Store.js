@@ -11,7 +11,7 @@ export default class Store {
     let store = new Freezer(init || {});
 
     this.connect = function (...args) {
-      return getConnectMixin(this, args.concat(args));
+      return getConnectMixin(this, args);
     };
 
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};

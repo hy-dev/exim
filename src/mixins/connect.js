@@ -1,4 +1,4 @@
-export default function getConnectMixin (store) {
+export default function getConnectMixin (store, keys) {
   let changeCallback = function (state) {
     this.setState(state.toJS());
   };
@@ -7,15 +7,18 @@ export default function getConnectMixin (store) {
 
   return {
     getInitialState: function () {
-      const frozen = store.store.get(arguments);
-      const state = frozen.toJS();
+      const state = {};
+
+      keys.forEach(key => {
+        state[key] = store.get(key);
+      });
 
       if (!this.boundEximChangeCallbacks)
         this.boundEximChangeCallbacks = {};
 
       this.boundEximChangeCallbacks[store] = changeCallback.bind(this);
 
-      listener = frozen.getListener();
+      listener = store.store.get().getListener();
       return state;
     },
 
