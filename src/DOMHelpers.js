@@ -16,11 +16,26 @@ function getFilePath(name) {
   return filePath;
 }
 
+function getFilePath(name) {
+  let segments = name.split('-');
+  let filePath;
+  if (segments.length > 1) {
+    filePath = segments.map(function(name, i){
+      if (i>0)
+        return name.charAt(0).toUpperCase() + name.slice(1)
+      return name
+    }).join('/');
+  } else {
+    filePath = name + '/' + name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  return filePath;
+}
+
 function getRouter () {
   const Router = {};
 
   if (typeof ReactRouter !== 'undefined') {
-    let routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Link', 'Redirect'],
+    let routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Redirect'],
     routerMixins = ['Navigation', 'State'],
     routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'],
     routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'],
@@ -36,6 +51,14 @@ function getRouter () {
 
     Router['mount'] = function(path) {
       console.log('Exim.Router.mount is not defined');
+    }
+
+    Router['Link'] = function(args, children) {
+      if ('class' in args) {
+        args.className = args['class'];
+        delete args['class'];
+      }
+      return React.createElement(ReactRouter['Link'], args, children);
     }
 
     Router['match'] = function(name, handler, args, children) {

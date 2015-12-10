@@ -240,11 +240,25 @@ function getFilePath(name) {
   return filePath;
 }
 
+function getFilePath(name) {
+  var segments = name.split("-");
+  var filePath = undefined;
+  if (segments.length > 1) {
+    filePath = segments.map(function (name, i) {
+      if (i > 0) return name.charAt(0).toUpperCase() + name.slice(1);
+      return name;
+    }).join("/");
+  } else {
+    filePath = name + "/" + name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  return filePath;
+}
+
 function getRouter() {
   var Router = {};
 
   if (typeof ReactRouter !== "undefined") {
-    var routerElements = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Link", "Redirect"],
+    var routerElements = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"],
         routerMixins = ["Navigation", "State"],
         routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"],
         routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"],
@@ -260,6 +274,14 @@ function getRouter() {
 
     Router.mount = function (path) {
       console.log("Exim.Router.mount is not defined");
+    };
+
+    Router.Link = function (args, children) {
+      if ("class" in args) {
+        args.className = args["class"];
+        delete args["class"];
+      }
+      return React.createElement(ReactRouter.Link, args, children);
     };
 
     Router.match = function (name, handler, args, children) {
@@ -821,17 +843,13 @@ var Store = (function () {
         // Actual execution.
         promise = promise.then(function (willResult) {
           return transaction(function () {
-            try {
-              if (while_) {
-                while_.call(preserver, true);
-              }
-              if (willResult == null) {
-                return on_.apply(preserver, args);
-              } else {
-                return on_.call(preserver, willResult);
-              }
-            } catch (error) {
-              console.log("transaction/on", error);
+            if (while_) {
+              while_.call(preserver, true);
+            }
+            if (willResult == null) {
+              return on_.apply(preserver, args);
+            } else {
+              return on_.call(preserver, willResult);
             }
           });
         });
@@ -845,13 +863,13 @@ var Store = (function () {
         // Handle the result.
         if (did) promise = promise.then(function (onResult) {
           return transaction(function () {
-            try {
-              if (while_) while_.call(preserver, false);
-              return did.call(preserver, onResult);
-            } catch (error) {
-              console.log("transaction/did", error);
-            }
+            if (while_) while_.call(preserver, false);
+            return did.call(preserver, onResult);
           });
+        });
+
+        if (typeof did === "undefined" && while_) promise = promise.then(function (onResult) {
+          return while_.call(state, false);
         });
 
         promise["catch"](function (error) {

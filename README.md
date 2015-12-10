@@ -1,5 +1,7 @@
 **[[PRE-RELEASE]]. Public release is expected soon. Please don't publicly share links to Exim for now.**
 
+[![Build Status](https://travis-ci.org/stelmakh/exim.svg?branch=new-master)](https://travis-ci.org/stelmakh/exim)
+
 # Exim.js
 
 [hellyeah.is/exim](http://hellyeah.is/exim/)
