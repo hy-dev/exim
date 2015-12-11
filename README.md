@@ -56,7 +56,7 @@ React.createClass({
     if (this.isFetching) {
       return <div>Showing a spinner is as simple as that.</div>
     } else {
-      return <div onClick={this.create}>Let's create something!</div>
+      return <div onClick={this.create}>Let me create something!</div>
     }
   }
 });
