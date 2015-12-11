@@ -1,14 +1,10 @@
-**[[PRE-RELEASE]]. Public release is expected soon. Please don't publicly share links to Exim for now.**
-
-[![Build Status](https://travis-ci.org/stelmakh/exim.svg?branch=new-master)](https://travis-ci.org/stelmakh/exim)
+[![Build Status](https://travis-ci.org/hellyeahllc/exim.svg?branch=new-master)](https://travis-ci.org/hellyeahllc/exim)
 
 # Exim.js
 
 [hellyeah.is/exim](http://hellyeah.is/exim/)
 
-An architecture for HTML5 apps using Facebook's Flux.js library.
-
-Standing on the shoulders of giants
+An ultra-lightweight Flux-like architecture for HTML5 apps using Facebook's React library.
 
 ## 8 reasons why Exim
 
