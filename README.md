@@ -86,11 +86,11 @@ The only hard dependency is React.js.
   would be groupped and then executed as one command instead of a few `set`s.
 * You can now use `class` as an alias to react's `className` for HTML tags.
 
-### Exim 0.7.0 (Aug 2015)
+### Exim 0.7.0 (Aug 15, 2015)
 
 * Test release using Freezer.js for immutability.
 
-### Exim 0.6.2 (22 May 2015)
+### Exim 0.6.2 (May 22, 2015)
 
 * Fix action's chain bug.
 
