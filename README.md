@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/hellyeahllc/exim.svg)](https://travis-ci.org/hellyeahllc/exim)
-
-# Exim.js
+# Exim.js [![Build Status](https://travis-ci.org/hellyeahllc/exim.svg)](https://travis-ci.org/hellyeahllc/exim)
 
 [hellyeah.is/exim](http://hellyeah.is/exim/)
 
