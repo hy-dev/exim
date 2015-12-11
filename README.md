@@ -18,26 +18,27 @@ Exim focuses on three things:
 
 ```javascript
 var User = Exim.createStore({
-  actions: ['create'],
+  actions: ['create', 'match'],
   create: {
     // Each action can simply be a function, or a "lifecycle" method.
-    on: data => {
+    on(data) {
       // `this` is a current action's context which
       // is cleaned after the execution.
       this.previous = this.get('lastUser');
       // Optimistic set.
+      // We could subscribe to the `lastUser` property in a React view.
       this.set({lastUser: data});
-      // Returns promise.
+      // Returns promise. `did` would be called once it's resolved.
       return request.post('/v1/user', data);
     },
-    did: response => {
+    did(response) {
       console.log('Success! The new user ID:', response.id);
     },
-    didNot: () => {
+    didNot() {
       // Revert the optimistic update.
       this.set({lastUser: this.previous});
     },
-    while: isFetching => {
+    while(isFetching) => {
       // Would be called twice: after `on` and before `did`
       // (when the promise is resolved).
       // Let's show a spinner while we're `post`ing stuff in `on`.
@@ -46,8 +47,8 @@ var User = Exim.createStore({
   },
 
   // Short / implicit action declaration form.
-  match: (user1, user2) => {
-    this.set({match: user1.id === user2.id});
+  match(user1, user2) => {
+    this.set({matched: user1.id === user2.id});
   }
 });
 
