@@ -6,24 +6,74 @@
 
 An ultra-lightweight Flux-like architecture for HTML5 apps using Facebook's React library.
 
-## 8 reasons why Exim
+## Why
 
-1. React.js - using the great Facebook base
-2. Flux.js - new architecture from Facebook, modern replacement for MVC.
-3. Intelligible React-based Router
-4. Tremendeously simple structure.
-5. First-class JS & coffeescript with support for short syntax.
-6. Lightweight, no big dependencies.
-7. Brunch, Grunt, Gulp boilerplates. Bower, NPM, Browserify, AMD & Common.js support
-8. Great conventions.
+Because, we hate complexity. Redux is very complex. Adding Redux to your app won't solve any problem per se — you would need to add tons of Redux plugins.
+
+Exim focuses on three things:
+
+1. Simple actions with unidirectional flow. You cannot change app data from the outside.
+2. Easy lifecycle management and optimistic updates. Those are solid requirements for many modern apps.
+3. Being a first-class React citizen. Subscribing to a data or calling an action should never be complex.
+
+```javascript
+var User = Exim.createStore({
+  actions: ['create'],
+  create: {
+    // Each action can simply be a function, or a "lifecycle" method.
+    on: data => {
+      // `this` is a current action's context which
+      // is cleaned after the execution.
+      this.previous = this.get('lastUser');
+      // Optimistic set.
+      this.set({lastUser: data});
+      // Returns promise.
+      return request.post('/v1/user', data);
+    },
+    did: response => {
+      console.log('Success! The new user ID:', response.id);
+    },
+    didNot: () => {
+      // Revert the optimistic update.
+      this.set({lastUser: this.previous});
+    },
+    while: isFetching => {
+      // Would be called twice: after `on` and before `did`
+      // (when the promise is resolved).
+      // Let's show a spinner while we're `post`ing stuff in `on`.
+      this.set({isFetching: isFetching});
+    }
+  }
+});
+
+// In your view
+React.createClass({
+  mixins: [User.connect('isFetching')],
+  create() {
+    User.actions.create({name: 'Jonny Bravo'});
+  },
+  render() {
+    if (this.isFetching) {
+      return <div>Showing a spinner is as simple as that.</div>
+    } else {
+      return <div onClick={this.create}>Let's create something!</div>
+    }
+  }
+});
+
+```
 
 ## Dependencies
 
 The only hard dependency is React.js.
 
-Optional dependency: **Bluebird** - ultra-fast promises
-
 ## Changelog
+
+### Exim 0.8.0 (Dec 11, 2015)
+
+### Exim 0.7.0 (Aug 2015)
+
+* Test release using Freezer.js for immutability.
 
 ### Exim 0.6.2 (22 May 2015)
 
