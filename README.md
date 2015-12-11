@@ -16,7 +16,7 @@ Exim focuses on three things:
 
 1. Simple actions with unidirectional flow. You cannot change app data from the outside.
 2. Easy lifecycle management and optimistic updates. Those are solid requirements for many modern apps.
-3. Being a first-class React citizen. Subscribing to a data or calling an action should never be complex.
+3. Being a first-class React citizen. Subscribing to data updates or calling an action should never be complex.
 
 ```javascript
 var User = Exim.createStore({
@@ -79,37 +79,41 @@ The only hard dependency is React.js.
 
 ### Exim 0.8.0 (Dec 11, 2015)
 
+* `while` and `on` / `did` are now wrapped in transactions — every data `set`
+  would be groupped and then executed as one command instead of a few `set`s.
+* You can now use `class` as an alias to react's `className` for HTML tags.
+
 ### Exim 0.7.0 (Aug 2015)
 
 * Test release using Freezer.js for immutability.
 
 ### Exim 0.6.2 (22 May 2015)
 
-1. Fix action's chain bug.
+* Fix action's chain bug.
 
-### Exim 0.6.1 (16 May 2015)
+### Exim 0.6.1 (May 16, 2015)
 
-1. Implement **store.reset()** / **store.reset(prop)**.
-2. Getter: Revert logic. Fix allowed methods bug.
-3. while[Action]: Fix `didNot` case bug.
-4. Fix *Unhandled rejection* error.
+* Implement **store.reset()** / **store.reset(prop)**.
+* Getter: Revert logic. Fix allowed methods bug.
+* while[Action]: Fix `didNot` case bug.
+* Fix *Unhandled rejection* error.
 
-### Exim 0.6.0 (15 May 2015)
+### Exim 0.6.0 (May 15, 2015)
 
-1. Massive reduce in size. Exim is only 4K now (when gzipped).
-2. Dropped all dependencies. But of course you'll need to include React.
-3. Massive simplification.
-4. Rewritten in ES6.
+* Massive reduce in size. Exim is only 4K now (when gzipped).
+* Dropped all dependencies. But of course you'll need to include React.
+* Massive simplification.
+* Rewritten in ES6.
 
-### Exim 0.5.0 (6 May 2015)
+### Exim 0.5.0 (May 6, 2015)
 
-1. Implement **Exim.createView**.
-2. **Exim.Router** enhancements.
-3. Add **Exim.helpers**.
+* Implement **Exim.createView**.
+* **Exim.Router** enhancements.
+* Add **Exim.helpers**.
 
-### Exim 0.4.0 (9 Dec 2014)
+### Exim 0.4.0 (Dec 9, 2014)
 
-Initial release.
+* Initial release.
 
 ## License
 
