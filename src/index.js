@@ -6,7 +6,7 @@ import GlobalStore from './GlobalStore'
 
 import {createView, Router, DOM} from './DOMHelpers'
 
-const Exim = {Action, Actions, Store, Router, DOM, helpers, createView}
+const Exim = {Action, Actions, Store, Router, DOM, helpers, createView};
 
 Exim.createAction = function (args) {
   return new Action(args);
@@ -24,13 +24,13 @@ Exim.listen = function (args) {
   let stores = new Object();
   args.forEach(function(path) {
     let pathBits = path.split('/');
-    let pathLength = pathBits.length
+    let pathLength = pathBits.length;
 
     if(pathLength > 1) {
       let storePath = pathBits.slice(0, pathLength - 1).join('/');
       let varPath = pathBits.slice(pathLength - 1)[0];
 
-      stores[storePath] = Array.isArray(stores[storePath]) ? stores[storePath].concat(varPath) : [varPath]
+      stores[storePath] = Array.isArray(stores[storePath]) ? stores[storePath].concat(varPath) : [varPath];
     }
   });
 

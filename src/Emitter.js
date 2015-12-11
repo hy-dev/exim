@@ -4,7 +4,7 @@ export default class {
   }
 
   findListenerIndex(listener) {
-    return this._listeners.indexOf(listener)
+    return this._listeners.indexOf(listener);
   }
 
   _addListener(listener, context) {

@@ -822,9 +822,6 @@ var Store = (function () {
         var preserver = Object.create(this.preserverProto);
 
         // Pre-check & preparations.
-        if (will) promise = promise.then(function () {
-          return will.apply(state, args);
-        });
 
         var transaction = function transaction(body) {
           var result = body();
@@ -839,6 +836,12 @@ var Store = (function () {
           }
           return result;
         };
+
+        if (will) promise = promise.then(function () {
+          return transaction(function () {
+            return will.apply(preserver, args);
+          });
+        });
 
         // Actual execution.
         promise = promise.then(function (willResult) {

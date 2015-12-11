@@ -7,8 +7,8 @@ function getFilePath(name) {
   if (segments.length > 1) {
     filePath = segments.map(function(name, i){
       if (i>0)
-        return name.charAt(0).toUpperCase() + name.slice(1)
-      return name
+        return name.charAt(0).toUpperCase() + name.slice(1);
+      return name;
     }).join('/');
   } else {
     filePath = name + '/' + name.charAt(0).toUpperCase() + name.slice(1);
@@ -22,8 +22,8 @@ function getFilePath(name) {
   if (segments.length > 1) {
     filePath = segments.map(function(name, i){
       if (i>0)
-        return name.charAt(0).toUpperCase() + name.slice(1)
-      return name
+        return name.charAt(0).toUpperCase() + name.slice(1);
+      return name;
     }).join('/');
   } else {
     filePath = name + '/' + name.charAt(0).toUpperCase() + name.slice(1);
@@ -66,7 +66,7 @@ function getRouter () {
         children = handler;
         args = {};
         handler = Router.mount(getFilePath(name));
-      } else if (typeof args === 'undefined' && typeof handler === 'object'){
+      } else if (typeof args === 'undefined' && typeof handler === 'object') {
         args = handler;
         handler = Router.mount(getFilePath(name));
       } else if (typeof handler === 'object' && Array.isArray(args)) {
@@ -114,7 +114,7 @@ function getDOM () {
       } else {
         attributes = {};
       }
-      return React.DOM[name].apply(React.DOM, [attributes].concat(args))
+      return React.DOM[name].apply(React.DOM, [attributes].concat(args));
     };
 
     let bindTag = function(tagName) {
