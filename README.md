@@ -43,6 +43,11 @@ var User = Exim.createStore({
       // Let's show a spinner while we're `post`ing stuff in `on`.
       this.set({isFetching: isFetching});
     }
+  },
+
+  // Short / implicit action declaration form.
+  match: (user1, user2) => {
+    this.set({match: user1.id === user2.id});
   }
 });
 
