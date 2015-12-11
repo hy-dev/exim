@@ -21,8 +21,11 @@ Exim focuses on three things:
 ```javascript
 var User = Exim.createStore({
   actions: ['create', 'match'],
+
+  // Each action can simply be a function, or a "lifecycle" method.
+  // on() => while(true) => <Promise is resolved>
+  // => while(false) => did() / didNot()
   create: {
-    // Each action can simply be a function, or a "lifecycle" method.
     on(data) {
       // `this` is a current action's context which
       // is cleaned after the execution.
@@ -40,10 +43,10 @@ var User = Exim.createStore({
       // Revert the optimistic update.
       this.set({lastUser: this.previous});
     },
+
+    // while(true) is called after on(). while(false) is called before did() / didNot().
     while(isFetching) {
-      // Would be called twice: after `on` and before `did`
-      // (when the promise is resolved).
-      // Let's show a spinner while we're `post`ing stuff in `on`.
+      // Let's show a spinner while we're doing a HTTP request.
       this.set({isFetching: isFetching});
     }
   },
