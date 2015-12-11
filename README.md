@@ -4,6 +4,10 @@
 
 An ultra-lightweight Flux-like architecture for HTML5 apps using Facebook's React library.
 
+## Install
+
+`npm install --save exim` or `bower install exim`
+
 ## Why
 
 Because, we hate complexity. Redux is very complex. Adding Redux to your app won't solve any problem per se — you would need to add tons of Redux plugins.
