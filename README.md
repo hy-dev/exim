@@ -1,20 +1,25 @@
+**[[PRE-RELEASE]]. Public release is expected soon. Please don't publicly share links to Exim for now.**
+
+[![Build Status](https://travis-ci.org/stelmakh/exim.svg?branch=new-master)](https://travis-ci.org/stelmakh/exim)
+
 # Exim.js
 
 [hellyeah.is/exim](http://hellyeah.is/exim/)
 
 An architecture for HTML5 apps using Facebook's Flux.js library.
 
-> Standing on the shoulders of giants.
+Standing on the shoulders of giants
 
-## 7 reasons why Exim
+## 8 reasons why Exim
 
 1. React.js - using the great Facebook base
 2. Flux.js - new architecture from Facebook, modern replacement for MVC.
-3. Ultra-cool sugar for React router 
-4. Tremendeously simple structure. Just enough for 99% of everyday dev needs.
+3. Intelligible React-based Router
+4. Tremendeously simple structure.
 5. First-class JS & coffeescript with support for short syntax.
 6. Lightweight, no big dependencies.
 7. Brunch, Grunt, Gulp boilerplates. Bower, NPM, Browserify, AMD & Common.js support
+8. Great conventions.
 
 ## Dependencies
 
@@ -23,14 +28,6 @@ The only hard dependency is React.js.
 Optional dependency: **Bluebird** - ultra-fast promises
 
 ## Changelog
-
-### Exim 0.7.0 (4 Aug 2015)
-1. Exim is webpack and browserify-friendly now.
-2. Fixed an issue related to `set` in stores.
-
-### Exim 0.6.3 (21 Jun 2015)
-
-1. Fix NPM support.
 
 ### Exim 0.6.2 (22 May 2015)
 
