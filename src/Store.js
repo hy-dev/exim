@@ -77,7 +77,7 @@ export default class Store {
           if (type === 'function') {
             result[key] = item[key](getValue(key));
            } else if (type === 'sting') {
-            result[key] = getValue(key)[val]
+            result[key] = getValue(key)[val];
           }
         }
         return result;
@@ -123,9 +123,9 @@ export default class Store {
 
   addAction(item) {
     if (Array.isArray(item)) {
-      this.actions = this.actions.concat(actions)
+      this.actions = this.actions.concat(actions);
     } else if (typeof item === 'object') {
-      this.actions.push(item)
+      this.actions.push(item);
     }
   }
 
@@ -146,10 +146,10 @@ export default class Store {
 
   getActionCycle(actionName, prefix='on') {
     const capitalized = utils.capitalize(actionName);
-    const fullActionName = `${prefix}${capitalized}`
+    const fullActionName = `${prefix}${capitalized}`;
     const handler = this.handlers[fullActionName] || this.handlers[actionName];
     if (!handler) {
-      throw new Error(`No handlers for ${actionName} action defined in current store`)
+      throw new Error(`No handlers for ${actionName} action defined in current store`);
     }
     let actions;
     // if (Array.isArray(handler)) {
@@ -159,7 +159,7 @@ export default class Store {
       // actions = utils.mapActionNames(handler);
       actions = handler;
     } else if (typeof handler === 'function') {
-      actions = {on: handler}
+      actions = {on: handler};
     } else {
       throw new Error(`${handler} must be an object or function`);
     }
@@ -183,9 +183,6 @@ export default class Store {
     let preserver =  Object.create(this.preserverProto);
 
     // Pre-check & preparations.
-    if (will) promise = promise.then(() => {
-      return will.apply(state, args)
-    });
 
     var transaction = function(body) {
       var result = body();
@@ -200,6 +197,12 @@ export default class Store {
       }
       return result;
     };
+
+    if (will) promise = promise.then(() => {
+      return transaction(function() {
+        return will.apply(preserver, args);
+      })
+    });
 
     // Actual execution.
     promise = promise.then(function (willResult) {
@@ -226,7 +229,7 @@ export default class Store {
       return transaction(function() {
         if (while_)
           while_.call(preserver, false);
-        return did.call(preserver, onResult)
+        return did.call(preserver, onResult);
       });
     });
 
@@ -237,9 +240,9 @@ export default class Store {
     promise.catch(error => {
       if (while_) while_.call(state, false);
       if (didNot) {
-        didNot.call(state, error)
+        didNot.call(state, error);
       } else {
-        throw error
+        throw error;
       }
     });
 
