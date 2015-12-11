@@ -40,7 +40,7 @@ var User = Exim.createStore({
       // Revert the optimistic update.
       this.set({lastUser: this.previous});
     },
-    while(isFetching) => {
+    while(isFetching) {
       // Would be called twice: after `on` and before `did`
       // (when the promise is resolved).
       // Let's show a spinner while we're `post`ing stuff in `on`.
@@ -49,7 +49,7 @@ var User = Exim.createStore({
   },
 
   // Short / implicit action declaration form.
-  match(user1, user2) => {
+  match(user1, user2) {
     this.set({matched: user1.id === user2.id});
   }
 });
