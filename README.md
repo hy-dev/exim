@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hellyeahllc/exim.svg?branch=new-master)](https://travis-ci.org/hellyeahllc/exim)
+[![Build Status](https://travis-ci.org/hellyeahllc/exim.svg)](https://travis-ci.org/hellyeahllc/exim)
 
 # Exim.js
 
