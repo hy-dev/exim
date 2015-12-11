@@ -22,6 +22,7 @@
       console.log(name, '+', diff, 'ms');
     };
     window.store = Exim.createStore({
+      path: 'store',
       actions: ['fetch'],
       initial: {
         items: [],

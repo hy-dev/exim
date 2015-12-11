@@ -80,11 +80,17 @@ The only hard dependency is React.js.
 
 ## Changelog
 
+### Exim 0.8.1 (Dec 11, 2015)
+
+* Fix temporary variables for `will` cycle.
+
 ### Exim 0.8.0 (Dec 11, 2015)
 
 * `while` and `on` / `did` are now wrapped in transactions — every data `set`
   would be groupped and then executed as one command instead of a few `set`s.
 * You can now use `class` as an alias to react's `className` for HTML tags.
+* `cx` helper enhancements.
+* Performance improvement.
 
 ### Exim 0.7.0 (Aug 15, 2015)
 

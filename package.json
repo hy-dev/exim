@@ -4,6 +4,7 @@
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
   "main": "exim.js",
   "scripts": {
+    "build": "node ./build",
     "watch": "watchify src/ -o exim.js",
     "test": "./node_modules/.bin/mocha --compilers js:babel-core/register"
   },
