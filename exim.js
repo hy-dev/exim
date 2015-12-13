@@ -230,23 +230,28 @@ function getRouter() {
   var Router = {};
 
   if (typeof ReactRouter !== "undefined") {
-    var routerElements = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"],
-        routerMixins = ["Navigation", "State"],
-        routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"],
-        routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"],
-        copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+    var ReactRouter1 = !ReactRouter.DefaultRoute;
+    if (ReactRouter1) {
+      var _routerComponents = ["Router", "Link", "IndexLink", "RoutingContext", "Route", "Redirect", "IndexRoute", "IndexRedirect"],
+          _routerMixins = ["Lifecycle", "History", "RouteContext"],
+          _routerFunctions = ["createRoutes", "useRoutes", "match", "default"],
+          _routerObjects = ["PropTypes"];
+    } else {
+      var _routerComponents2 = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"],
+          _routerMixins2 = ["Navigation", "State"],
+          _routerFunctions2 = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"],
+          _routerObjects2 = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"];
+    }
 
-    routerElements.forEach(function (name) {
+    copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+
+    routerComponents.forEach(function (name) {
       Router[name] = React.createElement.bind(React, ReactRouter[name]);
     });
 
     copiedItems.forEach(function (name) {
       Router[name] = ReactRouter[name];
     });
-
-    Router.mount = function (path) {
-      console.log("Exim.Router.mount is not defined");
-    };
 
     Router.Link = function (args, children) {
       if ("class" in args) {
@@ -256,38 +261,37 @@ function getRouter() {
       return React.createElement(ReactRouter.Link, args, children);
     };
 
-    Router.match = function (name, handler, args, children) {
-      if (typeof args === "undefined" && Array.isArray(handler)) {
-        children = handler;
-        args = {};
-        handler = Router.mount(getFilePath(name));
-      } else if (typeof args === "undefined" && typeof handler === "object") {
-        args = handler;
-        handler = Router.mount(getFilePath(name));
-      } else if (typeof handler === "object" && Array.isArray(args)) {
-        children = args;
-        args = handler;
-        handler = Router.mount(getFilePath(name));
-      }
-      var path = undefined,
-          key = undefined,
-          def = undefined;
+    if (!ReactRouter1) {
+      Router.match = function (name, handler, args, children) {
+        if (typeof args === "undefined" && Array.isArray(handler)) {
+          children = handler;
+          args = {};
+          handler = Router.mount(getFilePath(name));
+        } else if (typeof args === "undefined" && typeof handler === "object") {
+          args = handler;
+          handler = Router.mount(getFilePath(name));
+        } else if (typeof handler === "object" && Array.isArray(args)) {
+          children = args;
+          args = handler;
+          handler = Router.mount(getFilePath(name));
+        }
+        var path = undefined,
+            key = undefined,
+            def = undefined;
 
-      if (typeof args === "object") {
-        path = args.path;
-        key = args.key;
-        def = args["default"];
-      }
+        if (typeof args === "object") {
+          path = args.path;
+          key = args.key;
+          def = args["default"];
+        }
 
-      // if (typeof path === 'undefined' && (typeof def === 'undefined' || def === false))
-      //   path = name;
+        if (def === true) {
+          return Router.DefaultRoute({ name: name, path: path, handler: handler, key: key }, children);
+        }
 
-      if (def === true) {
-        return Router.DefaultRoute({ name: name, path: path, handler: handler, key: key }, children);
-      }
-
-      return Router.Route({ name: name, path: path, handler: handler, key: key }, children);
-    };
+        return Router.Route({ name: name, path: path, handler: handler, key: key }, children);
+      };
+    }
   }
 
   return Router;

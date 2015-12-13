@@ -1,21 +1,21 @@
-var hasOwn = {}.hasOwnProperty;
+const hasOwn = {}.hasOwnProperty;
 
 export default {
   cx: function () {
-    var classes = '';
+    let classes = '';
 
-    for (var i = 0; i < arguments.length; i++) {
-      var arg = arguments[i];
+    for (let i = 0; i < arguments.length; i++) {
+      const arg = arguments[i];
       if (!arg) continue;
 
-      var argType = typeof arg;
+      const argType = typeof arg;
 
       if (argType === 'string' || argType === 'number') {
         classes += ' ' + arg;
       } else if (Array.isArray(arg)) {
         classes += ' ' + this.cx.apply(this, arg);
       } else if (argType === 'object') {
-        for (var key in arg) {
+        for (let key in arg) {
           if (hasOwn.call(arg, key) && arg[key]) {
             classes += ' ' + key;
           }

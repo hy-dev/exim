@@ -35,23 +35,30 @@ function getRouter () {
   const Router = {};
 
   if (typeof ReactRouter !== 'undefined') {
-    let routerElements = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Redirect'],
-    routerMixins = ['Navigation', 'State'],
-    routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'],
-    routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'],
+    let routerComponents, routerMixins, routerFunctions, routerObjects, copiedItems;
+    const ReactRouter1 = !ReactRouter.DefaultRoute;
+    
+    if (ReactRouter1) {
+      routerComponents = ['Router', 'Link', 'IndexLink', 'RoutingContext', 'Route', 'Redirect', 'IndexRoute', 'IndexRedirect'],
+      routerMixins = ['Lifecycle', 'History', 'RouteContext'],
+      routerFunctions = ['createRoutes', 'useRoutes', 'match', 'default'],
+      routerObjects = ['PropTypes'];
+    } else {
+      routerComponents = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Redirect'],
+      routerMixins = ['Navigation', 'State'],
+      routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'],
+      routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior']
+    }
+    
     copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
-    routerElements.forEach(function(name) {
+    routerComponents.forEach(function(name) {
       Router[name] = React.createElement.bind(React, ReactRouter[name]);
     });
 
     copiedItems.forEach(function(name) {
       Router[name] = ReactRouter[name];
     });
-
-    Router['mount'] = function(path) {
-      console.log('Exim.Router.mount is not defined');
-    }
 
     Router['Link'] = function(args, children) {
       if ('class' in args) {
@@ -61,36 +68,35 @@ function getRouter () {
       return React.createElement(ReactRouter['Link'], args, children);
     }
 
-    Router['match'] = function(name, handler, args, children) {
-      if (typeof args === 'undefined' && Array.isArray(handler)) {
-        children = handler;
-        args = {};
-        handler = Router.mount(getFilePath(name));
-      } else if (typeof args === 'undefined' && typeof handler === 'object') {
-        args = handler;
-        handler = Router.mount(getFilePath(name));
-      } else if (typeof handler === 'object' && Array.isArray(args)) {
-        children = args;
-        args = handler;
-        handler = Router.mount(getFilePath(name));
-      }
-      let path, key, def;
+    if (!ReactRouter1) {
+      Router['match'] = function(name, handler, args, children) {
+        if (typeof args === 'undefined' && Array.isArray(handler)) {
+          children = handler;
+          args = {};
+          handler = Router.mount(getFilePath(name));
+        } else if (typeof args === 'undefined' && typeof handler === 'object') {
+          args = handler;
+          handler = Router.mount(getFilePath(name));
+        } else if (typeof handler === 'object' && Array.isArray(args)) {
+          children = args;
+          args = handler;
+          handler = Router.mount(getFilePath(name));
+        }
+        let path, key, def;
 
-      if (typeof args === 'object') {
-        path = args.path;
-        key = args.key;
-        def = args.default;
-      }
+        if (typeof args === 'object') {
+          path = args.path;
+          key = args.key;
+          def = args.default;
+        }
 
-      // if (typeof path === 'undefined' && (typeof def === 'undefined' || def === false))
-      //   path = name;
+        if (def === true) {
+          return Router['DefaultRoute']({name, path, handler, key}, children);
+        }
 
-      if (def === true) {
-        return Router['DefaultRoute']({name, path, handler, key}, children);
-      }
-
-      return Router['Route']({name, path, handler, key}, children);
-    };
+        return Router['Route']({name, path, handler, key}, children);
+      };
+    }
   }
 
   return Router;
