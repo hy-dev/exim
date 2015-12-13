@@ -80,6 +80,11 @@ The only hard dependency is React.js.
 
 ## Changelog
 
+### Exim 0.8.2 (Dec 13, 2015)
+
+* Add React Router 1.0 support.
+* Store's `path` argument is optional.
+
 ### Exim 0.8.1 (Dec 11, 2015)
 
 * Fix temporary variables for `will` cycle.
