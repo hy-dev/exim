@@ -230,17 +230,17 @@ function getRouter() {
   var Router = {};
 
   if (typeof ReactRouter !== "undefined") {
+    var routerComponents = undefined,
+        routerMixins = undefined,
+        routerFunctions = undefined,
+        routerObjects = undefined,
+        copiedItems = undefined;
     var ReactRouter1 = !ReactRouter.DefaultRoute;
+
     if (ReactRouter1) {
-      var _routerComponents = ["Router", "Link", "IndexLink", "RoutingContext", "Route", "Redirect", "IndexRoute", "IndexRedirect"],
-          _routerMixins = ["Lifecycle", "History", "RouteContext"],
-          _routerFunctions = ["createRoutes", "useRoutes", "match", "default"],
-          _routerObjects = ["PropTypes"];
+      routerComponents = ["Router", "Link", "IndexLink", "RoutingContext", "Route", "Redirect", "IndexRoute", "IndexRedirect"], routerMixins = ["Lifecycle", "History", "RouteContext"], routerFunctions = ["createRoutes", "useRoutes", "match", "default"], routerObjects = ["PropTypes"];
     } else {
-      var _routerComponents2 = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"],
-          _routerMixins2 = ["Navigation", "State"],
-          _routerFunctions2 = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"],
-          _routerObjects2 = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"];
+      routerComponents = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"], routerMixins = ["Navigation", "State"], routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"], routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"];
     }
 
     copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
@@ -597,6 +597,7 @@ var Store = (function () {
     var actions = args.actions;
     var initial = args.initial;
 
+    if (typeof path === "undefined" || path === null) path = "nopath/" + utils.generateId();
     this.initial = initial = typeof initial === "function" ? initial() : initial;
     this.path = path;
     GlobalStore.init(path, initial, this);
@@ -1031,6 +1032,22 @@ utils.capitalize = function (str) {
   var first = str.charAt(0).toUpperCase();
   var rest = str.slice(1);
   return "" + first + "" + rest;
+};
+
+utils.generateId = function () {
+  var idFormat = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  return idFormat.replace(/[xy]/g, function (c) {
+    var r = undefined,
+        v = undefined;
+    if (crypto && crypto.getRandomValues) {
+      r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0, v = c == "x" ? r : r & 3 | 8;
+    } else if (crypto && crypto.randomBytes) {
+      r = crypto.randomBytes(1)[0] % 16 | 0, v = c == "x" ? r : r & 3 | 8;
+    } else {
+      r = Math.random() * 16 | 0, v = c == "x" ? r : r & 3 | 8;
+    }
+    return v.toString(16);
+  });
 };
 
 module.exports = utils;
