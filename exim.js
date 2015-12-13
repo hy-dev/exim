@@ -74,10 +74,8 @@ if (typeof root.exports !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Actions":2,"./DOMHelpers":4,"./Getter":6,"./GlobalStore":7,"./Store":8,"./helpers":10}],2:[function(require,module,exports){
+},{"./Actions":2,"./DOMHelpers":3,"./Getter":5,"./GlobalStore":6,"./Store":7,"./helpers":9}],2:[function(require,module,exports){
 "use strict";
-
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -86,8 +84,6 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var Class = _interopRequire(require("./Class"));
 
 var Action = exports.Action = (function () {
   function Action(args) {
@@ -188,31 +184,7 @@ var Actions = exports.Actions = (function () {
   return Actions;
 })();
 
-},{"./Class":3}],3:[function(require,module,exports){
-"use strict";
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _default = (function () {
-  var _class = function _default() {
-    _classCallCheck(this, _class);
-  };
-
-  return _class;
-})();
-
-module.exports = _default;
-
-// find(type, key, value, multiple) {
-//   var result;
-//   const items = this[type];
-
-//   if (!Array.isArray(items)) throw Error `${key} must be an array`
-//   result = items.filter(item => item[key] === value)
-//   return multiple ? result : result[0]
-// }
-
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -382,7 +354,7 @@ function createView(classArgs) {
 
 ;
 
-},{"./helpers":10,"./utils":12}],5:[function(require,module,exports){
+},{"./helpers":9,"./utils":11}],4:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -436,7 +408,7 @@ var _default = (function () {
 
 module.exports = _default;
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -493,7 +465,7 @@ var Getter = (function (_Emitter) {
 
 module.exports = Getter;
 
-},{"./Emitter":5,"./config":9,"./mixins/connect":11}],7:[function(require,module,exports){
+},{"./Emitter":4,"./config":8,"./mixins/connect":10}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -592,7 +564,7 @@ var GlobalStore = (function () {
 
 module.exports = GlobalStore;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -894,14 +866,14 @@ var Store = (function () {
 
 module.exports = Store;
 
-},{"./Actions":2,"./Getter":6,"./GlobalStore":7,"./mixins/connect":11,"./utils":12}],9:[function(require,module,exports){
+},{"./Actions":2,"./Getter":5,"./GlobalStore":6,"./mixins/connect":10,"./utils":11}],8:[function(require,module,exports){
 "use strict";
 
 module.exports = {
   allowedGetterProps: ["get", "initial", "actions"]
 };
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 var hasOwn = ({}).hasOwnProperty;
@@ -933,7 +905,7 @@ module.exports = {
   }
 };
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -997,7 +969,7 @@ function getConnectMixin(store) {
   };
 }
 
-},{"../utils":12}],12:[function(require,module,exports){
+},{"../utils":11}],11:[function(require,module,exports){
 "use strict";
 
 var utils = {};

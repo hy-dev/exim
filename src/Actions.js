@@ -1,5 +1,3 @@
-import Class from './Class'
-
 export class Action {
   constructor(args) {
     const [store, stores, allStores] = [args.store, args.stores, []];
