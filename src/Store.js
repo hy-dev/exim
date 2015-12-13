@@ -7,10 +7,10 @@ import GlobalStore from './GlobalStore'
 export default class Store {
   constructor(args={}) {
     let {path, actions, initial} = args;
+    if (typeof path === 'undefined' || path === null) path = `nopath/${utils.generateId()}`;
     this.initial = initial = typeof initial === 'function' ? initial() : initial;
     this.path = path;
     GlobalStore.init(path, initial, this);
-
 
     let stateUpdates = new Object();
 
