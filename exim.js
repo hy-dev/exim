@@ -849,16 +849,20 @@ var Store = (function () {
         });
 
         if (typeof did === "undefined" && while_) promise = promise.then(function (onResult) {
-          return while_.call(state, false);
+          return transaction(function () {
+            return while_.call(preserver, false);
+          });
         });
 
         promise["catch"](function (error) {
-          if (while_) while_.call(state, false);
-          if (didNot) {
-            didNot.call(state, error);
-          } else {
-            throw error;
-          }
+          return transaction(function () {
+            if (while_) while_.call(preserver, false);
+            if (didNot) {
+              didNot.call(preserver, error);
+            } else {
+              throw error;
+            }
+          });
         });
 
         return promise;

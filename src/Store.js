@@ -234,16 +234,20 @@ export default class Store {
     });
 
     if (typeof did === 'undefined' && while_) promise = promise.then(onResult => {
-      return while_.call(state, false);
+      return transaction(function() {
+        return while_.call(preserver, false);
+      })
     });
 
     promise.catch(error => {
-      if (while_) while_.call(state, false);
-      if (didNot) {
-        didNot.call(state, error);
-      } else {
-        throw error;
-      }
+      return transaction(function() {
+        if (while_) while_.call(preserver, false);
+        if (didNot) {
+          didNot.call(preserver, error);
+        } else {
+          throw error;
+        }
+      })
     });
 
     return promise;
