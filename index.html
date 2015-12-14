@@ -97,7 +97,7 @@ components ---&gt; actions ---&gt; Dispatcher ---&gt; Callbacks ---&gt; stores
 |                                                           V
 ------------- (publish changes to components) ---------------
 </code></pre>
-<h2 id='actions'>Actions</h2>
+<h1 id='actions'>Actions</h1>
 <p>Actions are simple abstractions.
 They don&rsquo;t do anything on their own, they just say out loud &ldquo;action <code class="prettyprint">sleep</code>&rdquo; was activated, and then it&rsquo;s up to stores to do something useful based on that/</p>
 <pre><code class="highlight javascript"><span class="kd">var</span> <span class="nx">greet</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createAction</span><span class="p">(</span><span class="s1">'greet'</span><span class="p">)</span>
@@ -118,71 +118,230 @@ They don&rsquo;t do anything on their own, they just say out loud &ldquo;action 
 </span><span class="nx">actions</span><span class="p">.</span><span class="na">sleep</span><span class="p">()</span> <span class="c1"># won't do
 </span><span class="nx">actions</span><span class="p">.</span><span class="na">work</span><span class="p">()</span>  <span class="c1"># anything.
 </span></code></pre>
-<h2 id='stores'>Stores</h2>
+<h1 id='stores'>Stores</h1>
 <p>Stores subscribe to, and react on, specific actions.
 Usually, a store would perform an HTTP request in response to action and store the result.</p>
-
+<h2 id='actions-and-action-handlers'>Actions and action handlers</h2>
 <p>To listen to specific actions, you pass an object of actions to the <code class="prettyprint">actions</code> property.</p>
 
-<p>Then, you can define three functions for each action: <code class="prettyprint">willAction</code>, <code class="prettyprint">onAction</code>, and <code class="prettyprint">didAction</code>, where <code class="prettyprint">Action</code> is the name of action.</p>
+<p>Then, you have to define handlers for that actions.</p>
 
-<p>Alternatively, you can use a short form, hash with <code class="prettyprint">will</code>, <code class="prettyprint">on</code>, <code class="prettyprint">did</code> properties.</p>
-<pre><code class="highlight javascript"><span class="kd">var</span> <span class="nx">actions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createActions</span><span class="p">([</span><span class="s1">'work'</span><span class="p">,</span> <span class="s1">'eat'</span><span class="p">])</span>
+<p>For simple actions, define a function named exactly as the action.</p>
 
-<span class="kd">var</span> <span class="nx">People</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
-  <span class="na">actions</span><span class="p">:</span> <span class="nx">actions</span><span class="p">,</span>
+<p>For more complex actions, you can use a hash with <code class="prettyprint">while</code>, <code class="prettyprint">will</code>, <code class="prettyprint">on</code>, <code class="prettyprint">did</code>
+and <code class="prettyprint">didNot</code> properties.</p>
+<pre><code class="highlight javascript"><span class="kd">var</span> <span class="nx">People</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">actions</span><span class="p">:</span> <span class="p">[</span><span class="s1">'work'</span><span class="p">,</span> <span class="s1">'eat'</span><span class="p">],</span>
 
-  <span class="na">willWork</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">},</span>
-  <span class="nx">onWork</span><span class="err">:</span>   <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">},</span>
-  <span class="nx">didWork</span><span class="err">:</span>  <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="cm">/* ... */</span> <span class="p">},</span>
+  <span class="c1">// Using simple handler function. Equal to onReset: function(){}</span>
+  <span class="c1">// or reset: {on: fuction(){}}</span>
+  <span class="na">reset</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span><span class="cm">/* ... */</span><span class="p">},</span>
 
-  <span class="c1">// Alternative form.</span>
+  <span class="c1">//Using hash</span>
   <span class="nx">eat</span><span class="err">:</span> <span class="p">{</span>
-    <span class="nl">will</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
-    <span class="nx">on</span><span class="err">:</span>   <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
-    <span class="nx">did</span><span class="err">:</span>  <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+    <span class="nl">while</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
+    <span class="nx">will</span><span class="err">:</span>  <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
+    <span class="nx">on</span><span class="err">:</span>    <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
+    <span class="nx">did</span><span class="err">:</span>   <span class="kd">function</span><span class="p">()</span> <span class="p">{},</span>
+    <span class="nx">didNot</span><span class="err">:</span><span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
   <span class="p">}</span>
 <span class="p">})</span>
 </code></pre>
-<pre><code class="highlight coffeescript"><span class="nx">actions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createActions</span><span class="p">([</span><span class="s">'work'</span><span class="p">,</span> <span class="s">'eat'</span><span class="p">])</span>
+<pre><code class="highlight coffeescript"><span class="nx">People</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createStore</span>
+  <span class="na">actions</span><span class="o">:</span> <span class="p">[</span><span class="s">'work'</span><span class="p">,</span> <span class="s">'eat'</span><span class="p">]</span>
 
-<span class="nx">People</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createStore</span>
-  <span class="na">actions</span><span class="o">:</span> <span class="nx">actions</span>
-
-  <span class="na">willWork</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="c1"># some
-</span>  <span class="na">onWork</span><span class="o">:</span>   <span class="o">-&gt;</span> <span class="c1"># function
-</span>  <span class="na">didWork</span><span class="o">:</span>  <span class="o">-&gt;</span> <span class="c1"># body
+  <span class="c1"># Using simple handler function. Equal to onReset: -&gt; ...
+</span>  <span class="c1"># or reset: {on: -&gt; ...}
+</span>  <span class="na">reset</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="c1"># body
 </span>
-  <span class="c1"># Alternative form.
+  <span class="c1"># Using hash
 </span>  <span class="na">eat</span><span class="o">:</span>
-    <span class="na">will</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="c1"># goes
-</span>    <span class="na">on</span><span class="o">:</span>   <span class="o">-&gt;</span> <span class="c1"># right
-</span>    <span class="na">did</span><span class="o">:</span>  <span class="o">-&gt;</span> <span class="c1"># here
+    <span class="na">while</span><span class="o">:</span>  <span class="o">-&gt;</span> <span class="c1"># some
+</span>    <span class="na">will</span><span class="o">:</span>   <span class="o">-&gt;</span> <span class="c1"># function
+</span>    <span class="na">on</span><span class="o">:</span>     <span class="o">-&gt;</span> <span class="c1"># body
+</span>    <span class="na">did</span><span class="o">:</span>    <span class="o">-&gt;</span> <span class="c1"># goes
+</span>    <span class="na">didNot</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="c1"># here
 </span></code></pre>
-<h2 id='components'>Components</h2>
+<h2 id='action-lifecycle'>Action lifecycle</h2>
+<p>Action lifecycle includes five steps</p>
+
+<ol>
+<li><code class="prettyprint">while</code></li>
+<li><code class="prettyprint">will</code></li>
+<li><code class="prettyprint">on</code></li>
+<li><code class="prettyprint">did</code></li>
+<li><code class="prettyprint">didNot</code></li>
+</ol>
+
+<p>The only required step is <code class="prettyprint">on</code>, the rest of them are optional.</p>
+<h3 id='while'>while</h3>
+<p>A <code class="prettyprint">while</code> step, if defined, runs twice, at the beginning and at the end, with the
+<code class="prettyprint">true</code> and <code class="prettyprint">false</code> arguments passed respectively. It is usefull when you want to
+perform some operations while the action is running(e.g. to show a spinner etc.)</p>
+<h3 id='will'>will</h3>
+<p>A <code class="prettyprint">will</code> is used for preparatory operations. If it is defined, the arguments the
+action is called with will be passed here. The result of the execution of a
+<code class="prettyprint">will</code> step is then passed to the <code class="prettyprint">on</code> step</p>
+<h3 id='on'>on</h3>
+<p>The body of an action. The main operations are performed here(e.g. API
+requests). Receives arguments either from the <code class="prettyprint">will</code> step(if defined) or from
+the action call.</p>
+<h3 id='did'>did</h3>
+<p>When an <code class="prettyprint">on</code> step succeedes, a <code class="prettyprint">did</code> step is called. Receives the result of an
+<code class="prettyprint">on</code> step as an argument.</p>
+<h3 id='didnot'>didNot</h3>
+<p>Basically, a <code class="prettyprint">didNot</code> step works like a catch block, handling errors that are
+thrown while the action is runnning.</p>
+<pre><code class="highlight javascript"><span class="k">while</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="nx">will</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="nx">on</span><span class="p">(</span><span class="nx">args</span> <span class="o">||</span> <span class="nx">willResult</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="nx">did</span><span class="p">(</span><span class="nx">onResult</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="k">while</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+                                                        <span class="o">|</span>                      <span class="o">^</span>
+                                                        <span class="o">|</span>                      <span class="o">|</span>
+                                                        <span class="o">---&gt;</span> <span class="nx">didNot</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">-----</span>
+<span class="c1">// Store definition</span>
+<span class="kd">var</span> <span class="nx">Users</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">actions</span><span class="p">:</span> <span class="p">[</span><span class="s1">'eat'</span><span class="p">],</span>
+  <span class="na">eat</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">while</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">eating</span><span class="p">){</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">'eating'</span><span class="p">,</span> <span class="nx">eating</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="na">will</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ingredients</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">prepareFood</span><span class="p">(</span><span class="nx">ingredients</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">on</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">consume</span><span class="p">(</span><span class="nx">food</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">did</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">washDishes</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+    <span class="p">},</span>
+    <span class="nx">didNot</span><span class="err">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">panic</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="c1">// Action call</span>
+<span class="nx">Users</span><span class="p">.</span><span class="nx">actions</span><span class="p">.</span><span class="nx">eat</span><span class="p">([</span><span class="s1">'beans'</span><span class="p">,</span> <span class="s1">'pepper'</span><span class="p">,</span> <span class="s1">'tomatoes'</span><span class="p">]);</span>
+</code></pre>
+<pre><code class="highlight coffeescript"><span class="k">while</span><span class="p">(</span><span class="no">true</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="nx">will</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="no">on</span><span class="p">(</span><span class="nx">args</span> <span class="o">||</span> <span class="nx">willResult</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="nx">did</span><span class="p">(</span><span class="nx">onResult</span><span class="p">)</span> <span class="o">---&gt;</span> <span class="k">while</span><span class="p">(</span><span class="no">false</span><span class="p">)</span>
+                                                        <span class="o">|</span>                      <span class="o">^</span>
+                                                        <span class="o">|</span>                      <span class="o">|</span>
+                                                        <span class="o">---&gt;</span> <span class="nx">didNot</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">-----</span>
+
+<span class="c1"># Store definition
+</span><span class="nx">Users</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createStore</span>
+  <span class="na">actions</span><span class="o">:</span> <span class="p">[</span><span class="s">'eat'</span><span class="p">]</span>
+
+  <span class="na">eat</span><span class="o">:</span>
+    <span class="na">while</span><span class="o">:</span> <span class="p">(</span><span class="nx">eating</span><span class="p">)</span> <span class="o">-&gt;</span>
+      <span class="vi">@</span><span class="na">set</span> <span class="p">{</span><span class="nx">eating</span><span class="p">}</span>
+    <span class="na">will</span><span class="o">:</span> <span class="p">(</span><span class="nx">ingredients</span><span class="p">)</span> <span class="o">-&gt;</span>
+      <span class="nx">prepareFood</span><span class="p">(</span><span class="nx">ingredients</span><span class="p">)</span>
+    <span class="na">on</span><span class="o">:</span> <span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="o">-&gt;</span>
+      <span class="nx">consume</span><span class="p">(</span><span class="nx">food</span><span class="p">)</span>
+    <span class="na">did</span><span class="o">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="o">-&gt;</span>
+      <span class="nx">washDishes</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+    <span class="na">didNot</span><span class="o">:</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">-&gt;</span>
+      <span class="nx">panic</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+
+<span class="c1"># Action call
+</span><span class="nx">Users</span><span class="p">.</span><span class="na">actions</span><span class="p">.</span><span class="na">eat</span><span class="p">([</span><span class="s">'beans'</span><span class="p">,</span> <span class="s">'pepper'</span><span class="p">,</span> <span class="s">'tomatoes'</span><span class="p">])</span>
+</code></pre>
+<h2 id='data-storage'>Data storage</h2>
+<p>Exim has a built-in data storage for stores, that can be exposed to your
+components.</p>
+<h3 id='the-code-classprettyprintpathcode-property'>The <code class="prettyprint">path</code> property</h3>
+<p>The <code class="prettyprint">path</code> property is a unique identifier of the store.</p>
+<h3 id='code-classprettyprintgetcode-and-code-classprettyprintsetcode-methods'><code class="prettyprint">get</code> and <code class="prettyprint">set</code> methods</h3>
+<p>Use <code class="prettyprint">get</code> and <code class="prettyprint">set</code> methods to get or set values in store directly. <code class="prettyprint">get(item)</code>
+ returns the value stored under the <code class="prettyprint">item</code> key. <code class="prettyprint">set(item || hash, [ value ], [ options ])</code>
+  receives the item key, its value and a set of options. For now the only opiton is
+<code class="prettyprint">silent</code>(If used, state of connected views is not being updated). Also, <code class="prettyprint">set</code>
+can receive a single hash argument of key-value pairs to update instead of
+separate key and value args.</p>
+<h3 id='initial-values'>initial values</h3>
+<p>Store initial values can be specified using <code class="prettyprint">initial</code> property.</p>
+<h3 id='global-state'>global state</h3>
+<p>Exim&rsquo;s data storage is global. It means that the state of every store can be
+accessed via a handy <code class="prettyprint">Exim.stores</code> helper, which returns a hash with stores
+paths as keys and their states as values.</p>
+<h3 id='transactional-state-updates'>transactional state updates</h3>
+<p>Store state changes are transactional, hence it doesn&rsquo;t matter how many times
+you call a <code class="prettyprint">set</code> method within an action step, the state will be updated only
+once. Also, <code class="prettyprint">while</code> step state changes are being performed along with other
+steps(<code class="prettyprint">on</code> and <code class="prettyprint">did</code>) to avoid redundand state updates.</p>
+<pre><code class="highlight javascript"><span class="kd">var</span> <span class="nx">userActions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createActions</span><span class="p">([</span><span class="s1">'eat'</span><span class="p">,</span> <span class="s1">'drink'</span><span class="p">])</span>
+
+<span class="c1">// the actual work happens here:</span>
+<span class="kd">var</span> <span class="nx">Users</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">path</span><span class="p">:</span> <span class="s1">'users'</span><span class="p">,</span>
+  <span class="na">actions</span><span class="p">:</span> <span class="nx">actions</span><span class="p">,</span>
+  <span class="na">initial</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">prefix</span><span class="p">:</span> <span class="s1">'liquid'</span><span class="p">},</span>
+
+  <span class="na">eat</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="nx">food</span><span class="p">});</span>
+  <span class="p">},</span>
+  <span class="nx">drink</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'prefix'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="nx">drink</span><span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="c1">// Get value from the Users store</span>
+<span class="nx">Users</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'type'</span><span class="p">);</span>
+<span class="c1">// Get value from the global state</span>
+<span class="nx">Exim</span><span class="p">.</span><span class="nx">stores</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">food</span><span class="p">;</span>
+</code></pre>
+<pre><code class="highlight coffeescript"><span class="nx">userActions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createActions</span><span class="p">([</span><span class="s">'eat'</span><span class="p">,</span> <span class="s">'drink'</span><span class="p">])</span>
+
+<span class="nx">Users</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createStore</span>
+  <span class="na">path</span><span class="o">:</span> <span class="s">'users'</span>
+  <span class="na">actions</span><span class="o">:</span> <span class="nx">actions</span>
+  <span class="na">initial</span><span class="o">:</span>
+    <span class="na">type</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">prefix</span><span class="o">:</span> <span class="s">'liquid'</span>
+
+  <span class="na">eat</span><span class="o">:</span> <span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="vi">@</span><span class="na">set</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="nx">food</span><span class="p">)</span>
+
+  <span class="na">drink</span><span class="o">:</span> <span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="vi">@</span><span class="na">set</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">"</span><span class="si">#{</span><span class="vi">@</span><span class="na">get</span><span class="p">(</span><span class="s">'prefix'</span><span class="p">)</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="nx">drink</span><span class="si">}</span><span class="s">"</span>
+
+<span class="c1"># Get value from the Users store
+</span><span class="nx">Users</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">'type'</span><span class="p">)</span>
+<span class="c1"># Get value from the global state
+</span><span class="nx">Exim</span><span class="p">.</span><span class="na">stores</span><span class="p">.</span><span class="na">users</span><span class="p">.</span><span class="na">food</span>
+</code></pre>
+<h1 id='components'>Components</h1>
 <p>Simple React components.</p>
 
-<p>To simplify reacting to store updates, Exim exposes a helper, <code class="prettyprint">Exim.connect(store)</code>, which returns a mixin needed to re-render on store updates.</p>
+<p>To simplify reacting to store updates, Exim exposes a helper,
+<code class="prettyprint">Exim.connect(store([values]))</code>, which returns a mixin needed to re-render on store updates.
+Moreover, there is a <code class="prettyprint">listen</code> helper, which works like a <code class="prettyprint">connect</code> one, but has
+more pleasant synthax. (Note that in order to use a <code class="prettyprint">listen</code> helper, every store you
+subscribe to should have a <code class="prettyprint">path</code> property defined)</p>
 
 <p>(Exim also exposes DOM helpers for writing JSX-free CoffeeScript components. Check out the CoffeeScript tab.)</p>
 <pre><code class="highlight javascript"><span class="kd">var</span> <span class="nx">userActions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createActions</span><span class="p">([</span><span class="s1">'eat'</span><span class="p">,</span> <span class="s1">'drink'</span><span class="p">])</span>
 
 <span class="c1">// the actual work happens here:</span>
 <span class="kd">var</span> <span class="nx">Users</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createStore</span><span class="p">({</span>
+  <span class="na">path</span><span class="p">:</span> <span class="s1">'users'</span>
   <span class="na">actions</span><span class="p">:</span> <span class="nx">actions</span><span class="p">,</span>
   <span class="na">init</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="s1">''</span><span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">''</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="s1">''</span><span class="p">});</span>
   <span class="p">},</span>
-  <span class="nx">onEat</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="nx">food</span><span class="p">});</span>
+  <span class="nx">eat</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="nx">food</span><span class="p">});</span>
   <span class="p">},</span>
-  <span class="nx">onDrink</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="s1">'liquid '</span> <span class="o">+</span> <span class="nx">drink</span><span class="p">});</span>
+  <span class="nx">drink</span><span class="err">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">set</span><span class="p">({</span><span class="na">type</span><span class="p">:</span> <span class="s1">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="p">:</span> <span class="s1">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="p">:</span> <span class="s1">'liquid '</span> <span class="o">+</span> <span class="nx">drink</span><span class="p">});</span>
   <span class="p">}</span>
 <span class="p">})</span>
 
 <span class="kd">var</span> <span class="nx">UserView</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">createView</span><span class="p">({</span>
-  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">Exim</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">Users</span><span class="p">)],</span>
+  <span class="c1">//Subscribe to Users store `type` value updates</span>
+  <span class="na">mixins</span><span class="p">:</span> <span class="p">[</span><span class="nx">Exim</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">Users</span><span class="p">(</span><span class="s1">'type'</span><span class="p">))],</span>
+
+  <span class="c1">// Subscribe to Users store `with` and `food` values updates</span>
+  <span class="na">listen</span><span class="p">:</span> <span class="p">[</span><span class="s1">'users/with'</span><span class="p">,</span> <span class="s1">'users/food'</span><span class="p">],</span>
+
   <span class="na">render</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">;</span>
     <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">"user-view"</span><span class="o">&gt;</span>
@@ -199,19 +358,24 @@ Usually, a store would perform an HTTP request in response to action and store t
 <pre><code class="highlight coffeescript"><span class="nx">userActions</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createActions</span><span class="p">([</span><span class="s">'eat'</span><span class="p">,</span> <span class="s">'drink'</span><span class="p">])</span>
 
 <span class="nx">Users</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createStore</span>
+  <span class="na">path</span><span class="o">:</span> <span class="s">'users'</span>
   <span class="na">actions</span><span class="o">:</span> <span class="nx">actions</span>
 
   <span class="na">init</span><span class="o">:</span> <span class="o">-&gt;</span>
-    <span class="vi">@</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">''</span>
+    <span class="vi">@</span><span class="na">set</span> <span class="na">type</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">''</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">''</span>
 
-  <span class="na">onEat</span><span class="o">:</span> <span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="vi">@</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="nx">food</span><span class="p">)</span>
+  <span class="na">eat</span><span class="o">:</span> <span class="p">(</span><span class="nx">food</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="vi">@</span><span class="na">set</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="nx">food</span><span class="p">)</span>
 
-  <span class="na">onDrink</span><span class="o">:</span> <span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="vi">@</span><span class="na">update</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">'liquid '</span> <span class="o">+</span> <span class="nx">drink</span>
+  <span class="na">drink</span><span class="o">:</span> <span class="p">(</span><span class="nx">drink</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="vi">@</span><span class="na">set</span> <span class="na">type</span><span class="o">:</span> <span class="s">'Brunch'</span><span class="p">,</span> <span class="na">with</span><span class="o">:</span> <span class="s">'Chaplin'</span><span class="p">,</span> <span class="na">food</span><span class="o">:</span> <span class="s">'liquid '</span> <span class="o">+</span> <span class="nx">drink</span>
 
 <span class="nx">var</span> <span class="nx">UserView</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">createView</span>
-  <span class="na">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">Exim</span><span class="p">.</span><span class="na">connect</span><span class="p">(</span><span class="nx">Users</span><span class="p">)]</span>
+  <span class="c1">#Subscribe to Users store `type` value updates
+</span>  <span class="na">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">Exim</span><span class="p">.</span><span class="na">connect</span><span class="p">(</span><span class="nx">Users</span><span class="p">(</span><span class="s">'type'</span><span class="p">))]</span>
+
+  <span class="c1">#Subscribe to Users store `with` and `food` values updates
+</span>  <span class="na">listen</span><span class="o">:</span> <span class="p">[</span><span class="s">'users/with'</span><span class="p">,</span> <span class="s">'users/food'</span><span class="p">]</span>
 
   <span class="na">render</span><span class="o">:</span> <span class="o">-&gt;</span>
     <span class="p">{</span><span class="nx">food</span><span class="p">,</span> <span class="nx">friend</span><span class="p">,</span> <span class="nx">type</span><span class="p">}</span> <span class="o">=</span> <span class="vi">@</span><span class="na">state</span>
@@ -225,8 +389,10 @@ Usually, a store would perform an HTTP request in response to action and store t
 <span class="nx">userActions</span><span class="p">.</span><span class="na">eat</span><span class="p">(</span><span class="s">'Omelette'</span><span class="p">)</span>
 <span class="nx">userActions</span><span class="p">.</span><span class="na">drink</span><span class="p">(</span><span class="s">'Porridge'</span><span class="p">)</span>
 </code></pre>
-<h2 id='routes'>Routes</h2>
+<h1 id='routes'>Routes</h1>
 <p>Routes allow you to map top-level components to browser URLs.</p>
+<h3 id='mount-helper'>Mount helper</h3>
+<p>You can define a <code class="prettyprint">mount</code> helper to use string shortcuts for your routes.</p>
 <pre><code class="highlight javascript"><span class="c1">// 1. Define your React components.</span>
 <span class="kd">var</span> <span class="nx">App</span> <span class="o">=</span> <span class="p">...</span>
 <span class="kd">var</span> <span class="nx">TwoPane</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
@@ -242,11 +408,18 @@ Usually, a store would perform an HTTP request in response to action and store t
 <span class="kd">var</span> <span class="nx">startHistory</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">startHistory</span><span class="p">,</span>
     <span class="nx">match</span>        <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">match</span>
 
+<span class="c1">// Define mount helper</span>
+<span class="nx">Exim</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">mount</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()</span> <span class="o">+</span> <span class="nx">name</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="nx">require</span><span class="p">(</span><span class="s2">"components/"</span> <span class="o">+</span> <span class="nx">name</span> <span class="o">+</span> <span class="s2">"Page"</span><span class="p">)().</span><span class="nx">type</span>
+<span class="p">};</span>
+
 <span class="kd">var</span> <span class="nx">Routes</span> <span class="o">=</span> <span class="nx">startHistory</span><span class="p">(</span>
   <span class="nx">match</span><span class="p">(</span><span class="s1">'app'</span><span class="p">,</span> <span class="nx">App</span><span class="p">,</span> <span class="p">{</span><span class="na">path</span><span class="p">:</span> <span class="s1">'/'</span><span class="p">},</span>
     <span class="nx">match</span><span class="p">(</span><span class="s1">'feedback'</span><span class="p">,</span> <span class="nx">FeedbackPage</span><span class="p">),</span>  <span class="c1">// Each route handler is a React view</span>
     <span class="nx">match</span><span class="p">(</span><span class="s1">'terms'</span><span class="p">,</span> <span class="nx">TermsPage</span><span class="p">),</span>        <span class="c1">// this.props.activeRouteHandler()</span>
     <span class="nx">match</span><span class="p">(</span><span class="s1">'privacy'</span><span class="p">,</span> <span class="nx">PrivacyPage</span><span class="p">),</span>    <span class="c1">// is passed to each view.</span>
+    <span class="nx">match</span><span class="p">(</span><span class="s1">'about'</span><span class="p">),</span>                   <span class="c1">// Equal to match('about', AboutPage)</span>
 
     <span class="nx">match</span><span class="p">(</span><span class="nx">TwoPane</span><span class="p">,</span>
       <span class="nx">match</span><span class="p">(</span><span class="s1">'calendar'</span><span class="p">,</span> <span class="nx">Calendar</span><span class="p">),</span>
@@ -274,11 +447,18 @@ Usually, a store would perform an HTTP request in response to action and store t
 
 <span class="c1"># 2. Define your routes.
 </span><span class="p">{</span><span class="nx">startHistory</span><span class="p">,</span> <span class="nx">match</span><span class="p">}</span> <span class="o">=</span> <span class="nx">Exim</span><span class="p">.</span><span class="na">Router</span>
+
+<span class="c1"># Define mount helper
+</span><span class="nx">Exim</span><span class="p">.</span><span class="na">Router</span><span class="p">.</span><span class="na">mount</span> <span class="o">=</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="o">-&gt;</span>
+  <span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="na">toUpperCase</span><span class="p">()</span> <span class="o">+</span> <span class="nx">name</span><span class="p">.</span><span class="na">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="nx">require</span><span class="p">(</span><span class="s">"components/</span><span class="si">#{</span><span class="nx">name</span><span class="si">}</span><span class="s">Page"</span><span class="p">)().</span><span class="na">type</span>
+
 <span class="nx">routes</span> <span class="o">=</span> <span class="nx">startHistory</span>
   <span class="nx">match</span> <span class="s">'app'</span><span class="p">,</span> <span class="nx">App</span><span class="p">,</span> <span class="na">path</span><span class="o">:</span> <span class="s">'/'</span><span class="p">,</span>
     <span class="nx">match</span> <span class="s">'feedback'</span><span class="p">,</span> <span class="nx">FeedbackPage</span>  <span class="c1"># Each route handler is a React view
 </span>    <span class="nx">match</span> <span class="s">'terms'</span><span class="p">,</span> <span class="nx">TermsPage</span>        <span class="c1"># @props.activeRouteHandler()
 </span>    <span class="nx">match</span> <span class="s">'privacy'</span><span class="p">,</span> <span class="nx">PrivacyPage</span>    <span class="c1"># is passed to each view.
+</span>    <span class="nx">match</span> <span class="s">'about'</span>                   <span class="c1"># Equal to match 'about', AboutPage
 </span>
     <span class="nx">match</span> <span class="nx">TwoPane</span><span class="p">,</span>
       <span class="nx">match</span> <span class="s">'calendar'</span><span class="p">,</span> <span class="nx">Calendar</span>
