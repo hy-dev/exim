@@ -4,9 +4,9 @@ import helpers from './helpers'
 import Getter from './Getter'
 import GlobalStore from './GlobalStore'
 
-import {createView, Router, DOM} from './DOMHelpers'
+import {createView, getRouter, Router , DOM} from './DOMHelpers'
 
-const Exim = {Action, Actions, Store, Router, DOM, helpers, createView};
+const Exim = {Action, Actions, Store, Router, DOM, helpers, createView, getRouter};
 
 Exim.createAction = function (args) {
   return new Action(args);

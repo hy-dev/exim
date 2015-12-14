@@ -20,10 +20,11 @@ var GlobalStore = _interopRequire(require("./GlobalStore"));
 var _DOMHelpers = require("./DOMHelpers");
 
 var createView = _DOMHelpers.createView;
+var getRouter = _DOMHelpers.getRouter;
 var Router = _DOMHelpers.Router;
 var DOM = _DOMHelpers.DOM;
 
-var Exim = { Action: Action, Actions: Actions, Store: Store, Router: Router, DOM: DOM, helpers: helpers, createView: createView };
+var Exim = { Action: Action, Actions: Actions, Store: Store, Router: Router, DOM: DOM, helpers: helpers, createView: createView, getRouter: getRouter };
 
 Exim.createAction = function (args) {
   return new Action(args);
@@ -345,6 +346,8 @@ function getDOM() {
 
 var Router = getRouter();
 exports.Router = Router;
+var getRouter = getRouter;
+exports.getRouter = getRouter;
 var DOM = getDOM();
 
 exports.DOM = DOM;
