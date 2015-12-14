@@ -186,14 +186,17 @@ export default class Store {
 
     var transaction = function(body) {
       var result = body();
-
-      if (typeof result !== 'undefined' && typeof result.then == 'function') {
-        result.then((res) => {
-          state.set(preserver.getPreservedState());
-          return Promise.resolve(res);
-        });
-      } else {
-        state.set(preserver.getPreservedState());
+      let preservedState = preserver.getPreservedState();
+      let stateChanged = Object.keys(preservedState).length;
+      if (stateChanged) {
+        if (typeof result !== 'undefined' && typeof result.then == 'function') {
+          result.then((res) => {
+            state.set(preservedState);
+            return Promise.resolve(res);
+          });
+        } else {
+          state.set(preservedState);
+        }
       }
       return result;
     };

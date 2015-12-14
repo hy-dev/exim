@@ -805,14 +805,17 @@ var Store = (function () {
 
         var transaction = function transaction(body) {
           var result = body();
-
-          if (typeof result !== "undefined" && typeof result.then == "function") {
-            result.then(function (res) {
-              state.set(preserver.getPreservedState());
-              return Promise.resolve(res);
-            });
-          } else {
-            state.set(preserver.getPreservedState());
+          var preservedState = preserver.getPreservedState();
+          var stateChanged = Object.keys(preservedState).length;
+          if (stateChanged) {
+            if (typeof result !== "undefined" && typeof result.then == "function") {
+              result.then(function (res) {
+                state.set(preservedState);
+                return Promise.resolve(res);
+              });
+            } else {
+              state.set(preservedState);
+            }
           }
           return result;
         };
