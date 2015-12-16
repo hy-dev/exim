@@ -1,14 +1,14 @@
-var actions = require('actions/messages');
-var ThreadActions = require('actions/threads')
 var ThreadStore = require('./threads');
+var utils = require('lib/utils');
 
 var store = Exim.createStore({
-  actions: actions,
+  actions: [
+    'recieveMessages',
+    'createMessage'
+  ],
 
-  getInitial: function () {
-    return {
-      messages: []
-    }
+  initial: {
+    messages: []
   },
 
   recieveMessages: function () {
@@ -20,7 +20,7 @@ var store = Exim.createStore({
       })
       .map(utils.dateSetter)
       .sort(utils.dateComparator);
-    this.update({messages: filtered});
+    this.set({messages: filtered});
   },
 
   createMessage: {
@@ -41,12 +41,12 @@ var store = Exim.createStore({
 
       var storeItems = this.get('messages');
       storeItems.push(message);
-      this.update('messages', storeItems);
+      this.set('messages', storeItems);
 
       return message;
     },
     did: function(message) {
-      ThreadActions.updateLast(message);
+      ThreadStore.actions.updateLast(message);
     }
   }
 })

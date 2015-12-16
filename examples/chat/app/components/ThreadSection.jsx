@@ -1,12 +1,11 @@
 var ThreadListItem = require('./ThreadListItem');
-var actions = require('actions/threads');
 var Store = require('stores/threads');
 
 var ThreadSection = React.createClass({
-  mixins: [Exim.connect(Store, 'threads', 'unread')],
+  mixins: [Store.connect('threads', 'unread')],
 
   componentWillMount: function () {
-    actions.recieveThreads();
+    Store.actions.recieveThreads();
   },
 
   render: function() {

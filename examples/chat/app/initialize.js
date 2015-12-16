@@ -3,5 +3,7 @@ var utils = require('lib/utils');
 
 document.addEventListener('DOMContentLoaded', function() {
   utils.initLocalStorage();
-  Exim.startRouting(routes, document.body);
+  ReactRouter.run(routes, function (Handler) {
+    React.render(React.createElement(Handler, null), document.body);
+  });
 }, true);

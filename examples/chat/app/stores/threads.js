@@ -1,15 +1,17 @@
-var actions = require('actions/threads');
 var utils = require('lib/utils');
 
 var store = Exim.createStore({
-  actions: actions,
+  actions: [
+    'recieveThreads',
+    'updateCurrent',
+    'updateLast',
+    'updateUnread'
+  ],
 
-  getInitial: function() {
-    return {
-      threads: {},
-      currentID: null,
-      unread: 0
-    }
+  initial: {
+    threads: {},
+    currentID: null,
+    unread: 0
   },
 
   recieveThreads: function() {
@@ -17,22 +19,23 @@ var store = Exim.createStore({
       .map(utils.dateSetter)
       .sort(utils.dateComparator);
     var threads = utils.getThreads(messages);
-    this.update('threads', threads);
+    console.log(threads);
+    this.set('threads', threads);
   },
 
   didRecieveThreads: function() {
-    actions.updateUnread();
+    this.actions.updateUnread();
   },
 
   updateCurrent: function(id) {
-    this.update('currentID', id);
+    this.set('currentID', id);
   },
 
   updateLast: function(message) {
     var threads = this.get('threads');
     var thread = threads[message.threadID];
     thread.lastMessage = message;
-    this.update('threads', threads);
+    this.set('threads', threads);
   },
 
   updateUnread: function(threadId, value) {
@@ -42,7 +45,7 @@ var store = Exim.createStore({
     if (threadId) {
       var thread  = threads[threadId];
       thread.lastMessage.isRead = value || true;
-      this.update('threads', threads);
+      this.set('threads', threads);
     }
 
     var unread = 0;
@@ -52,7 +55,7 @@ var store = Exim.createStore({
         unread++;
       }
     }
-    this.update('unread', unread);
+    this.set('unread', unread);
   }
 
 })

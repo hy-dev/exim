@@ -1,5 +1,5 @@
 var ENTER_KEY_CODE = 13;
-var actions = require("actions/messages");
+var MessageStore    = require("stores/messages");
 
 var MessageComposer = React.createClass({
   getInitialState: function() {
@@ -15,7 +15,7 @@ var MessageComposer = React.createClass({
       event.preventDefault();
       var text = this.state.text.trim();
       if (text) {
-        actions.createMessage(text);
+        MessageStore.actions.createMessage(text);
       }
       this.setState({text: ''});
     }
