@@ -2,10 +2,10 @@
   "name": "exim",
   "version": "0.8.4",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
-  "main": "./lib",
+  "main": "./src",
   "scripts": {
-    "build": "node ./build && make min && npm run 2es5",
-    "prepublish": "npm run build",
+    "build": "node ./build && make min",
+    "prepublish": "npm run build && npm run 2es5",
     "watch": "watchify src/ -o exim.js",
     "2es5": "node build.js && babel --optional runtime --stage 1 ./src --out-dir ./lib",
     "test": "./node_modules/.bin/mocha --compilers js:babel-core/register"
