@@ -227,7 +227,7 @@ function getFilePath(name) {
   return filePath;
 }
 
-function getRouter() {
+var getRouter = function getRouter() {
   var Router = {};
 
   if (typeof ReactRouter !== "undefined") {
@@ -296,8 +296,9 @@ function getRouter() {
   }
 
   return Router;
-}
+};
 
+exports.getRouter = getRouter;
 function getDOM() {
   var DOMHelpers = {};
 
@@ -346,8 +347,6 @@ function getDOM() {
 
 var Router = getRouter();
 exports.Router = Router;
-var getRouter = getRouter;
-exports.getRouter = getRouter;
 var DOM = getDOM();
 
 exports.DOM = DOM;

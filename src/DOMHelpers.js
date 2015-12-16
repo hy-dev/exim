@@ -31,7 +31,7 @@ function getFilePath(name) {
   return filePath;
 }
 
-function getRouter () {
+export const getRouter = function () {
   const Router = {};
 
   if (typeof ReactRouter !== 'undefined') {
@@ -143,7 +143,6 @@ function getDOM () {
 }
 
 export const Router = getRouter();
-export const getRouter = getRouter;
 export const DOM = getDOM();
 
 export function createView (classArgs) {
