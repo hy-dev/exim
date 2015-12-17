@@ -11,7 +11,7 @@ var ListItem = React.createClass({
       className += cls;
       this.props.className = '';
     }
-    var link = Link(this.props);
+    var link = Link(this.props, this.props.children);
     return (
       <li className={className}>{link}</li>
     )
@@ -29,7 +29,7 @@ var ThreadListItem = React.createClass({
   render: function () {
     var thread = this.props.thread
     var lastMessage = thread.lastMessage;
-    var className = Exim.cx({
+    var className = Exim.helpers.cx({
       'thread-list-item': true,
       'unread': thread.unread
     })

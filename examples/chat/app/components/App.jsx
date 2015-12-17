@@ -7,7 +7,7 @@ App = React.createClass({
     return (
       <div className="chatapp">
         <ThreadSection/>
-        <RouteHandler/>
+        {RouteHandler()}
       </div>
     )
   }

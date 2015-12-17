@@ -170,9 +170,7 @@ var TodoFooter = React.createClass({displayName: 'TodoFooter',
 });
 
 // Renders the full application
-// activeRouteHandler will always be TodoMain, but with different 'showing' prop (all/completed/active)
 var TodoApp = React.createClass({displayName: 'TodoApp',
-  // this will cause setState({list:updatedlist}) whenever the store does trigger(updatedlist)
   mixins: [TodoStore.connect("todos")],
   render: function() {
     return (

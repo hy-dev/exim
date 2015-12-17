@@ -12,13 +12,14 @@
     "test": "brunch test"
   },
   "dependencies": {
-    "auto-reload-brunch": ">= 1.0 < 1.8",
+    "auto-reload-brunch": ">= 1.0 < 1.9",
     "autoprefixer-brunch": "^1.8.3",
-    "clean-css-brunch": ">= 1.0 < 1.8",
-    "css-brunch": ">= 1.0 < 1.8",
-    "javascript-brunch": ">= 1.0 < 1.8",
-    "react-brunch": "^1.0.6",
-    "react-coffee-brunch": "0.0.1",
-    "uglify-js-brunch": ">= 1.0 < 1.8"
+    "clean-css-brunch": ">= 1.0 < 1.9",
+    "coffee-script": "^1.8.0",
+    "coffee-script-brunch": ">= 1.0 < 1.9",
+    "css-brunch": ">= 1.0 < 1.9",
+    "javascript-brunch": ">= 1.0 < 1.9",
+    "react-brunch": "^1.0.9",
+    "uglify-js-brunch": ">= 1.0 < 1.9"
   }
 }
