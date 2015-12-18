@@ -636,8 +636,14 @@ var Store = (function () {
       return correctArgs ? GlobalStore.set(path, key, value) : false;
     };
 
-    var getValue = function getValue(key) {
-      return GlobalStore.get(path, key);
+    var getValue = function getValue(key, preserved) {
+      if (preserved && key in stateUpdates) {
+        return stateUpdates[key];
+      }return GlobalStore.get(path, key);
+    };
+
+    var getPreservedValue = function getPreservedValue(key) {
+      return getValue(key, true);
     };
 
     var removeValue = function removeValue(key) {
@@ -676,7 +682,7 @@ var Store = (function () {
           var type = typeof val;
           if (type === "function") {
             result[key] = item[key](getValue(key));
-          } else if (type === "sting") {
+          } else if (type === "string") {
             result[key] = getValue(key)[val];
           }
         }
@@ -707,6 +713,30 @@ var Store = (function () {
       }
     };
 
+    var getPreserved = function getPreserved(item) {
+      if (typeof item === "string" || typeof item === "number") {
+        return getPreservedValue(item);
+      } else if (Array.isArray(item)) {
+        return item.map(function (key) {
+          return getPreservedValue(key);
+        });
+      } else if (!item) {
+        return getPreservedValue();
+      } else if (typeof item === "object") {
+        var result = {};
+        for (var key in item) {
+          var val = item[key];
+          var type = typeof val;
+          if (type === "function") {
+            result[key] = item[key](getPreservedValue(key));
+          } else if (type === "string") {
+            result[key] = getPreservedValue(key)[val];
+          }
+        }
+        return result;
+      }
+    };
+
     var getPreservedState = function getPreservedState() {
       var newState = new Object(stateUpdates);
       stateUpdates = new Object();
@@ -718,7 +748,7 @@ var Store = (function () {
     this.reset = reset;
 
     this.stateProto = { set: set, get: get, reset: reset, actions: actions };
-    this.preserverProto = { set: preserve, get: get, reset: reset, actions: actions, getPreservedState: getPreservedState };
+    this.preserverProto = { set: preserve, get: getPreserved, reset: reset, actions: actions, getPreservedState: getPreservedState };
 
     return this.getter = new Getter(this);
   }

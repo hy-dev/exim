@@ -40,8 +40,14 @@ export default class Store {
       return (correctArgs) ? GlobalStore.set(path, key, value) : false;
     }
 
-    const getValue = function (key) {
+    const getValue = function (key, preserved) {
+      if(preserved && key in stateUpdates)
+        return stateUpdates[key]
       return GlobalStore.get(path, key);
+    }
+
+    const getPreservedValue = function (key) {
+      return getValue(key, true);
     }
 
     const removeValue = function (key) {
@@ -76,7 +82,7 @@ export default class Store {
           let type = typeof val;
           if (type === 'function') {
             result[key] = item[key](getValue(key));
-           } else if (type === 'sting') {
+           } else if (type === 'string') {
             result[key] = getValue(key)[val];
           }
         }
@@ -105,6 +111,28 @@ export default class Store {
       }
     }
 
+    const getPreserved = function(item) {
+      if (typeof item === 'string' || typeof item === 'number') {
+        return getPreservedValue(item);
+      } else if (Array.isArray(item)) {
+        return item.map(key => getPreservedValue(key))
+      } else if (!item) {
+        return getPreservedValue();
+      } else if (typeof item === 'object') {
+        let result = {};
+        for (let key in item) {
+          let val = item[key];
+          let type = typeof val;
+          if (type === 'function') {
+            result[key] = item[key](getPreservedValue(key));
+           } else if (type === 'string') {
+            result[key] = getPreservedValue(key)[val];
+          }
+        }
+        return result;
+      }
+    }
+
     const getPreservedState = function() {
       var newState = new Object(stateUpdates);
       stateUpdates = new Object();
@@ -116,7 +144,7 @@ export default class Store {
     this.reset = reset;
 
     this.stateProto = {set, get, reset, actions};
-    this.preserverProto = {set: preserve, get, reset, actions, getPreservedState};
+    this.preserverProto = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
 
     return this.getter = new Getter(this);
   }
