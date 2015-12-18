@@ -20,9 +20,15 @@ Exim focuses on three things:
 
 ```javascript
 var User = Exim.createStore({
-  actions: ['create', 'match'],
+  actions: ['match', 'create'],
 
   // Each action can simply be a function, or a "lifecycle" method.
+  // A function: short / implicit action declaration form.
+  match(user1, user2) {
+    this.set({matched: user1.id === user2.id});
+  },
+
+  // More explicit method with defined lifecycle.
   // on() => while(true) => <Promise is resolved>
   // => while(false) => did() / didNot()
   create: {
@@ -49,11 +55,6 @@ var User = Exim.createStore({
       // Let's show a spinner while we're doing a HTTP request.
       this.set({isFetching: isFetching});
     }
-  },
-
-  // Short / implicit action declaration form.
-  match(user1, user2) {
-    this.set({matched: user1.id === user2.id});
   }
 });
 
