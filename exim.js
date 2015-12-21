@@ -834,15 +834,20 @@ var Store = (function () {
 
         var transaction = function transaction(body) {
           var result = body();
-          var preservedState = preserver.getPreservedState();
-          var stateChanged = Object.keys(preservedState).length;
-          if (stateChanged) {
-            if (typeof result !== "undefined" && typeof result.then == "function") {
-              result.then(function (res) {
+
+          if (typeof result !== "undefined" && typeof result.then == "function") {
+            result.then(function (res) {
+              var preservedState = preserver.getPreservedState();
+              var stateChanged = Object.keys(preservedState).length;
+              if (stateChanged) {
                 state.set(preservedState);
-                return Promise.resolve(res);
-              });
-            } else {
+              }
+              return Promise.resolve(res);
+            });
+          } else {
+            var preservedState = preserver.getPreservedState();
+            var stateChanged = Object.keys(preservedState).length;
+            if (stateChanged) {
               state.set(preservedState);
             }
           }
