@@ -214,15 +214,20 @@ export default class Store {
 
     var transaction = function(body) {
       var result = body();
-      let preservedState = preserver.getPreservedState();
-      let stateChanged = Object.keys(preservedState).length;
-      if (stateChanged) {
-        if (typeof result !== 'undefined' && typeof result.then == 'function') {
-          result.then((res) => {
+      
+      if (typeof result !== 'undefined' && typeof result.then == 'function') {
+        result.then((res) => {
+          let preservedState = preserver.getPreservedState();
+          let stateChanged = Object.keys(preservedState).length;
+          if (stateChanged) {
             state.set(preservedState);
-            return Promise.resolve(res);
-          });
-        } else {
+          }
+          return Promise.resolve(res);
+        });
+      } else {
+        let preservedState = preserver.getPreservedState();
+        let stateChanged = Object.keys(preservedState).length;
+        if (stateChanged) {
           state.set(preservedState);
         }
       }
