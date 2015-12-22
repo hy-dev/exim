@@ -160,7 +160,7 @@ var Actions = exports.Actions = (function () {
       value: function removeAction(item) {
         var action = this.detectAction(item, true);
         var index = this.all.indexOf(action);
-        if (index !== -1) this.all(splice(index, 1));
+        if (index !== -1) this.all.splice(index, 1);
         delete this[action.name];
       }
     },
@@ -190,7 +190,6 @@ var Actions = exports.Actions = (function () {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-exports.createView = createView;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -199,7 +198,7 @@ var utils = _interopRequire(require("./utils"));
 
 var helpers = _interopRequire(require("./helpers"));
 
-function getFilePath(name) {
+var getFilePath = function getFilePath(name) {
   var segments = name.split("-");
   var filePath = undefined;
   if (segments.length > 1) {
@@ -211,21 +210,7 @@ function getFilePath(name) {
     filePath = name + "/" + name.charAt(0).toUpperCase() + name.slice(1);
   }
   return filePath;
-}
-
-function getFilePath(name) {
-  var segments = name.split("-");
-  var filePath = undefined;
-  if (segments.length > 1) {
-    filePath = segments.map(function (name, i) {
-      if (i > 0) return name.charAt(0).toUpperCase() + name.slice(1);
-      return name;
-    }).join("/");
-  } else {
-    filePath = name + "/" + name.charAt(0).toUpperCase() + name.slice(1);
-  }
-  return filePath;
-}
+};
 
 var getRouter = function getRouter() {
   var Router = {};
@@ -239,9 +224,15 @@ var getRouter = function getRouter() {
     var ReactRouter1 = !ReactRouter.DefaultRoute;
 
     if (ReactRouter1) {
-      routerComponents = ["Router", "Link", "IndexLink", "RoutingContext", "Route", "Redirect", "IndexRoute", "IndexRedirect"], routerMixins = ["Lifecycle", "History", "RouteContext"], routerFunctions = ["createRoutes", "useRoutes", "match", "default"], routerObjects = ["PropTypes"];
+      routerComponents = ["Router", "Link", "IndexLink", "RoutingContext", "Route", "Redirect", "IndexRoute", "IndexRedirect"];
+      routerMixins = ["Lifecycle", "History", "RouteContext"];
+      routerFunctions = ["createRoutes", "useRoutes", "match", "default"];
+      routerObjects = ["PropTypes"];
     } else {
-      routerComponents = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"], routerMixins = ["Navigation", "State"], routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"], routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"];
+      routerComponents = ["Route", "DefaultRoute", "RouteHandler", "ActiveHandler", "NotFoundRoute", "Redirect"];
+      routerMixins = ["Navigation", "State"];
+      routerFunctions = ["create", "createDefaultRoute", "createNotFoundRoute", "createRedirect", "createRoute", "createRoutesFromReactChildren", "run"];
+      routerObjects = ["HashLocation", "History", "HistoryLocation", "RefreshLocation", "StaticLocation", "TestLocation", "ImitateBrowserBehavior", "ScrollToTopBehavior"];
     }
 
     copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
@@ -299,7 +290,7 @@ var getRouter = function getRouter() {
 };
 
 exports.getRouter = getRouter;
-function getDOM() {
+var getDOM = function getDOM() {
   var DOMHelpers = {};
 
   if (typeof React !== "undefined") {
@@ -343,22 +334,20 @@ function getDOM() {
     })();
   }
   return DOMHelpers;
-}
+};
 
 var Router = getRouter();
 exports.Router = Router;
 var DOM = getDOM();
 
 exports.DOM = DOM;
-
-function createView(classArgs) {
+var createView = function createView(classArgs) {
   var ReactClass = React.createClass(classArgs);
   var ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
   return ReactElement;
-}
-
-;
+};
+exports.createView = createView;
 
 },{"./helpers":9,"./utils":11}],4:[function(require,module,exports){
 "use strict";
@@ -531,8 +520,9 @@ var GlobalStore = (function () {
     get: {
       value: function get(substore, name) {
         var values = this.getSubstore(substore);
-        if (!name) values;
-        return values ? values[name] : {};
+        if (!name) {
+          return values;
+        }return values ? values[name] : {};
       }
     },
     remove: {
@@ -541,11 +531,11 @@ var GlobalStore = (function () {
 
         var success = false;
         if (!key) {
+          success = values[key] && delete values[key];
+        } else {
           for (var _key in values) {
             success = values[_key] && delete values[_key];
           }
-        } else {
-          success = values[key] && delete values[key];
         }
         return success;
       }
@@ -553,10 +543,8 @@ var GlobalStore = (function () {
     set: {
       value: function set(substore, name, value) {
         var values = this.getSubstore(substore);
-
         if (values) values[name] = value;
-
-        return this.get(substore);
+        return value;
       }
     },
     findStore: {
@@ -617,21 +605,6 @@ var Store = (function () {
     GlobalStore.init(path, initValue, this);
 
     var stateUpdates = {};
-
-    var privateMethods = undefined;
-    if (!args.privateMethods) {
-      privateMethods = new Set();
-    } else if (Array.isArray(args.privateMethods)) {
-      privateMethods = new Set();
-      args.privateMethods.forEach(function (m) {
-        return privateSet.add(m);
-      });
-      args.privateMethods = privateSet;
-    } else if (args.privateMethods.constructor === Set) {
-      privateMethods = args.privateMethods;
-    }
-    this.privateMethods = privateMethods;
-
     this.handlers = args.handlers || utils.getWithoutFields(["actions"], args) || {};
 
     if (Array.isArray(actions)) {
@@ -659,7 +632,8 @@ var Store = (function () {
     var getValue = function getValue(key, preserved) {
       if (preserved && key in stateUpdates) {
         return stateUpdates[key];
-      }return GlobalStore.get(path, key);
+      }
+      return GlobalStore.get(path, key);
     };
 
     var setPreservedValue = function setPreservedValue(key, value) {
@@ -763,7 +737,7 @@ var Store = (function () {
     };
 
     var getPreservedState = function getPreservedState() {
-      var newState = new Object(stateUpdates);
+      var newState = stateUpdates;
       stateUpdates = {};
       return newState;
     };
@@ -782,7 +756,7 @@ var Store = (function () {
     addAction: {
       value: function addAction(item) {
         if (Array.isArray(item)) {
-          this.actions = this.actions.concat(actions);
+          this.actions = this.actions.concat(item);
         } else if (typeof item === "object") {
           this.actions.push(item);
         }
@@ -790,13 +764,13 @@ var Store = (function () {
     },
     removeAction: {
       value: function removeAction(item) {
-        var action;
+        var action = undefined;
         if (typeof item === "string") {
           action = this.findByName("actions", "name", item);
           if (action) action.removeStore(this);
         } else if (typeof item === "object") {
           action = item;
-          index = this.actions.indexOf(action);
+          var index = this.actions.indexOf(action);
           if (index !== -1) {
             action.removeStore(this);
             this.actions = this.actions.splice(index, 1);
@@ -874,7 +848,7 @@ var Store = (function () {
             return Promise.reject(error);
           }
 
-          if (result && typeof result === "object" && typeof result.then == "function") {
+          if (result && typeof result === "object" && typeof result.then === "function") {
             return result.then(function (res) {
               var preservedState = preserver.getPreservedState();
               var stateChanged = Object.keys(preservedState).length;
@@ -893,11 +867,13 @@ var Store = (function () {
           }
         };
 
-        if (will) promise = promise.then(function () {
-          return transaction("will", function () {
-            return will.apply(preserver, args);
+        if (will) {
+          promise = promise.then(function () {
+            return transaction("will", function () {
+              return will.apply(preserver, args);
+            });
           });
-        });
+        }
 
         // Actual execution.
         promise = promise.then(function (willResult) {
@@ -920,18 +896,23 @@ var Store = (function () {
         });
 
         // Handle the result.
-        if (did) promise = promise.then(function (onResult) {
-          return transaction("did", function () {
-            if (while_) while_.call(preserver, false);
-            return did.call(preserver, onResult);
+        if (did) {
+          promise = promise.then(function (onResult) {
+            return transaction("did", function () {
+              if (while_) while_.call(preserver, false);
+              return did.call(preserver, onResult);
+            });
           });
-        });
+        }
 
-        if (!did && while_) promise = promise.then(function (onResult) {
-          return transaction("while", function () {
-            return while_.call(preserver, false);
+        // TODO: check while for duplication.
+        if (!did && while_) {
+          promise = promise.then(function (onResult) {
+            return transaction("while", function () {
+              return while_.call(preserver, false);
+            });
           });
-        });
+        }
 
         promise = promise["catch"](function (error) {
           var start = actionName + "#";
@@ -1004,11 +985,9 @@ module.exports = {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-module.exports = getConnectMixin;
-
 var utils = _interopRequire(require("../utils"));
 
-function getConnectMixin(store) {
+var getConnectMixin = function getConnectMixin(store) {
   for (var _len = arguments.length, key = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     key[_key - 1] = arguments[_key];
   }
@@ -1017,15 +996,12 @@ function getConnectMixin(store) {
     var state = {};
     array.forEach(function (k) {
       if (typeof k === "string") {
-        // connect('itemName')
         state[k] = source.get(k);
       } else if (utils.isObject(k)) {
         Object.keys(k).forEach(function (name) {
           if (typeof k[name] === "function") {
-            // connect({data: function (d) {return d.name}})
             state[k] = k[name](source.get(k));
           } else if (typeof k[name] === "string") {
-            // connect({nameInStore: nameInComponent})
             state[k[name]] = source.get(name);
           }
         });
@@ -1035,13 +1011,7 @@ function getConnectMixin(store) {
   };
 
   var getState = function getState() {
-    if (key.length) {
-      // get values from array
-      return getStateFromArray(store, key);
-    } else {
-      // get all values
-      return store.get();
-    }
+    return key.length ? getStateFromArray(store, key) : store.get();
   };
 
   var changeCallback = function changeCallback() {
@@ -1077,7 +1047,9 @@ function getConnectMixin(store) {
       store.offChange(changeCallback);
     }
   };
-}
+};
+
+module.exports = getConnectMixin;
 
 },{"../utils":11}],11:[function(require,module,exports){
 "use strict";
@@ -1129,8 +1101,9 @@ utils.mapActionNames = function (object) {
   return list;
 };
 
+var _objectClass = "[object Object]";
 utils.isObject = function (targ) {
-  return targ ? targ.toString().slice(8, 14) === "Object" : false;
+  return targ ? targ.toString() === _objectClass : false;
 };
 
 utils.capitalize = function (str) {
@@ -1139,19 +1112,13 @@ utils.capitalize = function (str) {
   return "" + first + "" + rest;
 };
 
+var idFormat = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+var pad = 16;
 utils.generateId = function () {
-  var idFormat = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
   return idFormat.replace(/[xy]/g, function (c) {
-    var r = undefined,
-        v = undefined;
-    if (crypto && crypto.getRandomValues) {
-      r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0, v = c == "x" ? r : r & 3 | 8;
-    } else if (crypto && crypto.randomBytes) {
-      r = crypto.randomBytes(1)[0] % 16 | 0, v = c == "x" ? r : r & 3 | 8;
-    } else {
-      r = Math.random() * 16 | 0, v = c == "x" ? r : r & 3 | 8;
-    }
-    return v.toString(16);
+    var r = Math.random() * pad | 0;
+    var v = c === "x" ? r : r & 3 | pad / 2;
+    return v.toString(pad);
   });
 };
 
