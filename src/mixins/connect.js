@@ -33,7 +33,22 @@ export default function getConnectMixin (store, ...key) {
   }
 
   let changeCallback = function () {
-    this.setState(getState());
+    var prev = this.state;
+    var curr = getState();
+    var isDifferent = false;
+
+    for (var key in curr) {
+      var prevValue = prev[key];
+      var currValue = curr[key];
+      if (prevValue !== currValue) {
+        // console.log('Exim#changeCallback diff', key, prevValue, currValue);
+        isDifferent = true;
+        break;
+      }
+    }
+
+    if (!isDifferent) return;
+    this.setState(curr);
   }
 
   return {
