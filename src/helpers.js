@@ -1,7 +1,7 @@
 const hasOwn = {}.hasOwnProperty;
 
 export default {
-  cx: function () {
+  cx: function() {
     let classes = '';
 
     for (let i = 0; i < arguments.length; i++) {
@@ -25,4 +25,4 @@ export default {
 
     return classes.substr(1);
   }
-}
+};

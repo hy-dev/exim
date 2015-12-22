@@ -12,7 +12,7 @@ export class Action {
   run(...args) {
     const storesCycles = this.stores.map(store =>
       store.runCycle.apply(store, [this.name].concat(args))
-    )
+    );
     return Promise.all(storesCycles);
   }
 
@@ -45,7 +45,7 @@ export class Actions {
   removeAction(item) {
     const action = this.detectAction(item, true);
     const index = this.all.indexOf(action);
-    if (index !== -1) this.all(splice(index, 1));
+    if (index !== -1) this.all.splice(index, 1);
     delete this[action.name];
   }
 

@@ -1,55 +1,39 @@
-import utils from './utils'
-import helpers from './helpers'
+import utils from './utils';
+import helpers from './helpers';
 
-function getFilePath(name) {
+const getFilePath = function(name) {
   let segments = name.split('-');
   let filePath;
   if (segments.length > 1) {
-    filePath = segments.map(function(name, i){
-      if (i>0)
-        return name.charAt(0).toUpperCase() + name.slice(1);
+    filePath = segments.map(function(name, i) {
+      if (i > 0) return name.charAt(0).toUpperCase() + name.slice(1);
       return name;
     }).join('/');
   } else {
     filePath = name + '/' + name.charAt(0).toUpperCase() + name.slice(1);
   }
   return filePath;
-}
+};
 
-function getFilePath(name) {
-  let segments = name.split('-');
-  let filePath;
-  if (segments.length > 1) {
-    filePath = segments.map(function(name, i){
-      if (i>0)
-        return name.charAt(0).toUpperCase() + name.slice(1);
-      return name;
-    }).join('/');
-  } else {
-    filePath = name + '/' + name.charAt(0).toUpperCase() + name.slice(1);
-  }
-  return filePath;
-}
-
-export const getRouter = function () {
+export const getRouter = function() {
   const Router = {};
 
   if (typeof ReactRouter !== 'undefined') {
     let routerComponents, routerMixins, routerFunctions, routerObjects, copiedItems;
     const ReactRouter1 = !ReactRouter.DefaultRoute;
-    
+
     if (ReactRouter1) {
-      routerComponents = ['Router', 'Link', 'IndexLink', 'RoutingContext', 'Route', 'Redirect', 'IndexRoute', 'IndexRedirect'],
-      routerMixins = ['Lifecycle', 'History', 'RouteContext'],
-      routerFunctions = ['createRoutes', 'useRoutes', 'match', 'default'],
+      routerComponents = ['Router', 'Link', 'IndexLink', 'RoutingContext', 'Route', 'Redirect', 'IndexRoute', 'IndexRedirect'];
+      routerMixins = ['Lifecycle', 'History', 'RouteContext'];
+      routerFunctions = ['createRoutes', 'useRoutes', 'match', 'default'];
       routerObjects = ['PropTypes'];
     } else {
-      routerComponents = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Redirect'],
-      routerMixins = ['Navigation', 'State'],
-      routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'],
-      routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior']
+      routerComponents = ['Route', 'DefaultRoute', 'RouteHandler', 'ActiveHandler', 'NotFoundRoute', 'Redirect'];
+      routerMixins = ['Navigation', 'State'];
+      routerFunctions = ['create', 'createDefaultRoute', 'createNotFoundRoute', 'createRedirect', 'createRoute', 'createRoutesFromReactChildren', 'run'];
+      routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'];
     }
-    
+
     copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
     routerComponents.forEach(function(name) {
@@ -66,7 +50,7 @@ export const getRouter = function () {
         delete args['class'];
       }
       return React.createElement(ReactRouter['Link'], args, children);
-    }
+    };
 
     if (!ReactRouter1) {
       Router['match'] = function(name, handler, args, children) {
@@ -100,13 +84,13 @@ export const getRouter = function () {
   }
 
   return Router;
-}
+};
 
-function getDOM () {
+var getDOM = function() {
   const DOMHelpers = {};
 
   if (typeof React !== 'undefined') {
-    let tag = function (name, ...args) {
+    let tag = function(name, ...args) {
       let attributes;
       let first = args[0] && args[0].constructor;
       if (first === Object) {
@@ -140,12 +124,12 @@ function getDOM () {
     };
   }
   return DOMHelpers;
-}
+};
 
 export const Router = getRouter();
 export const DOM = getDOM();
 
-export function createView (classArgs) {
+export const createView = function(classArgs) {
   let ReactClass = React.createClass(classArgs);
   let ReactElement = React.createElement.bind(React.createElement, ReactClass);
 

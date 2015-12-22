@@ -1,6 +1,6 @@
-const utils = {}
+const utils = {};
 
-utils.getWithoutFields = function (outcast, target) {
+utils.getWithoutFields = function(outcast, target) {
   if (!target) throw new Error('TypeError: target is not an object.');
   var result = {};
   if (typeof outcast === 'string') outcast = [outcast];
@@ -17,12 +17,12 @@ utils.getWithoutFields = function (outcast, target) {
   return result;
 };
 
-utils.objectToArray = function (object) {
+utils.objectToArray = function(object) {
   return Object.keys(object).map(key => object[key]);
 };
 
-utils.classWithArgs = function (Item, args) {
-  return Item.bind.apply(Item,[Item].concat(args));
+utils.classWithArgs = function(Item, args) {
+  return Item.bind.apply(Item, [Item].concat(args));
 };
 
 // 1. will
@@ -45,29 +45,25 @@ utils.mapActionNames = function(object) {
   return list;
 };
 
-utils.isObject = function (targ) {
-  return targ ? targ.toString().slice(8,14) === 'Object' : false
-}
+const _objectClass = '[object Object]';
+utils.isObject = function(targ) {
+  return targ ? targ.toString() === _objectClass : false;
+};
 
-utils.capitalize = function (str) {
+utils.capitalize = function(str) {
   const first = str.charAt(0).toUpperCase();
   const rest = str.slice(1);
   return `${first}${rest}`;
-}
+};
 
-utils.generateId = function () {
-  const idFormat = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+const idFormat = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+const pad = 16;
+utils.generateId = function() {
   return idFormat.replace(/[xy]/g, c => {
-    let r, v;
-    if (crypto && crypto.getRandomValues) {
-      r = crypto.getRandomValues(new Uint8Array(1))[0]%16|0, v = c == 'x' ? r : (r&0x3|0x8);
-    } else if (crypto && crypto.randomBytes) {
-      r = crypto.randomBytes(1)[0]%16|0, v = c == 'x' ? r : (r&0x3|0x8);
-    } else {
-      r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-    }
-    return v.toString(16);
-  })
-}
+    let r = Math.random() * pad | 0;
+    const v = c === 'x' ? r : (r & 3 | pad / 2);
+    return v.toString(pad);
+  });
+};
 
-export default utils
+export default utils;

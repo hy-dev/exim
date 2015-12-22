@@ -31,31 +31,28 @@ export default class GlobalStore {
 
   static get(substore, name) {
     let values = this.getSubstore(substore);
-    if (!name) values;
+    if (!name) return values;
     return values ? values[name] : {};
   }
 
   static remove(substore, key) {
-    let values = this.getSubstore(substore);
+    const values = this.getSubstore(substore);
 
     let success = false;
     if (!key) {
+      success = values[key] && delete values[key];
+    } else {
       for (let key in values) {
         success = values[key] && delete values[key];
       }
-    } else {
-     success = values[key] && delete values[key];
     }
     return success;
   }
 
   static set(substore, name, value) {
     let values = this.getSubstore(substore);
-
-    if (values)
-      values[name] = value;
-
-    return this.get(substore);
+    if (values) values[name] = value;
+    return value;
   }
 
   static findStore(path) {

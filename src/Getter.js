@@ -1,6 +1,6 @@
-import Emitter from './Emitter'
-import config from './config'
-import getConnectMixin from './mixins/connect'
+import Emitter from './Emitter';
+import config from './config';
+import getConnectMixin from './mixins/connect';
 
 export default class Getter extends Emitter {
   constructor(store) {
@@ -13,8 +13,8 @@ export default class Getter extends Emitter {
     [this.onChange, this.offChange] = [this._addListener, this._removeListener];
 
     // Connect mixin binded to getter.
-    this.connect = function (...args) {
+    this.connect = function(...args) {
       return getConnectMixin.apply(null, [this].concat(args));
-    }
+    };
   }
 }

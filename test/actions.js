@@ -1,8 +1,8 @@
 'use strict';
 
 let chai = require('chai');
-var sinon = require("sinon");
-var sinonChai = require("sinon-chai");
+var sinon = require('sinon');
+var sinonChai = require('sinon-chai');
 
 chai.use(sinonChai);
 chai.should();

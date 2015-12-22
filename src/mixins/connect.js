@@ -1,38 +1,31 @@
-import utils from '../utils'
+import utils from '../utils';
 
-export default function getConnectMixin (store, ...key) {
-  let getStateFromArray = function (source, array) {
-    let state = {}
+const getConnectMixin = function(store, ...key) {
+  let getStateFromArray = function(source, array) {
+    let state = {};
     array.forEach(k => {
       if (typeof k === 'string') {
-        // connect('itemName')
-        state[k] = source.get(k)
+        state[k] = source.get(k);
       } else if (utils.isObject(k)) {
         Object.keys(k).forEach(name => {
           if (typeof k[name] === 'function') {
-            // connect({data: function (d) {return d.name}})
             state[k] = k[name](source.get(k));
           } else if (typeof k[name] === 'string') {
-            // connect({nameInStore: nameInComponent})
-            state[k[name]] = source.get(name)
+            state[k[name]] = source.get(name);
           }
-        })
+        });
       }
     });
     return state;
-  }
+  };
 
-  let getState = function () {
-    if (key.length) {
-        // get values from array
-      return getStateFromArray(store, key);
-    } else {
-      // get all values
-      return store.get()
-    }
-  }
+  let getState = function() {
+    return key.length ?
+      getStateFromArray(store, key) :
+      store.get();
+  };
 
-  let changeCallback = function () {
+  let changeCallback = function() {
     var prev = this.state;
     var curr = getState();
     var isDifferent = false;
@@ -49,19 +42,21 @@ export default function getConnectMixin (store, ...key) {
 
     if (!isDifferent) return;
     this.setState(curr);
-  }
+  };
 
   return {
-    getInitialState: function () {
-      return getState()
+    getInitialState: function() {
+      return getState();
     },
 
-    componentDidMount: function () {
+    componentDidMount: function() {
       store.onChange(changeCallback, this);
     },
 
-    componentWillUnmount: function () {
+    componentWillUnmount: function() {
       store.offChange(changeCallback);
     }
-  }
-}
+  };
+};
+
+export default getConnectMixin;

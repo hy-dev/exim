@@ -1,9 +1,9 @@
 'use strict';
 
 let chai = require('chai');
-var sinon = require("sinon");
-var sinonChai = require("sinon-chai");
-var chaiAsPromised = require("chai-as-promised");
+var sinon = require('sinon');
+var sinonChai = require('sinon-chai');
+var chaiAsPromised = require('chai-as-promised');
 
 
 chai.use(sinonChai);
@@ -111,7 +111,7 @@ describe('Store', () => {
       });
 
       describe('on error', () =>  {
-        it("rejects promise", () => {
+        it('rejects promise', () => {
           let handler = function(){throw 'reject';};
           let store = createStore('action', handler);
 
@@ -121,7 +121,7 @@ describe('Store', () => {
     });
 
     describe('declared as hash', () =>  {
-      it("executes 'will' action", () => {
+      it('executes "will" action', () => {
         let name = 'action';
         let onHandler = sinon.spy(), willHandler = sinon.spy();
         let handler = {will: willHandler, on: onHandler};
@@ -132,7 +132,7 @@ describe('Store', () => {
           willHandler.should.have.been.calledOnce;
         });
       });
-      it("executes 'on' action", () => {
+      it('executes "on" action', () => {
         let name = 'action';
         let onHandler = sinon.spy();
         let handler = {on: onHandler};
@@ -144,7 +144,7 @@ describe('Store', () => {
         });
       });
 
-      it("executes 'did' action", () => {
+      it('executes "did" action', () => {
         let name = 'action';
         let onHandler = sinon.spy(), didHandler = sinon.spy();
         let handler = {did: didHandler, on: onHandler};
@@ -156,8 +156,8 @@ describe('Store', () => {
         });
       });
 
-      describe("'while' action", () =>  {
-        it("being executed properly when 'on' action defined", () => {
+      describe('"while" action', () =>  {
+        it('being executed properly when "on" action defined', () => {
           let name = 'action';
           let onHandler = sinon.spy(), whileHandler = sinon.spy();
           let handler = {while: whileHandler, on: onHandler};
@@ -171,7 +171,7 @@ describe('Store', () => {
           });
         });
 
-        it("being executed properly when 'on' and 'did' actions defined", () => {
+        it('being executed properly when "on" and "did" actions defined', () => {
           let name = 'action';
           let onHandler = sinon.spy(), whileHandler = sinon.spy(), didHandler = sinon.spy();
           let handler = {while: whileHandler, on: onHandler, did: didHandler};
@@ -185,7 +185,7 @@ describe('Store', () => {
           });
         });
 
-        it("being executed properly on error", () => {
+        it('being executed properly on error', () => {
           let name = 'action';
           let onHandler = function(){throw 'reject';}, whileHandler = sinon.spy();
           let handler = {while: whileHandler, on: onHandler};
@@ -211,13 +211,13 @@ describe('Store', () => {
           store = createStore('action', {didNot: didNotHandler, on: onHandler});
         });
 
-        it("rejects promise", () => {
+        it('rejects promise', () => {
           let result = store.actions.action()
 
           return result.should.be.rejected;
         });
 
-        it("executes 'didNot' function", () => {
+        it('executes "didNot" function', () => {
           let result = store.actions.action()
 
           return result.catch(() => {
