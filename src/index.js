@@ -21,7 +21,7 @@ Exim.createStore = function (args) {
 }
 
 Exim.listen = function (args) {
-  let stores = new Object();
+  let stores = {};
   args.forEach(function(path) {
     let pathBits = path.split('/');
     let pathLength = pathBits.length;

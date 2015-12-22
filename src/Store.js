@@ -17,12 +17,13 @@ var printTraces = function(actionName, error) {
 export default class Store {
   constructor(args={}) {
     let {path, actions, initial} = args;
-    if (typeof path === 'undefined' || path === null) path = `nopath/${utils.generateId()}`;
-    this.initial = initial = typeof initial === 'function' ? initial() : initial;
+    if (path == null) path = `nopath/${utils.generateId()}`;
+    let initValue = typeof initial === 'function' ? initial() : initial;
+    this.initial = initValue;
     this.path = path;
     GlobalStore.init(path, initial, this);
 
-    let stateUpdates = new Object();
+    let stateUpdates = {};
 
     let privateMethods;
     if (!args.privateMethods) {
@@ -112,12 +113,12 @@ export default class Store {
     }
 
     const preserve = function(arg1, arg2) {
-      if(typeof arg2 !== 'undefined'){
-        stateUpdates[arg1] = arg2;
-      } else {
+      if (typeof arg2 === 'undefined'){
         Object.keys(arg1).forEach(function(key) {
           stateUpdates[key] = arg1[key];
         });
+      } else {
+        stateUpdates[arg1] = arg2;
       }
     }
 
@@ -145,7 +146,7 @@ export default class Store {
 
     const getPreservedState = function() {
       var newState = new Object(stateUpdates);
-      stateUpdates = new Object();
+      stateUpdates = {};
       return newState;
     }
 

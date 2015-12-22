@@ -39,7 +39,7 @@ Exim.createStore = function (args) {
 };
 
 Exim.listen = function (args) {
-  var stores = new Object();
+  var stores = {};
   args.forEach(function (path) {
     var pathBits = path.split("/");
     var pathLength = pathBits.length;
@@ -478,7 +478,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var globalStore, stores;
+var globalStore = undefined,
+    stores = undefined;
 
 var GlobalStore = (function () {
   function GlobalStore() {
@@ -489,7 +490,7 @@ var GlobalStore = (function () {
     getStore: {
       value: function getStore() {
         if (!globalStore) {
-          globalStore = new Object();
+          globalStore = {};
         }
         return globalStore;
       }
@@ -503,7 +504,7 @@ var GlobalStore = (function () {
           if (values[bit]) {
             values = values[bit];
           } else {
-            values[bit] = typeof init !== undefined && bits.length - 1 === i ? init : new Object();
+            values[bit] = typeof init !== undefined && bits.length - 1 === i ? init : {};
             values = values[bit];
           }
         });
@@ -522,7 +523,7 @@ var GlobalStore = (function () {
 
         return _initWrapper;
       })(function (path, init, store) {
-        if (typeof stores === "undefined") stores = new Object();
+        if (stores == null) stores = {};
         stores[path] = store;
         return this.getSubstore(path, init);
       })
@@ -531,7 +532,7 @@ var GlobalStore = (function () {
       value: function get(substore, name) {
         var values = this.getSubstore(substore);
         if (!name) values;
-        return values ? values[name] : new Object();
+        return values ? values[name] : {};
       }
     },
     remove: {
@@ -609,12 +610,13 @@ var Store = (function () {
     var actions = args.actions;
     var initial = args.initial;
 
-    if (typeof path === "undefined" || path === null) path = "nopath/" + utils.generateId();
-    this.initial = initial = typeof initial === "function" ? initial() : initial;
+    if (path == null) path = "nopath/" + utils.generateId();
+    var initValue = typeof initial === "function" ? initial() : initial;
+    this.initial = initValue;
     this.path = path;
     GlobalStore.init(path, initial, this);
 
-    var stateUpdates = new Object();
+    var stateUpdates = {};
 
     var privateMethods = undefined;
     if (!args.privateMethods) {
@@ -714,12 +716,12 @@ var Store = (function () {
     };
 
     var preserve = function preserve(arg1, arg2) {
-      if (typeof arg2 !== "undefined") {
-        stateUpdates[arg1] = arg2;
-      } else {
+      if (typeof arg2 === "undefined") {
         Object.keys(arg1).forEach(function (key) {
           stateUpdates[key] = arg1[key];
         });
+      } else {
+        stateUpdates[arg1] = arg2;
       }
     };
 
@@ -749,7 +751,7 @@ var Store = (function () {
 
     var getPreservedState = function getPreservedState() {
       var newState = new Object(stateUpdates);
-      stateUpdates = new Object();
+      stateUpdates = {};
       return newState;
     };
 

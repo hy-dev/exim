@@ -1,9 +1,9 @@
-var globalStore, stores;
+let globalStore, stores;
 
 export default class GlobalStore {
   static getStore() {
     if (!globalStore) {
-      globalStore = new Object();
+      globalStore = {};
     }
     return globalStore;
   }
@@ -16,7 +16,7 @@ export default class GlobalStore {
       if (values[bit]) {
         values = values[bit];
       } else {
-        values[bit] = (typeof init !== undefined && bits.length - 1 === i) ? init : new Object();
+        values[bit] = (typeof init !== undefined && bits.length - 1 === i) ? init : {};
         values = values[bit];
       }
     });
@@ -24,17 +24,15 @@ export default class GlobalStore {
   }
 
   static init(path, init, store) {
-    if(typeof stores === 'undefined')
-      stores = new Object();
+    if (stores == null) stores = {};
     stores[path] = store;
     return this.getSubstore(path, init);
   }
 
   static get(substore, name) {
     let values = this.getSubstore(substore);
-    if (!name)
-      values;
-    return values ? values[name] : new Object();
+    if (!name) values;
+    return values ? values[name] : {};
   }
 
   static remove(substore, key) {
