@@ -935,18 +935,19 @@ var Store = (function () {
 
         promise = promise["catch"](function (error) {
           var start = actionName + "#";
-          if (!didNot) {
-            return transaction("error", function () {
+          if (didNot) {
+            return transaction("didNot", function () {
+              if (while_) while_.call(preserver, false);
+              didNot.call(preserver, error)["catch"](function (error) {
+                return rejectAction(start + "didNot", error);
+              });
+            });
+          } else {
+            return transaction(lastStep, function () {
               if (while_) while_.call(preserver, false);
               return rejectAction(start + lastStep, error);
             });
           }
-          return transaction("didNot", function () {
-            if (while_) while_.call(preserver, false);
-            didNot.call(preserver, error)["catch"](function (error) {
-              return rejectAction(start + "didNot", error);
-            });
-          });
         });
 
         return promise;
