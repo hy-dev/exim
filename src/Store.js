@@ -1,8 +1,8 @@
-import {Actions} from './Actions'
-import connect from './mixins/connect'
-import Getter from './Getter'
-import utils from './utils'
-import GlobalStore from './GlobalStore'
+import {Actions} from './Actions';
+import connect from './mixins/connect';
+import Getter from './Getter';
+import utils from './utils';
+import GlobalStore from './GlobalStore';
 
 var printTraces = function(actionName, error) {
   var msg = 'Exim: Uncaught error in %s';
@@ -222,7 +222,7 @@ export default class Store {
 
     // Local state for this cycle.
     let state = Object.create(this.stateProto);
-    let preserver =  Object.create(this.preserverProto);
+    let preserver = Object.create(this.preserverProto);
     let lastStep = 'will';
 
     let rejectAction = function(trace, error) {
@@ -239,11 +239,11 @@ export default class Store {
       lastStep = cycleName;
       try {
         result = body();
-      } catch(error) {
+      } catch (error) {
         return Promise.reject(error);
       }
 
-      if (result && typeof result === 'object' && typeof result.then == 'function') {
+      if (result && typeof result === 'object' && typeof result.then === 'function') {
         return result.then((res) => {
           let preservedState = preserver.getPreservedState();
           let stateChanged = Object.keys(preservedState).length;
@@ -262,25 +262,23 @@ export default class Store {
       }
     };
 
-    if (will) promise = promise.then(() => {
-      return transaction('will', function() {
+    if (will) {
+      promise = promise.then(() => transaction('will', () => {
         return will.apply(preserver, args);
-      })
-    });
+      }));
+    }
 
     // Actual execution.
-    promise = promise.then(function (willResult) {
-      return transaction('on', function() {
-        if (while_) {
-          while_.call(preserver, true);
-        }
-        if (willResult == null) {
-          return on_.apply(preserver, args);
-        } else {
-          return on_.call(preserver, willResult);
-        }
-      });
-    });
+    promise = promise.then(willResult => transaction('on', () => {
+      if (while_) {
+        while_.call(preserver, true);
+      }
+      if (willResult == null) {
+        return on_.apply(preserver, args);
+      } else {
+        return on_.call(preserver, willResult);
+      }
+    }));
 
     // For did and didNot state is freezed.
     promise = promise.then((onResult) => {
@@ -289,18 +287,21 @@ export default class Store {
     });
 
     // Handle the result.
-    if (did) promise = promise.then(onResult => {
-      return transaction('did', function() {
+    if (did) {
+      promise = promise.then(onResult => transaction('did', function() {
         if (while_) while_.call(preserver, false);
         return did.call(preserver, onResult);
-      });
-    });
+      }));
+    }
 
-    if (!did && while_) promise = promise.then(onResult => {
-      return transaction('while', function() {
-        return while_.call(preserver, false);
-      })
-    });
+    // TODO: check while for duplication.
+    if (!did && while_) {
+      promise = promise.then(onResult => {
+        return transaction('while', function() {
+          return while_.call(preserver, false);
+        });
+      });
+    }
 
     promise = promise.catch(error => {
       let start = actionName + '#';
@@ -308,7 +309,7 @@ export default class Store {
         return transaction('didNot', function() {
           if (while_) while_.call(preserver, false);
           didNot.call(preserver, error).catch(error => {
-            return rejectAction(start + 'didNot', error)
+            return rejectAction(start + 'didNot', error);
           });
         });
       } else {
