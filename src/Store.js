@@ -4,6 +4,16 @@ import Getter from './Getter'
 import utils from './utils'
 import GlobalStore from './GlobalStore'
 
+var printTraces = function(actionName, error) {
+  var msg = 'Exim: Uncaught error in %s';
+  if (error.eximStack) msg += ' => ' + error.eximStack;
+  if (error.message) {
+    console.error(msg, actionName, error.message, ' ', error.stack);
+  } else {
+    console.error(msg, actionName, error);
+  }
+};
+
 export default class Store {
   constructor(args={}) {
     let {path, actions, initial} = args;
@@ -209,13 +219,27 @@ export default class Store {
     // Local state for this cycle.
     let state = Object.create(this.stateProto);
     let preserver =  Object.create(this.preserverProto);
+    let lastStep = 'will';
+
+    let rejectAction = function(trace, error) {
+      printTraces(trace, error);
+      if (!error.eximStack) error.eximStack = trace;
+      return Promise.reject(error);
+    };
 
     // Pre-check & preparations.
 
-    var transaction = function(body) {
-      var result = body();
-      
-      if (typeof result !== 'undefined' && typeof result.then == 'function') {
+    var transaction = function(cycleName, body) {
+      var result;
+
+      try {
+        result = body();
+        lastStep = cycleName;
+      } catch(error) {
+        return Promise.reject(error);
+      }
+
+      if (result && typeof result === 'object' && typeof result.then == 'function') {
         result.then((res) => {
           let preservedState = preserver.getPreservedState();
           let stateChanged = Object.keys(preservedState).length;
@@ -235,14 +259,14 @@ export default class Store {
     };
 
     if (will) promise = promise.then(() => {
-      return transaction(function() {
+      return transaction('will', function() {
         return will.apply(preserver, args);
       })
     });
 
     // Actual execution.
     promise = promise.then(function (willResult) {
-      return transaction(function() {
+      return transaction('on', function() {
         if (while_) {
           while_.call(preserver, true);
         }
@@ -262,28 +286,25 @@ export default class Store {
 
     // Handle the result.
     if (did) promise = promise.then(onResult => {
-      return transaction(function() {
-        if (while_)
-          while_.call(preserver, false);
+      return transaction('did', function() {
+        if (while_) while_.call(preserver, false);
         return did.call(preserver, onResult);
       });
     });
 
-    if (typeof did === 'undefined' && while_) promise = promise.then(onResult => {
-      return transaction(function() {
+    if (!did && while_) promise = promise.then(onResult => {
+      return transaction('while', function() {
         return while_.call(preserver, false);
       })
     });
 
     promise.catch(error => {
-      return transaction(function() {
+      let start = actionName + '#';
+      if (!didNot) return rejectAction(start + lastStep, error);
+      return transaction('didNot', function() {
         if (while_) while_.call(preserver, false);
-        if (didNot) {
-          didNot.call(preserver, error);
-        } else {
-          throw error;
-        }
-      })
+        didNot.call(preserver, error);
+      }).catch(error => rejectAction(start + 'didNot', error));
     });
 
     return promise;

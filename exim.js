@@ -589,6 +589,16 @@ var utils = _interopRequire(require("./utils"));
 
 var GlobalStore = _interopRequire(require("./GlobalStore"));
 
+var printTraces = function printTraces(actionName, error) {
+  var msg = "Exim: Uncaught error in %s";
+  if (error.eximStack) msg += " => " + error.eximStack;
+  if (error.message) {
+    console.error(msg, actionName, error.message, " ", error.stack);
+  } else {
+    console.error(msg, actionName, error);
+  }
+};
+
 var Store = (function () {
   function Store() {
     var args = arguments[0] === undefined ? {} : arguments[0];
@@ -829,13 +839,27 @@ var Store = (function () {
         // Local state for this cycle.
         var state = Object.create(this.stateProto);
         var preserver = Object.create(this.preserverProto);
+        var lastStep = "will";
+
+        var rejectAction = function rejectAction(trace, error) {
+          printTraces(trace, error);
+          if (!error.eximStack) error.eximStack = trace;
+          return Promise.reject(error);
+        };
 
         // Pre-check & preparations.
 
-        var transaction = function transaction(body) {
-          var result = body();
+        var transaction = function transaction(cycleName, body) {
+          var result;
 
-          if (typeof result !== "undefined" && typeof result.then == "function") {
+          try {
+            result = body();
+            lastStep = cycleName;
+          } catch (error) {
+            return Promise.reject(error);
+          }
+
+          if (result && typeof result === "object" && typeof result.then == "function") {
             result.then(function (res) {
               var preservedState = preserver.getPreservedState();
               var stateChanged = Object.keys(preservedState).length;
@@ -855,14 +879,14 @@ var Store = (function () {
         };
 
         if (will) promise = promise.then(function () {
-          return transaction(function () {
+          return transaction("will", function () {
             return will.apply(preserver, args);
           });
         });
 
         // Actual execution.
         promise = promise.then(function (willResult) {
-          return transaction(function () {
+          return transaction("on", function () {
             if (while_) {
               while_.call(preserver, true);
             }
@@ -882,26 +906,26 @@ var Store = (function () {
 
         // Handle the result.
         if (did) promise = promise.then(function (onResult) {
-          return transaction(function () {
+          return transaction("did", function () {
             if (while_) while_.call(preserver, false);
             return did.call(preserver, onResult);
           });
         });
 
-        if (typeof did === "undefined" && while_) promise = promise.then(function (onResult) {
-          return transaction(function () {
+        if (!did && while_) promise = promise.then(function (onResult) {
+          return transaction("while", function () {
             return while_.call(preserver, false);
           });
         });
 
         promise["catch"](function (error) {
-          return transaction(function () {
+          var start = actionName + "#";
+          if (!didNot) return rejectAction(start + lastStep, error);
+          return transaction("didNot", function () {
             if (while_) while_.call(preserver, false);
-            if (didNot) {
-              didNot.call(preserver, error);
-            } else {
-              throw error;
-            }
+            didNot.call(preserver, error);
+          })["catch"](function (error) {
+            return rejectAction(start + "didNot", error);
           });
         });
 
