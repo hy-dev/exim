@@ -24,19 +24,6 @@ export default class Store {
     GlobalStore.init(path, initValue, this);
 
     let stateUpdates = {};
-
-    let privateMethods;
-    if (!args.privateMethods) {
-      privateMethods = new Set()
-    } else if (Array.isArray(args.privateMethods)) {
-      privateMethods = new Set();
-      args.privateMethods.forEach(m => privateSet.add(m));
-      args.privateMethods = privateSet;
-    } else if (args.privateMethods.constructor === Set) {
-      privateMethods = args.privateMethods;
-    }
-    this.privateMethods = privateMethods;
-
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
 
     if (Array.isArray(actions)) {
@@ -51,36 +38,37 @@ export default class Store {
       if (!propTypes || !propTypes[propName]) return;
       var obj = {};
       obj[propName] = value;
-      var error = propTypes[propName](obj, propName, path, "prop");
+      var error = propTypes[propName](obj, propName, path, 'prop');
       if (error) throw error;
     };
 
-    const setValue = function (key, value) {
+    const setValue = function(key, value) {
       checkPropType(key, value);
-      GlobalStore.set(path, key, value)
+      GlobalStore.set(path, key, value);
     };
 
-    const getValue = function (key, preserved) {
-      if(preserved && key in stateUpdates)
-        return stateUpdates[key]
+    const getValue = function(key, preserved) {
+      if (preserved && key in stateUpdates) {
+        return stateUpdates[key];
+      }
       return GlobalStore.get(path, key);
     };
 
-    const setPreservedValue = function (key, value) {
+    const setPreservedValue = function(key, value) {
       checkPropType(key, value);
       stateUpdates[key] = value;
     };
 
 
-    const getPreservedValue = function (key) {
+    const getPreservedValue = function(key) {
       return getValue(key, true);
-    }
+    };
 
-    const removeValue = function (key) {
+    const removeValue = function(key) {
       return GlobalStore.remove(path, key);
-    }
+    };
 
-    const set = function (item, value, options={}) {
+    const set = function(item, value, options={}) {
       if (utils.isObject(item)) {
         if (utils.isObject(value)) options = value;
         for (let key in item) {
@@ -92,13 +80,13 @@ export default class Store {
       if (!options.silent) {
         _this.getter.emit();
       }
-    }
+    };
 
-    const get = function (item) {
+    const get = function(item) {
       if (typeof item === 'string' || typeof item === 'number') {
         return getValue(item);
       } else if (Array.isArray(item)) {
-        return item.map(key => getValue(key))
+        return item.map(key => getValue(key));
       } else if (!item) {
         return getValue();
       } else if (typeof item === 'object') {
@@ -108,15 +96,15 @@ export default class Store {
           let type = typeof val;
           if (type === 'function') {
             result[key] = item[key](getValue(key));
-           } else if (type === 'string') {
+          } else if (type === 'string') {
             result[key] = getValue(key)[val];
           }
         }
         return result;
       }
-    }
+    };
 
-    const reset = function (item, options={}) {
+    const reset = function(item, options={}) {
       if (item) {
         setValue(item, initValue[item]);
       } else {
@@ -125,23 +113,23 @@ export default class Store {
       if (!options.silent) {
         _this.getter.emit();
       }
-    }
+    };
 
     const preserve = function(arg1, arg2) {
-      if (typeof arg2 === 'undefined'){
+      if (typeof arg2 === 'undefined') {
         Object.keys(arg1).forEach(function(key) {
-          setPreservedValue(key, arg1[key])
+          setPreservedValue(key, arg1[key]);
         });
       } else {
         setPreservedValue(arg1, arg2);
       }
-    }
+    };
 
     const getPreserved = function(item) {
       if (typeof item === 'string' || typeof item === 'number') {
         return getPreservedValue(item);
       } else if (Array.isArray(item)) {
-        return item.map(key => getPreservedValue(key))
+        return item.map(key => getPreservedValue(key));
       } else if (!item) {
         return getPreservedValue();
       } else if (typeof item === 'object') {
@@ -151,19 +139,19 @@ export default class Store {
           let type = typeof val;
           if (type === 'function') {
             result[key] = item[key](getPreservedValue(key));
-           } else if (type === 'string') {
+          } else if (type === 'string') {
             result[key] = getPreservedValue(key)[val];
           }
         }
         return result;
       }
-    }
+    };
 
     const getPreservedState = function() {
-      var newState = new Object(stateUpdates);
+      var newState = stateUpdates;
       stateUpdates = {};
       return newState;
-    }
+    };
 
     this.set = set;
     this.get = get;
@@ -177,20 +165,20 @@ export default class Store {
 
   addAction(item) {
     if (Array.isArray(item)) {
-      this.actions = this.actions.concat(actions);
+      this.actions = this.actions.concat(item);
     } else if (typeof item === 'object') {
       this.actions.push(item);
     }
   }
 
   removeAction(item) {
-    var action;
+    let action;
     if (typeof item === 'string') {
       action = this.findByName('actions', 'name', item);
       if (action) action.removeStore(this);
     } else if (typeof item === 'object') {
       action = item;
-      index = this.actions.indexOf(action);
+      let index = this.actions.indexOf(action);
       if (index !== -1) {
         action.removeStore(this);
         this.actions = this.actions.splice(index, 1);
