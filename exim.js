@@ -614,7 +614,7 @@ var Store = (function () {
     var initValue = typeof initial === "function" ? initial() : initial;
     this.initial = initValue;
     this.path = path;
-    GlobalStore.init(path, initial, this);
+    GlobalStore.init(path, initValue, this);
 
     var stateUpdates = {};
 
@@ -641,17 +641,30 @@ var Store = (function () {
 
     var _this = this;
 
+    var propTypes = args.propTypes;
+    var checkPropType = function checkPropType(propName, value) {
+      if (!propTypes || !propTypes[propName]) {
+        return;
+      }var obj = {};
+      obj[propName] = value;
+      var error = propTypes[propName](obj, propName, path, "prop");
+      if (error) throw error;
+    };
+
     var setValue = function setValue(key, value) {
-      var correctArgs = ["key", "value"].every(function (item) {
-        return typeof item === "string";
-      });
-      return correctArgs ? GlobalStore.set(path, key, value) : false;
+      checkPropType(key, value);
+      GlobalStore.set(path, key, value);
     };
 
     var getValue = function getValue(key, preserved) {
       if (preserved && key in stateUpdates) {
         return stateUpdates[key];
       }return GlobalStore.get(path, key);
+    };
+
+    var setPreservedValue = function setPreservedValue(key, value) {
+      checkPropType(key, value);
+      stateUpdates[key] = value;
     };
 
     var getPreservedValue = function getPreservedValue(key) {
@@ -706,7 +719,7 @@ var Store = (function () {
       var options = arguments[1] === undefined ? {} : arguments[1];
 
       if (item) {
-        setValue(item, initial[item]);
+        setValue(item, initValue[item]);
       } else {
         removeValue(item);
       }
@@ -718,10 +731,10 @@ var Store = (function () {
     var preserve = function preserve(arg1, arg2) {
       if (typeof arg2 === "undefined") {
         Object.keys(arg1).forEach(function (key) {
-          stateUpdates[key] = arg1[key];
+          setPreservedValue(key, arg1[key]);
         });
       } else {
-        stateUpdates[arg1] = arg2;
+        setPreservedValue(arg1, arg2);
       }
     };
 
@@ -854,15 +867,15 @@ var Store = (function () {
         var transaction = function transaction(cycleName, body) {
           var result;
 
+          lastStep = cycleName;
           try {
             result = body();
-            lastStep = cycleName;
           } catch (error) {
             return Promise.reject(error);
           }
 
           if (result && typeof result === "object" && typeof result.then == "function") {
-            result.then(function (res) {
+            return result.then(function (res) {
               var preservedState = preserver.getPreservedState();
               var stateChanged = Object.keys(preservedState).length;
               if (stateChanged) {
@@ -876,8 +889,8 @@ var Store = (function () {
             if (stateChanged) {
               state.set(preservedState);
             }
+            return Promise.resolve(result);
           }
-          return result;
         };
 
         if (will) promise = promise.then(function () {
@@ -920,7 +933,7 @@ var Store = (function () {
           });
         });
 
-        promise["catch"](function (error) {
+        promise = promise["catch"](function (error) {
           var start = actionName + "#";
           if (!didNot) return rejectAction(start + lastStep, error);
           return transaction("didNot", function () {

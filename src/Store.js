@@ -21,7 +21,7 @@ export default class Store {
     let initValue = typeof initial === 'function' ? initial() : initial;
     this.initial = initValue;
     this.path = path;
-    GlobalStore.init(path, initial, this);
+    GlobalStore.init(path, initValue, this);
 
     let stateUpdates = {};
 
@@ -46,16 +46,31 @@ export default class Store {
 
     let _this = this;
 
+    const propTypes = args.propTypes;
+    const checkPropType = function(propName, value) {
+      if (!propTypes || !propTypes[propName]) return;
+      var obj = {};
+      obj[propName] = value;
+      var error = propTypes[propName](obj, propName, path, "prop");
+      if (error) throw error;
+    };
+
     const setValue = function (key, value) {
-      const correctArgs = ['key', 'value'].every(item => typeof item === 'string');
-      return (correctArgs) ? GlobalStore.set(path, key, value) : false;
-    }
+      checkPropType(key, value);
+      GlobalStore.set(path, key, value)
+    };
 
     const getValue = function (key, preserved) {
       if(preserved && key in stateUpdates)
         return stateUpdates[key]
       return GlobalStore.get(path, key);
-    }
+    };
+
+    const setPreservedValue = function (key, value) {
+      checkPropType(key, value);
+      stateUpdates[key] = value;
+    };
+
 
     const getPreservedValue = function (key) {
       return getValue(key, true);
@@ -103,7 +118,7 @@ export default class Store {
 
     const reset = function (item, options={}) {
       if (item) {
-        setValue(item, initial[item]);
+        setValue(item, initValue[item]);
       } else {
         removeValue(item);
       }
@@ -115,10 +130,10 @@ export default class Store {
     const preserve = function(arg1, arg2) {
       if (typeof arg2 === 'undefined'){
         Object.keys(arg1).forEach(function(key) {
-          stateUpdates[key] = arg1[key];
+          setPreservedValue(key, arg1[key])
         });
       } else {
-        stateUpdates[arg1] = arg2;
+        setPreservedValue(arg1, arg2);
       }
     }
 
@@ -233,15 +248,15 @@ export default class Store {
     var transaction = function(cycleName, body) {
       var result;
 
+      lastStep = cycleName;
       try {
         result = body();
-        lastStep = cycleName;
       } catch(error) {
         return Promise.reject(error);
       }
 
       if (result && typeof result === 'object' && typeof result.then == 'function') {
-        result.then((res) => {
+        return result.then((res) => {
           let preservedState = preserver.getPreservedState();
           let stateChanged = Object.keys(preservedState).length;
           if (stateChanged) {
@@ -255,8 +270,8 @@ export default class Store {
         if (stateChanged) {
           state.set(preservedState);
         }
+        return Promise.resolve(result);
       }
-      return result;
     };
 
     if (will) promise = promise.then(() => {
@@ -299,7 +314,7 @@ export default class Store {
       })
     });
 
-    promise.catch(error => {
+    promise = promise.catch(error => {
       let start = actionName + '#';
       if (!didNot) return rejectAction(start + lastStep, error);
       return transaction('didNot', function() {
