@@ -316,11 +316,16 @@ export default class Store {
 
     promise = promise.catch(error => {
       let start = actionName + '#';
-      if (!didNot) return rejectAction(start + lastStep, error);
+      if (!didNot) {
+        return transaction('error', function() {
+          if (while_) while_.call(preserver, false);
+          return rejectAction(start + lastStep, error);
+        })
+      }
       return transaction('didNot', function() {
         if (while_) while_.call(preserver, false);
-        didNot.call(preserver, error);
-      }).catch(error => rejectAction(start + 'didNot', error));
+        didNot.call(preserver, error).catch(error => rejectAction(start + 'didNot', error));
+      });
     });
 
     return promise;
