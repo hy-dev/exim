@@ -81,6 +81,10 @@ The only hard dependency is React.js.
 
 ## Changelog
 
+### Exim 0.9.0 (Dec 22, 2015)
+* Stores can now use `propTypes` to specify the exact data types of properties.
+* Massively improved debugging.
+
 ### Exim 0.8.2 (Dec 13, 2015)
 
 * Add React Router 1.0 support.
