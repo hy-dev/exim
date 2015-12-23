@@ -43,9 +43,6 @@ var store = Exim.createStore({
       storeItems.push(message);
       this.set('messages', storeItems);
 
-      return message;
-    },
-    did: function(message) {
       ThreadStore.actions.updateLast(message);
     }
   }
