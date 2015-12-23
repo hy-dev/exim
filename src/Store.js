@@ -72,7 +72,8 @@ export default class Store {
     const set = function(item, value, options={}) {
       if (utils.isObject(item)) {
         if (utils.isObject(value)) options = value;
-        for (let key in item) {
+        let key;
+        for (key in item) {
           setValue(key, item[key], options);
         }
       } else {
@@ -92,7 +93,8 @@ export default class Store {
         return getValue();
       } else if (typeof item === 'object') {
         const result = {};
-        for (let key in item) {
+        let key;
+        for (key in item) {
           const val = item[key];
           const type = typeof val;
           if (type === 'function') {
@@ -135,7 +137,8 @@ export default class Store {
         return getPreservedValue();
       } else if (typeof item === 'object') {
         const result = {};
-        for (let key in item) {
+        let key;
+        for (key in item) {
           const val = item[key];
           const type = typeof val;
           if (type === 'function') {

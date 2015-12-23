@@ -5,7 +5,7 @@ export default {
     let classes = '';
 
     for (let i = 0; i < arguments.length; i++) {
-      let arg = arguments[i];
+      const arg = arguments[i];
       if (!arg) continue;
 
       const argType = typeof arg;
@@ -15,7 +15,8 @@ export default {
       } else if (Array.isArray(arg)) {
         classes += ' ' + this.cx.apply(this, arg);
       } else if (argType === 'object') {
-        for (let key in arg) {
+        let key;
+        for (key in arg) {
           if (hasOwn.call(arg, key) && arg[key]) {
             classes += ' ' + key;
           }

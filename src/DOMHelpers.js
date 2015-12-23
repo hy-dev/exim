@@ -111,11 +111,9 @@ const getDOM = function() {
       return DOMHelpers[tagName] = tag.bind(this, tagName);
     };
 
-    for (let tagName in React.DOM) {
-      bindTag(tagName);
-    }
+    Object.keys(React.DOM).forEach(bindTag);
 
-    DOMHelpers['space'] = function() {
+    DOMHelpers.space = function() {
       return React.DOM.span({
         dangerouslySetInnerHTML: {
           __html: '&nbsp;'

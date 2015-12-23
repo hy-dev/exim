@@ -320,9 +320,7 @@ var getDOM = function getDOM() {
         return DOMHelpers[tagName] = tag.bind(this, tagName);
       };
 
-      for (var tagName in React.DOM) {
-        bindTag(tagName);
-      }
+      Object.keys(React.DOM).forEach(bindTag);
 
       DOMHelpers.space = function () {
         return React.DOM.span({
@@ -530,12 +528,13 @@ var GlobalStore = (function () {
         var values = this.getSubstore(substore);
 
         var success = false;
-        if (!key) {
-          success = values[key] && delete values[key];
-        } else {
-          for (var _key in values) {
-            success = values[_key] && delete values[_key];
+        if (key) {
+          var k = undefined;
+          for (k in values) {
+            success = values[k] && delete values[k];
           }
+        } else {
+          success = values[key] && delete values[key];
         }
         return success;
       }
@@ -654,7 +653,8 @@ var Store = (function () {
 
       if (utils.isObject(item)) {
         if (utils.isObject(value)) options = value;
-        for (var key in item) {
+        var key = undefined;
+        for (key in item) {
           setValue(key, item[key], options);
         }
       } else {
@@ -676,7 +676,8 @@ var Store = (function () {
         return getValue();
       } else if (typeof item === "object") {
         var result = {};
-        for (var key in item) {
+        var key = undefined;
+        for (key in item) {
           var val = item[key];
           var type = typeof val;
           if (type === "function") {
@@ -723,7 +724,8 @@ var Store = (function () {
         return getPreservedValue();
       } else if (typeof item === "object") {
         var result = {};
-        for (var key in item) {
+        var key = undefined;
+        for (key in item) {
           var val = item[key];
           var type = typeof val;
           if (type === "function") {
@@ -968,7 +970,8 @@ module.exports = {
       } else if (Array.isArray(arg)) {
         classes += " " + this.cx.apply(this, arg);
       } else if (argType === "object") {
-        for (var key in arg) {
+        var key = undefined;
+        for (key in arg) {
           if (hasOwn.call(arg, key) && arg[key]) {
             classes += " " + key;
           }
