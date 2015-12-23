@@ -4,8 +4,8 @@ import Getter from './Getter';
 import utils from './utils';
 import GlobalStore from './GlobalStore';
 
-var printTraces = function(actionName, error) {
-  var msg = 'Exim: Uncaught error in %s';
+const printTraces = function(actionName, error) {
+  let msg = 'Exim: Uncaught error in %s';
   if (error.eximStack) msg += ' => ' + error.eximStack;
   if (error.message) {
     console.error(msg, actionName, error.message, ' ', error.stack);
@@ -16,9 +16,10 @@ var printTraces = function(actionName, error) {
 
 export default class Store {
   constructor(args={}) {
-    let {path, actions, initial} = args;
+    const {initial} = args;
+    let {path, actions} = args;
     if (path == null) path = `nopath/${utils.generateId()}`;
-    let initValue = typeof initial === 'function' ? initial() : initial;
+    const initValue = typeof initial === 'function' ? initial() : initial;
     this.initial = initValue;
     this.path = path;
     GlobalStore.init(path, initValue, this);
@@ -31,14 +32,14 @@ export default class Store {
       this.actions.addStore(this);
     }
 
-    let _this = this;
+    const _this = this;
 
     const propTypes = args.propTypes;
     const checkPropType = function(propName, value) {
       if (!propTypes || !propTypes[propName]) return;
-      var obj = {};
+      const obj = {};
       obj[propName] = value;
-      var error = propTypes[propName](obj, propName, path, 'prop');
+      const error = propTypes[propName](obj, propName, path, 'prop');
       if (error) throw error;
     };
 
@@ -90,10 +91,10 @@ export default class Store {
       } else if (!item) {
         return getValue();
       } else if (typeof item === 'object') {
-        let result = {};
+        const result = {};
         for (let key in item) {
-          let val = item[key];
-          let type = typeof val;
+          const val = item[key];
+          const type = typeof val;
           if (type === 'function') {
             result[key] = item[key](getValue(key));
           } else if (type === 'string') {
@@ -133,10 +134,10 @@ export default class Store {
       } else if (!item) {
         return getPreservedValue();
       } else if (typeof item === 'object') {
-        let result = {};
+        const result = {};
         for (let key in item) {
-          let val = item[key];
-          let type = typeof val;
+          const val = item[key];
+          const type = typeof val;
           if (type === 'function') {
             result[key] = item[key](getPreservedValue(key));
           } else if (type === 'string') {
@@ -148,7 +149,7 @@ export default class Store {
     };
 
     const getPreservedState = function() {
-      var newState = stateUpdates;
+      const newState = stateUpdates;
       stateUpdates = {};
       return newState;
     };
@@ -178,7 +179,7 @@ export default class Store {
       if (action) action.removeStore(this);
     } else if (typeof item === 'object') {
       action = item;
-      let index = this.actions.indexOf(action);
+      const index = this.actions.indexOf(action);
       if (index !== -1) {
         action.removeStore(this);
         this.actions = this.actions.splice(index, 1);
@@ -217,15 +218,15 @@ export default class Store {
     // new Promise(resolve => resolve(true))
     const cycle = this.getActionCycle(actionName);
     let promise = Promise.resolve();
-    let will = cycle.will, while_ = cycle.while, on_ = cycle.on;
-    let did = cycle.did, didNot = cycle.didNot;
+    const will = cycle.will, while_ = cycle.while, on_ = cycle.on;
+    const did = cycle.did, didNot = cycle.didNot;
 
     // Local state for this cycle.
-    let state = Object.create(this.stateProto);
-    let preserver = Object.create(this.preserverProto);
+    const state = Object.create(this.stateProto);
+    const preserver = Object.create(this.preserverProto);
     let lastStep = 'will';
 
-    let rejectAction = function(trace, error) {
+    const rejectAction = function(trace, error) {
       printTraces(trace, error);
       if (!error.eximStack) error.eximStack = trace;
       return Promise.reject(error);
@@ -233,8 +234,8 @@ export default class Store {
 
     // Pre-check & preparations.
 
-    var transaction = function(cycleName, body) {
-      var result;
+    const transaction = function(cycleName, body) {
+      let result;
 
       lastStep = cycleName;
       try {
@@ -245,16 +246,16 @@ export default class Store {
 
       if (result && typeof result === 'object' && typeof result.then === 'function') {
         return result.then((res) => {
-          let preservedState = preserver.getPreservedState();
-          let stateChanged = Object.keys(preservedState).length;
+          const preservedState = preserver.getPreservedState();
+          const stateChanged = Object.keys(preservedState).length;
           if (stateChanged) {
             state.set(preservedState);
           }
           return Promise.resolve(res);
         });
       } else {
-        let preservedState = preserver.getPreservedState();
-        let stateChanged = Object.keys(preservedState).length;
+        const preservedState = preserver.getPreservedState();
+        const stateChanged = Object.keys(preservedState).length;
         if (stateChanged) {
           state.set(preservedState);
         }
@@ -304,7 +305,7 @@ export default class Store {
     }
 
     promise = promise.catch(error => {
-      let start = actionName + '#';
+      const start = actionName + '#';
       if (didNot) {
         return transaction('didNot', function() {
           if (while_) while_.call(preserver, false);

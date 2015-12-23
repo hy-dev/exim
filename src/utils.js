@@ -2,9 +2,9 @@ const utils = {};
 
 utils.getWithoutFields = function(outcast, target) {
   if (!target) throw new Error('TypeError: target is not an object.');
-  var result = {};
+  const result = {};
   if (typeof outcast === 'string') outcast = [outcast];
-  var tKeys = Object.keys(target);
+  const tKeys = Object.keys(target);
   outcast.forEach(function(fieldName) {
     tKeys
       .filter(function(key) {
@@ -60,7 +60,7 @@ const idFormat = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
 const pad = 16;
 utils.generateId = function() {
   return idFormat.replace(/[xy]/g, c => {
-    let r = Math.random() * pad | 0;
+    const r = Math.random() * pad | 0;
     const v = c === 'x' ? r : (r & 3 | pad / 2);
     return v.toString(pad);
   });

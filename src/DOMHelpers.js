@@ -2,7 +2,7 @@ import utils from './utils';
 import helpers from './helpers';
 
 const getFilePath = function(name) {
-  let segments = name.split('-');
+  const segments = name.split('-');
   let filePath;
   if (segments.length > 1) {
     filePath = segments.map(function(name, i) {
@@ -86,13 +86,13 @@ export const getRouter = function() {
   return Router;
 };
 
-var getDOM = function() {
+const getDOM = function() {
   const DOMHelpers = {};
 
   if (typeof React !== 'undefined') {
-    let tag = function(name, ...args) {
+    const tag = function(name, ...args) {
       let attributes;
-      let first = args[0] && args[0].constructor;
+      const first = args[0] && args[0].constructor;
       if (first === Object) {
         attributes = args.shift();
         if (attributes.class != null) {
@@ -107,7 +107,7 @@ var getDOM = function() {
       return React.DOM[name].apply(React.DOM, [attributes].concat(args));
     };
 
-    let bindTag = function(tagName) {
+    const bindTag = function(tagName) {
       return DOMHelpers[tagName] = tag.bind(this, tagName);
     };
 
@@ -130,8 +130,8 @@ export const Router = getRouter();
 export const DOM = getDOM();
 
 export const createView = function(classArgs) {
-  let ReactClass = React.createClass(classArgs);
-  let ReactElement = React.createElement.bind(React.createElement, ReactClass);
+  const ReactClass = React.createClass(classArgs);
+  const ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
   return ReactElement;
 };

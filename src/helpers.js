@@ -5,7 +5,7 @@ export default {
     let classes = '';
 
     for (let i = 0; i < arguments.length; i++) {
-      const arg = arguments[i];
+      let arg = arguments[i];
       if (!arg) continue;
 
       const argType = typeof arg;

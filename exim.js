@@ -46,9 +46,9 @@ Exim.listen = function (args) {
 
     if (pathLength > 1) {
       var storePath = pathBits.slice(0, pathLength - 1).join("/");
-      var varPath = pathBits.slice(pathLength - 1)[0];
+      var tPath = pathBits.slice(pathLength - 1)[0];
 
-      stores[storePath] = Array.isArray(stores[storePath]) ? stores[storePath].concat(varPath) : [varPath];
+      stores[storePath] = Array.isArray(stores[storePath]) ? stores[storePath].concat(tPath) : [tPath];
     }
   });
 
@@ -381,8 +381,8 @@ var _default = (function () {
     },
     _removeListener: {
       value: function _removeListener(listener) {
-        var index = undefined,
-            found = (index = this.findListenerIndex(listener)) >= 0;
+        var index = this.findListenerIndex(listener);
+        var found = index >= 0;
         if (found) {
           this._listeners.splice(index, 1);
         }
@@ -594,9 +594,9 @@ var Store = (function () {
 
     _classCallCheck(this, Store);
 
+    var initial = args.initial;
     var path = args.path;
     var actions = args.actions;
-    var initial = args.initial;
 
     if (path == null) path = "nopath/" + utils.generateId();
     var initValue = typeof initial === "function" ? initial() : initial;
@@ -839,7 +839,7 @@ var Store = (function () {
         // Pre-check & preparations.
 
         var transaction = function transaction(cycleName, body) {
-          var result;
+          var result = undefined;
 
           lastStep = cycleName;
           try {
@@ -1017,21 +1017,10 @@ var getConnectMixin = function getConnectMixin(store) {
   var changeCallback = function changeCallback() {
     var prev = this.state;
     var curr = getState();
-    var isDifferent = false;
-
-    for (var key in curr) {
-      var prevValue = prev[key];
-      var currValue = curr[key];
-      if (prevValue !== currValue) {
-        // console.log('Exim#changeCallback diff', key, prevValue, currValue);
-        isDifferent = true;
-        break;
-      }
-    }
-
-    if (!isDifferent) {
-      return;
-    }this.setState(curr);
+    var diff = Object.keys(curr).some(function (key) {
+      return prev[key] !== curr[key];
+    });
+    if (diff) this.setState(curr);
   };
 
   return {

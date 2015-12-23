@@ -21,22 +21,23 @@ Exim.createStore = function(args) {
 };
 
 Exim.listen = function(args) {
-  let stores = {};
+  const stores = {};
   args.forEach(function(path) {
-    let pathBits = path.split('/');
-    let pathLength = pathBits.length;
+    const pathBits = path.split('/');
+    const pathLength = pathBits.length;
 
     if (pathLength > 1) {
-      let storePath = pathBits.slice(0, pathLength - 1).join('/');
-      let varPath = pathBits.slice(pathLength - 1)[0];
+      const storePath = pathBits.slice(0, pathLength - 1).join('/');
+      const tPath = pathBits.slice(pathLength - 1)[0];
 
-      stores[storePath] = Array.isArray(stores[storePath]) ? stores[storePath].concat(varPath) : [varPath];
+      stores[storePath] = Array.isArray(stores[storePath]) ?
+        stores[storePath].concat(tPath) : [tPath];
     }
   });
 
-  let mixins = [];
+  const mixins = [];
   Object.keys(stores).forEach(function(path) {
-    let store = GlobalStore.findStore(path);
+    const store = GlobalStore.findStore(path);
     mixins.push(store.getter.connect.apply(store.getter, stores[path]));
   });
 

@@ -8,7 +8,7 @@ export default class {
   }
 
   _addListener(listener, context) {
-    let found = this.findListenerIndex(listener) >= 0;
+    const found = this.findListenerIndex(listener) >= 0;
     if (!found) {
       if (context) listener._ctx = context;
       this._listeners.push(listener);
@@ -17,7 +17,8 @@ export default class {
   }
 
   _removeListener(listener) {
-    let index, found = (index = this.findListenerIndex(listener)) >= 0;
+    const index = this.findListenerIndex(listener);
+    const found = (index >= 0);
     if (found) {
       this._listeners.splice(index, 1);
     }

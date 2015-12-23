@@ -1,8 +1,8 @@
 import utils from '../utils';
 
 const getConnectMixin = function(store, ...key) {
-  let getStateFromArray = function(source, array) {
-    let state = {};
+  const getStateFromArray = function(source, array) {
+    const state = {};
     array.forEach(k => {
       if (typeof k === 'string') {
         state[k] = source.get(k);
@@ -19,29 +19,17 @@ const getConnectMixin = function(store, ...key) {
     return state;
   };
 
-  let getState = function() {
+  const getState = function() {
     return key.length ?
       getStateFromArray(store, key) :
       store.get();
   };
 
-  let changeCallback = function() {
-    var prev = this.state;
-    var curr = getState();
-    var isDifferent = false;
-
-    for (var key in curr) {
-      var prevValue = prev[key];
-      var currValue = curr[key];
-      if (prevValue !== currValue) {
-        // console.log('Exim#changeCallback diff', key, prevValue, currValue);
-        isDifferent = true;
-        break;
-      }
-    }
-
-    if (!isDifferent) return;
-    this.setState(curr);
+  const changeCallback = function() {
+    const prev = this.state;
+    const curr = getState();
+    const diff = Object.keys(curr).some(key => prev[key] !== curr[key]);
+    if (diff) this.setState(curr);
   };
 
   return {
