@@ -33,7 +33,6 @@ export default class Store {
 
     if (actions == null) {
       actions = Object.keys(args).filter(name => !reservedActionNames[name]);
-      // console.log('act', actions);
     }
 
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
