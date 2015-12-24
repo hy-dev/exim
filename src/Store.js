@@ -14,6 +14,11 @@ const printTraces = function(actionName, error) {
   }
 };
 
+const reservedActionNames = {
+  path: true, handlers: true, propTypes: true, initial: true,
+  connect: true, get: true, set: true, reset: true
+};
+
 export default class Store {
   constructor(args={}) {
     const {initial} = args;
@@ -25,6 +30,12 @@ export default class Store {
     GlobalStore.init(path, initValue, this);
 
     let stateUpdates = {};
+
+    if (actions == null) {
+      actions = Object.keys(args).filter(name => !reservedActionNames[name]);
+      // console.log('act', actions);
+    }
+
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
 
     if (Array.isArray(actions)) {
