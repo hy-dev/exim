@@ -55,7 +55,7 @@ Exim.listen = function (args) {
   var mixins = [];
   Object.keys(stores).forEach(function (path) {
     var store = GlobalStore.findStore(path);
-    mixins.push(store.getter.connect.apply(store.getter, stores[path]));
+    mixins.push(store._getter.connect.apply(store._getter, stores[path]));
   });
 
   return mixins;
