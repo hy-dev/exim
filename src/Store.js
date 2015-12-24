@@ -19,7 +19,7 @@ export default class Store {
     const {initial} = args;
     let {path, actions} = args;
     if (path == null) path = `nopath/${utils.generateId()}`;
-    const initValue = typeof initial === 'function' ? initial() : initial;
+    const initValue = (typeof initial === 'function' ? initial() : initial) || {};
     this.initial = initValue;
     this.path = path;
     GlobalStore.init(path, initValue, this);
