@@ -587,6 +587,11 @@ var printTraces = function printTraces(actionName, error) {
   }
 };
 
+var reservedActionNames = {
+  path: true, handlers: true, propTypes: true, initial: true,
+  connect: true, get: true, set: true, reset: true
+};
+
 var Store = (function () {
   function Store() {
     var args = arguments[0] === undefined ? {} : arguments[0];
@@ -598,12 +603,19 @@ var Store = (function () {
     var actions = args.actions;
 
     if (path == null) path = "nopath/" + utils.generateId();
-    var initValue = typeof initial === "function" ? initial() : initial;
+    var initValue = (typeof initial === "function" ? initial() : initial) || {};
     this.initial = initValue;
     this.path = path;
     GlobalStore.init(path, initValue, this);
 
     var stateUpdates = {};
+
+    if (actions == null) {
+      actions = Object.keys(args).filter(function (name) {
+        return !reservedActionNames[name];
+      });
+    }
+
     this.handlers = args.handlers || utils.getWithoutFields(["actions"], args) || {};
 
     if (Array.isArray(actions)) {
@@ -661,7 +673,7 @@ var Store = (function () {
         setValue(item, value, options);
       }
       if (!options.silent) {
-        _this.getter.emit();
+        _this._getter.emit();
       }
     };
 
@@ -699,7 +711,7 @@ var Store = (function () {
         removeValue(item);
       }
       if (!options.silent) {
-        _this.getter.emit();
+        _this._getter.emit();
       }
     };
 
@@ -748,10 +760,10 @@ var Store = (function () {
     this.get = get;
     this.reset = reset;
 
-    this.stateProto = { set: set, get: get, reset: reset, actions: actions };
-    this.preserverProto = { set: preserve, get: getPreserved, reset: reset, actions: actions, getPreservedState: getPreservedState };
+    this._stateProto = { set: set, get: get, reset: reset, actions: actions };
+    this._preserverProto = { set: preserve, get: getPreserved, reset: reset, actions: actions, getPreservedState: getPreservedState };
 
-    return this.getter = new Getter(this);
+    return this._getter = new Getter(this);
   }
 
   _createClass(Store, {
@@ -828,8 +840,8 @@ var Store = (function () {
             didNot = cycle.didNot;
 
         // Local state for this cycle.
-        var state = Object.create(this.stateProto);
-        var preserver = Object.create(this.preserverProto);
+        var state = Object.create(this._stateProto);
+        var preserver = Object.create(this._preserverProto);
         var lastStep = "will";
 
         var rejectAction = function rejectAction(trace, error) {

@@ -13,9 +13,7 @@ chai.should();
 import Store from '../src/Store'
 import { Action, Actions } from '../src/Actions'
 
-let dummyConfig = {
-  path: 'test'
-}
+let dummyConfig = {};
 
 const createStore = function(name, handler, config){
   let conf;
@@ -25,7 +23,7 @@ const createStore = function(name, handler, config){
   else
     conf = Object.create(dummyConfig);
 
-  if(typeof name !== 'undefined' && typeof handler !== 'undefined'){
+  if(typeof name !== 'undefined' && !!name && typeof handler !== 'undefined'){
     let params = {name};
     let action = new Action(params);
 
@@ -45,10 +43,21 @@ describe('Store', () => {
       store.should.be.an.instanceOf(Object);
     });
 
-    it('initializes actions', () => {
+    it('initializes actions explicitly', () => {
       let action = 'action1';
       let config = Object.create(dummyConfig);
       config.actions = [action];
+
+      let store = new Store(config);
+
+      store.actions.should.be.instanceOf(Object);
+      store.actions.should.include.keys(action);
+    });
+
+    it('initializes actions implicitly', () => {
+      let action = 'action1';
+      let config = Object.create(dummyConfig);
+      config.action1 = sinon.spy();
 
       let store = new Store(config);
 
@@ -232,8 +241,7 @@ describe('Store', () => {
   describe('#get', () =>  {
     it('returns initial values', () => {
       let initial = {testValue: 'abc'};
-      let config = Object.create(dummyConfig);
-      config.initial = initial;
+      let config = {initial};
 
       let store = createStore(null, null, config);
 
@@ -255,8 +263,7 @@ describe('Store', () => {
 
     it('updates initial values in action handler', () => {
       let initial = {testKey: 'abc'};
-      let config = Object.create(dummyConfig);
-      config.initial = initial;
+      let config = {initial};
 
       let name = 'action';
       let val = {testKey: 'testValue'}
@@ -266,8 +273,8 @@ describe('Store', () => {
       let store = createStore(name, handler, config);
 
       return store.actions.action().then(() => {
-        store.get(Object.keys(val)[0]).should.not.equal(initial.testKey);
-        store.get(Object.keys(val)[0]).should.equal(val.testKey);
+        store.get(Object.keys(val)[0]).should.not.equal('abc');
+        store.get(Object.keys(val)[0]).should.equal('testValue');
       });
     });
   });
