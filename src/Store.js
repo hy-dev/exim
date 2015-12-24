@@ -80,7 +80,7 @@ export default class Store {
         setValue(item, value, options);
       }
       if (!options.silent) {
-        _this.getter.emit();
+        _this._getter.emit();
       }
     };
 
@@ -114,7 +114,7 @@ export default class Store {
         removeValue(item);
       }
       if (!options.silent) {
-        _this.getter.emit();
+        _this._getter.emit();
       }
     };
 
@@ -161,10 +161,10 @@ export default class Store {
     this.get = get;
     this.reset = reset;
 
-    this.stateProto = {set, get, reset, actions};
-    this.preserverProto = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
+    this._stateProto = {set, get, reset, actions};
+    this._preserverProto = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
 
-    return this.getter = new Getter(this);
+    return this._getter = new Getter(this);
   }
 
   addAction(item) {
@@ -225,8 +225,8 @@ export default class Store {
     const did = cycle.did, didNot = cycle.didNot;
 
     // Local state for this cycle.
-    const state = Object.create(this.stateProto);
-    const preserver = Object.create(this.preserverProto);
+    const state = Object.create(this._stateProto);
+    const preserver = Object.create(this._preserverProto);
     let lastStep = 'will';
 
     const rejectAction = function(trace, error) {
