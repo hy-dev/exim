@@ -42,10 +42,8 @@ export default class Store {
       this.actions.addStore(this);
     }
 
-    const _this = this;
-
     const propTypes = args.propTypes;
-    const checkPropType = function(propName, value) {
+    const checkPropType = (propName, value) => {
       if (!propTypes || !propTypes[propName]) return;
       const obj = {};
       obj[propName] = value;
@@ -53,33 +51,29 @@ export default class Store {
       if (error) throw error;
     };
 
-    const setValue = function(key, value) {
+    const setValue = (key, value) => {
       checkPropType(key, value);
       GlobalStore.set(path, key, value);
     };
 
-    const getValue = function(key, preserved) {
+    const getValue = (key, preserved) => {
       if (preserved && key in stateUpdates) {
         return stateUpdates[key];
       }
       return GlobalStore.get(path, key);
     };
 
-    const setPreservedValue = function(key, value) {
+    const setPreservedValue = (key, value) => {
       checkPropType(key, value);
       stateUpdates[key] = value;
     };
 
 
-    const getPreservedValue = function(key) {
-      return getValue(key, true);
-    };
+    const getPreservedValue = key => getValue(key, true);
 
-    const removeValue = function(key) {
-      return GlobalStore.remove(path, key);
-    };
+    const removeValue = key => GlobalStore.remove(path, key);
 
-    const set = function(item, value, options={}) {
+    const set = (item, value, options={}) => {
       if (utils.isObject(item)) {
         if (utils.isObject(value)) options = value;
         let key;
@@ -90,11 +84,11 @@ export default class Store {
         setValue(item, value, options);
       }
       if (!options.silent) {
-        _this._getter.emit();
+        this._getter.emit();
       }
     };
 
-    const get = function(item) {
+    const _get = (item) => {
       if (typeof item === 'string' || typeof item === 'number') {
         return getValue(item);
       } else if (Array.isArray(item)) {
@@ -117,18 +111,26 @@ export default class Store {
       }
     };
 
-    const reset = function(item, options={}) {
+    const get = (...items) => {
+      if (items.length === 1) {
+        return _get(items[0]);
+      } else {
+        return items.map(_get);
+      }
+    };
+
+    const reset = (item, options={}) => {
       if (item) {
         setValue(item, initValue[item]);
       } else {
         removeValue(item);
       }
       if (!options.silent) {
-        _this._getter.emit();
+        this._getter.emit();
       }
     };
 
-    const preserve = function(arg1, arg2) {
+    const preserve = (arg1, arg2) => {
       if (typeof arg2 === 'undefined') {
         Object.keys(arg1).forEach(function(key) {
           setPreservedValue(key, arg1[key]);
@@ -138,7 +140,7 @@ export default class Store {
       }
     };
 
-    const getPreserved = function(item) {
+    const getPreserved = (item) => {
       if (typeof item === 'string' || typeof item === 'number') {
         return getPreservedValue(item);
       } else if (Array.isArray(item)) {
@@ -161,7 +163,7 @@ export default class Store {
       }
     };
 
-    const getPreservedState = function() {
+    const getPreservedState = () => {
       const newState = stateUpdates;
       stateUpdates = {};
       return newState;

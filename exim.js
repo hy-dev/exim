@@ -593,6 +593,8 @@ var reservedActionNames = {
 
 var Store = (function () {
   function Store() {
+    var _this = this;
+
     var args = arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Store);
@@ -622,44 +624,41 @@ var Store = (function () {
       this.actions.addStore(this);
     }
 
-    var _this = this;
-
     var propTypes = args.propTypes;
-    var checkPropType = function checkPropType(propName, value) {
-      if (!propTypes || !propTypes[propName]) {
-        return;
-      }var obj = {};
+    var checkPropType = function (propName, value) {
+      if (!propTypes || !propTypes[propName]) return;
+      var obj = {};
       obj[propName] = value;
       var error = propTypes[propName](obj, propName, path, "prop");
       if (error) throw error;
     };
 
-    var setValue = function setValue(key, value) {
+    var setValue = function (key, value) {
       checkPropType(key, value);
       GlobalStore.set(path, key, value);
     };
 
-    var getValue = function getValue(key, preserved) {
+    var getValue = function (key, preserved) {
       if (preserved && key in stateUpdates) {
         return stateUpdates[key];
       }
       return GlobalStore.get(path, key);
     };
 
-    var setPreservedValue = function setPreservedValue(key, value) {
+    var setPreservedValue = function (key, value) {
       checkPropType(key, value);
       stateUpdates[key] = value;
     };
 
-    var getPreservedValue = function getPreservedValue(key) {
+    var getPreservedValue = function (key) {
       return getValue(key, true);
     };
 
-    var removeValue = function removeValue(key) {
+    var removeValue = function (key) {
       return GlobalStore.remove(path, key);
     };
 
-    var set = function set(item, value) {
+    var set = function (item, value) {
       var options = arguments[2] === undefined ? {} : arguments[2];
 
       if (utils.isObject(item)) {
@@ -676,7 +675,7 @@ var Store = (function () {
       }
     };
 
-    var get = function get(item) {
+    var _get = function (item) {
       if (typeof item === "string" || typeof item === "number") {
         return getValue(item);
       } else if (Array.isArray(item)) {
@@ -701,7 +700,19 @@ var Store = (function () {
       }
     };
 
-    var reset = function reset(item) {
+    var get = function () {
+      for (var _len = arguments.length, items = Array(_len), _key = 0; _key < _len; _key++) {
+        items[_key] = arguments[_key];
+      }
+
+      if (items.length === 1) {
+        return _get(items[0]);
+      } else {
+        return items.map(_get);
+      }
+    };
+
+    var reset = function (item) {
       var options = arguments[1] === undefined ? {} : arguments[1];
 
       if (item) {
@@ -714,7 +725,7 @@ var Store = (function () {
       }
     };
 
-    var preserve = function preserve(arg1, arg2) {
+    var preserve = function (arg1, arg2) {
       if (typeof arg2 === "undefined") {
         Object.keys(arg1).forEach(function (key) {
           setPreservedValue(key, arg1[key]);
@@ -724,7 +735,7 @@ var Store = (function () {
       }
     };
 
-    var getPreserved = function getPreserved(item) {
+    var getPreserved = function (item) {
       if (typeof item === "string" || typeof item === "number") {
         return getPreservedValue(item);
       } else if (Array.isArray(item)) {
@@ -749,7 +760,7 @@ var Store = (function () {
       }
     };
 
-    var getPreservedState = function getPreservedState() {
+    var getPreservedState = function () {
       var newState = stateUpdates;
       stateUpdates = {};
       return newState;
