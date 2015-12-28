@@ -127,7 +127,18 @@ const getDOM = function() {
 export const Router = getRouter();
 export const DOM = getDOM();
 
-export const createView = function(classArgs) {
+export const createView = function(id, classArgs) {
+  if (typeof id === 'string') {
+    classArgs._module = id;
+    if (!classArgs.displayName) {
+      var idComps = id.split('/');
+      classArgs.displayName = idComps[idComps.length - 1];
+    }
+  } else {
+    classArgs = id;
+    id = null;
+  }
+
   const ReactClass = React.createClass(classArgs);
   const ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
