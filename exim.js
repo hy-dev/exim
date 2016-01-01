@@ -66,9 +66,10 @@ Exim.stores = GlobalStore.getStore();
 var root = typeof self === "object" && self.self === self && self || typeof global === "object" && global.global === global && global;
 
 if (typeof root.exports !== "undefined") {
+  if (typeof module !== "undefined" && module.exports) {
+    exports = module.exports = Exim;
+  }
   exports.Exim = Exim;
-} else if (typeof module !== "undefined" && module.exports) {
-  exports = module.exports = Exim;
 } else {
   root.Exim = Exim;
 }
@@ -338,7 +339,18 @@ exports.Router = Router;
 var DOM = getDOM();
 
 exports.DOM = DOM;
-var createView = function createView(classArgs) {
+var createView = function createView(id, classArgs) {
+  if (typeof id === "string") {
+    classArgs._module = id;
+    if (!classArgs.displayName) {
+      var idComps = id.split("/");
+      classArgs.displayName = idComps[idComps.length - 1];
+    }
+  } else {
+    classArgs = id;
+    id = null;
+  }
+
   var ReactClass = React.createClass(classArgs);
   var ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
