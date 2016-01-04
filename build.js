@@ -2,7 +2,7 @@ var fs = require("fs");
 var browserify = require("browserify");
 var watchify = require("watchify");
 var babelify = require("babelify");
-var bro = browserify({ debug: false, cache: {}, packageCache: {}})
+var bro = browserify({ debug: false, cache: {}, packageCache: {}, standalone: 'Exim' })
 function update () {
   bro
     .transform(babelify)
