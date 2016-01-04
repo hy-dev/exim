@@ -53,6 +53,6 @@ if (typeof root.exports !== 'undefined') {
     exports = module.exports = Exim;
   }
   exports.Exim = Exim;
-} else {
-  root.Exim = Exim;
+} else if (typeof module !== 'undefined' && module.exports) {
+  module.exports = Exim;
 }
