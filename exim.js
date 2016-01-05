@@ -306,6 +306,7 @@ var getDOM = function getDOM() {
           attributes = args.shift();
           if (attributes["class"] != null) {
             attributes.className = attributes["class"];
+            delete attributes["class"];
           }
           if (typeof attributes.className === "object") {
             attributes.className = helpers.cx(attributes.className);
