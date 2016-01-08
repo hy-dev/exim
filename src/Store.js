@@ -284,11 +284,11 @@ export default class Store {
       }));
     }
 
+    if (while_) {
+      while_.call(state, true);
+    }
     // Actual execution.
     promise = promise.then(willResult => transaction('on', () => {
-      if (while_) {
-        while_.call(preserver, true);
-      }
       if (willResult == null) {
         return on_.apply(preserver, args);
       } else {
