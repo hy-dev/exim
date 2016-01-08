@@ -912,12 +912,12 @@ var Store = (function () {
           });
         }
 
+        if (while_) {
+          while_.call(state, true);
+        }
         // Actual execution.
         promise = promise.then(function (willResult) {
           return transaction("on", function () {
-            if (while_) {
-              while_.call(preserver, true);
-            }
             if (willResult == null) {
               return on_.apply(preserver, args);
             } else {
