@@ -15,6 +15,19 @@ const getFilePath = function(name) {
   return filePath;
 };
 
+const globalOrRequire = (glob, mod) => {
+  const g = typeof global !== 'undefined' ? global : window;
+  if (g[glob]) return g[glob];
+  try {
+    return require(mod);
+  } catch(e) {
+    return;
+  }
+};
+
+const ReactRouter = globalOrRequire('ReactRouter', 'react-router');
+const React = globalOrRequire('React', 'react');
+
 export const getRouter = function() {
   const Router = {};
 
