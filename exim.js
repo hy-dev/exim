@@ -186,6 +186,7 @@ var Actions = exports.Actions = (function () {
 })();
 
 },{}],3:[function(require,module,exports){
+(function (global){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -211,6 +212,19 @@ var getFilePath = function getFilePath(name) {
   }
   return filePath;
 };
+
+var globalOrRequire = function (glob, mod) {
+  var g = typeof global !== "undefined" ? global : window;
+  if (g[glob]) return g[glob];
+  try {
+    return require(mod);
+  } catch (e) {
+    return;
+  }
+};
+
+var ReactRouter = globalOrRequire("ReactRouter", "react-router");
+var React = globalOrRequire("React", "react");
 
 var getRouter = function getRouter() {
   var Router = {};
@@ -359,6 +373,7 @@ var createView = function createView(id, classArgs) {
 };
 exports.createView = createView;
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./helpers":9,"./utils":11}],4:[function(require,module,exports){
 "use strict";
 
