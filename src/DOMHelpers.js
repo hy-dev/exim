@@ -20,7 +20,7 @@ const globalOrRequire = (glob, mod) => {
   if (g[glob]) return g[glob];
   try {
     return require(mod);
-  } catch(e) {
+  } catch (e) {
     return;
   }
 };
