@@ -20,40 +20,31 @@ Exim focuses on three things:
 
 ```javascript
 var User = Exim.createStore({
-  actions: ['match', 'create'],
-
-  // Each action can simply be a function, or a "lifecycle" method.
-  // A function: short / implicit action declaration form.
-  match(user1, user2) {
-    this.set({matched: user1.id === user2.id});
-  },
-
-  // More explicit method with defined lifecycle.
-  // on() => while(true) => <Promise is resolved>
-  // => while(false) => did() / didNot()
-  create: {
-    on(data) {
-      // `this` is a current action's context which
-      // is cleaned after the execution.
-      this.previous = this.get('lastUser');
-      // Optimistic set.
-      // We could subscribe to the `lastUser` property in a React view.
-      this.set({lastUser: data});
-      // Returns promise. `did` would be called once it's resolved.
-      return request.post('/v1/user', data);
+  fetch: {
+    on(name) {
+      return request.get('/v1/user/' + name);
     },
     did(response) {
-      console.log('Success! The new user ID:', response.id);
+      this.set({currentUser: response});
     },
-    didNot() {
-      // Revert the optimistic update.
-      this.set({lastUser: this.previous});
-    },
-
-    // while(true) is called after on(). while(false) is called before did() / didNot().
     while(isFetching) {
-      // Let's show a spinner while we're doing a HTTP request.
+      // This allows us to show a spinner.
       this.set({isFetching: isFetching});
+    }
+  },
+  
+  create: {
+    on(data) {
+      return request.put('/v1/user', data);
+    },
+    did(userInfo) {
+      const list = this.get('users');
+      list.push(userInfo);
+      this.set({users: list}); // Immutable by default. Need to write updates explicitly.
+    },
+    didNot(error) {
+      // Revert your optimistic updates here.
+      console.error('Whoops. Something happened. You can revert some state here. Code:', error);
     }
   }
 });
