@@ -6,7 +6,9 @@ An ultra-lightweight Flux-like architecture for HTML5 apps using Facebook's Reac
 
 ## Install
 
-`npm install --save exim` or `bower install exim`
+`npm install --save exim`
+
+If you're using Bower: `bower install exim`
 
 ## Why
 
@@ -32,7 +34,7 @@ var User = Exim.createStore({
       this.set({isFetching: isFetching});
     }
   },
-  
+
   create: {
     on(data) {
       return request.put('/v1/user', data);
