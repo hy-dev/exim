@@ -28,7 +28,7 @@
         items: [],
         fetching: false,
         error: null,
-        data: null,
+        data: {},
         word: 'Hello'
       },
       fetch: {
@@ -74,7 +74,7 @@
           this.state.word,
           Ell(),
           Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH'),
-          Exim.DOM.div(this.state.error || data || '')
+          Exim.DOM.div(this.state.error || data.name || '')
         )
       }
     });
