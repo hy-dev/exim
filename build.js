@@ -1,17 +1,14 @@
-var fs = require("fs");
-var browserify = require("browserify");
-var watchify = require("watchify");
-var babelify = require("babelify");
-var bro = browserify({ debug: false, cache: {}, packageCache: {}, standalone: 'Exim' })
-function update () {
-  bro
-    .transform(babelify)
-    .require("./src", { entry: true })
-    .bundle()
-    .on("error", function (err) { console.log("Error : " + err.message); })
-    .pipe(fs.createWriteStream("./exim.js"))
-};
-update();
+const fs   = require("fs"),
+browserify = require("browserify");
 
-// watchify({cache: {}}).on('update', update);
-
+browserify({ 
+	debug: false, 
+	cache: {}, 
+	packageCache: {}, 
+	standalone: 'Exim' 
+})
+  .transform("babelify")
+  .require("./src", { entry: true })
+  .bundle()
+  .on("error", err => console.log("Error : " + err.message) )
+  .pipe(fs.createWriteStream("./exim.js"));
