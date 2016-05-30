@@ -2,10 +2,10 @@ const fs   = require("fs"),
 browserify = require("browserify");
 
 browserify({ 
-	debug: false, 
-	cache: {}, 
-	packageCache: {}, 
-	standalone: 'Exim' 
+  debug: false, 
+  cache: {}, 
+  packageCache: {}, 
+  standalone: 'Exim' 
 })
   .transform("babelify")
   .require("./src", { entry: true })
