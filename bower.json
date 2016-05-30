@@ -1,6 +1,6 @@
 {
   "name": "exim",
-  "version": "0.9.6",
+  "version": "0.9.7-beta.0",
   "authors": [
     "Artem Yavorsky <artem@yavorsky.org>",
     "Paul Miller <paul@paulmillr.com>"
