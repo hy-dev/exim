@@ -890,31 +890,32 @@ var Store = (function () {
 
         // Pre-check & preparations.
 
+        var updateState = function () {
+          var preservedState = preserver.getPreservedState();
+          var stateChanged = Object.keys(preservedState).length;
+          if (stateChanged) state.set(preservedState);
+        };
+
         var transaction = function transaction(cycleName, body) {
           var result = undefined;
-
           lastStep = cycleName;
-          try {
+
+          updateState(preserver);
+          if (typeof body !== "function") {
+            return;
+          }try {
             result = body();
           } catch (error) {
             return Promise.reject(error);
           }
 
-          if (result && typeof result === "object" && typeof result.then === "function") {
+          var resultIsPromise = result != null && typeof result.then === "function";
+
+          if (resultIsPromise) {
             return result.then(function (res) {
-              var preservedState = preserver.getPreservedState();
-              var stateChanged = Object.keys(preservedState).length;
-              if (stateChanged) {
-                state.set(preservedState);
-              }
               return Promise.resolve(res);
             });
           } else {
-            var preservedState = preserver.getPreservedState();
-            var stateChanged = Object.keys(preservedState).length;
-            if (stateChanged) {
-              state.set(preservedState);
-            }
             return Promise.resolve(result);
           }
         };
@@ -950,8 +951,12 @@ var Store = (function () {
         // Handle the result.
         if (did) {
           promise = promise.then(function (onResult) {
+            if (while_) {
+              transaction("while", function () {
+                while_.call(preserver, false);
+              });
+            }
             return transaction("did", function () {
-              if (while_) while_.call(preserver, false);
               return did.call(preserver, onResult);
             });
           });
@@ -966,21 +971,26 @@ var Store = (function () {
           });
         }
 
+        promise = promise.then(function () {
+          return transaction("was");
+        });
+
         promise = promise["catch"](function (error) {
           var start = actionName + "#";
           if (didNot) {
-            return transaction("didNot", function () {
+            transaction("didNot", function () {
               if (while_) while_.call(preserver, false);
               didNot.call(preserver, error)["catch"](function (error) {
                 return rejectAction(start + "didNot", error);
               });
             });
           } else {
-            return transaction(lastStep, function () {
+            transaction(lastStep, function () {
               if (while_) while_.call(preserver, false);
               return rejectAction(start + lastStep, error);
             });
           }
+          return transaction("was");
         });
 
         return promise;

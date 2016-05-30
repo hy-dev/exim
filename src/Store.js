@@ -249,31 +249,30 @@ export default class Store {
 
     // Pre-check & preparations.
 
+    const updateState = () => {
+      const preservedState = preserver.getPreservedState();
+      const stateChanged = Object.keys(preservedState).length;
+      if (stateChanged) state.set(preservedState);
+    }
+
     const transaction = function(cycleName, body) {
       let result;
-
       lastStep = cycleName;
+
+      updateState(preserver);
+      if (typeof body !== 'function') return;
+
       try {
         result = body();
       } catch (error) {
         return Promise.reject(error);
       }
 
-      if (result && typeof result === 'object' && typeof result.then === 'function') {
-        return result.then((res) => {
-          const preservedState = preserver.getPreservedState();
-          const stateChanged = Object.keys(preservedState).length;
-          if (stateChanged) {
-            state.set(preservedState);
-          }
-          return Promise.resolve(res);
-        });
+      const resultIsPromise = result != null && typeof result.then === 'function';
+
+      if (resultIsPromise) {
+        return result.then(res => Promise.resolve(res));
       } else {
-        const preservedState = preserver.getPreservedState();
-        const stateChanged = Object.keys(preservedState).length;
-        if (stateChanged) {
-          state.set(preservedState);
-        }
         return Promise.resolve(result);
       }
     };
@@ -304,10 +303,16 @@ export default class Store {
 
     // Handle the result.
     if (did) {
-      promise = promise.then(onResult => transaction('did', function() {
-        if (while_) while_.call(preserver, false);
-        return did.call(preserver, onResult);
-      }));
+      promise = promise.then(onResult => { 
+        if (while_) {
+          transaction('while', function () {
+            while_.call(preserver, false);
+          })
+        }
+        return transaction('did', function() {
+          return did.call(preserver, onResult);
+        });
+      });
     }
 
     // TODO: check while for duplication.
@@ -319,21 +324,24 @@ export default class Store {
       });
     }
 
+    promise = promise.then(() => transaction('was'));
+
     promise = promise.catch(error => {
       const start = actionName + '#';
       if (didNot) {
-        return transaction('didNot', function() {
+        transaction('didNot', function() {
           if (while_) while_.call(preserver, false);
           didNot.call(preserver, error).catch(error => {
             return rejectAction(start + 'didNot', error);
           });
         });
       } else {
-        return transaction(lastStep, function() {
+        transaction(lastStep, function() {
           if (while_) while_.call(preserver, false);
           return rejectAction(start + lastStep, error);
         });
       }
+      return transaction('was');
     });
 
     return promise;
