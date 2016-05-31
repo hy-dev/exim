@@ -324,7 +324,10 @@ export default class Store {
       });
     }
 
-    promise = promise.then(() => transaction('was'));
+    promise = promise.then((arg) => {
+      transaction('was');
+      return arg;
+    });
 
     promise = promise.catch(error => {
       const start = actionName + '#';

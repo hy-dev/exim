@@ -971,8 +971,9 @@ var Store = (function () {
           });
         }
 
-        promise = promise.then(function () {
-          return transaction("was");
+        promise = promise.then(function (arg) {
+          transaction("was");
+          return arg;
         });
 
         promise = promise["catch"](function (error) {
