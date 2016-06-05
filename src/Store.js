@@ -36,6 +36,7 @@ export default class Store {
     }
 
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
+    const helpers = args.helpers || {};
 
     if (Array.isArray(actions)) {
       this.actions = actions = new Actions(actions);
@@ -67,7 +68,6 @@ export default class Store {
       checkPropType(key, value);
       stateUpdates[key] = value;
     };
-
 
     const getPreservedValue = key => getValue(key, true);
 
@@ -173,8 +173,17 @@ export default class Store {
     this.get = get;
     this.reset = reset;
 
-    this._stateProto = {set, get, reset, actions};
-    this._preserverProto = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
+    const defaultStateHelpers = {set, get, reset, actions};
+    const defaultPreserverHelpers = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
+
+    const stateHelpers = utils.extend(helpers, defaultStateHelpers);
+    const preserverHelpers = utils.extend(helpers, defaultPreserverHelpers);
+
+    const customStateHelpers = utils.bindValues(helpers, stateHelpers);
+    const customPreserverHelpers = utils.bindValues(helpers, preserverHelpers);
+
+    this._stateProto = utils.extend(customStateHelpers, defaultStateHelpers);
+    this._preserverProto = utils.extend(customPreserverHelpers, defaultPreserverHelpers);
 
     return this._getter = new Getter(this);
   }

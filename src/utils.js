@@ -1,4 +1,7 @@
 const utils = {};
+const _objectClass = '[object Object]';
+const idFormat = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+const pad = 16;
 
 utils.getWithoutFields = function(outcast, target) {
   if (!target) throw new Error('TypeError: target is not an object.');
@@ -45,7 +48,6 @@ utils.mapActionNames = function(object) {
   return list;
 };
 
-const _objectClass = '[object Object]';
 utils.isObject = function(targ) {
   return targ ? targ.toString() === _objectClass : false;
 };
@@ -56,14 +58,30 @@ utils.capitalize = function(str) {
   return `${first}${rest}`;
 };
 
-const idFormat = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-const pad = 16;
 utils.generateId = function() {
   return idFormat.replace(/[xy]/g, c => {
     const r = Math.random() * pad | 0;
     const v = c === 'x' ? r : (r & 3 | pad / 2);
     return v.toString(pad);
   });
+};
+
+utils.extend = (...objects) => {
+  const result = {};
+  objects.forEach((object) => {
+    for (let key in object) {
+      result[key] = object[key];
+    }
+  });
+  return result;
+};
+
+utils.bindValues = (object, scope) => {
+  const result = {};
+  for (let key in object) {
+    result[key] = object[key].bind(scope);
+  }
+  return result;
 };
 
 export default utils;
