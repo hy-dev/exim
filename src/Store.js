@@ -340,20 +340,22 @@ export default class Store {
 
     promise = promise.catch(error => {
       const start = actionName + '#';
+      let result;
       if (didNot) {
-        transaction('didNot', function() {
+        result = transaction('didNot', function() {
           if (while_) while_.call(preserver, false);
           didNot.call(preserver, error).catch(error => {
             return rejectAction(start + 'didNot', error);
           });
         });
       } else {
-        transaction(lastStep, function() {
+        result = transaction(lastStep, function() {
           if (while_) while_.call(preserver, false);
           return rejectAction(start + lastStep, error);
         });
       }
-      return transaction('was');
+      transaction('was');
+      return result;
     });
 
     return promise;
