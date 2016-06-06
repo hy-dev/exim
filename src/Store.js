@@ -36,6 +36,7 @@ export default class Store {
     }
 
     this.handlers = args.handlers || utils.getWithoutFields(['actions'], args) || {};
+    const helpers = args.helpers || {};
 
     if (Array.isArray(actions)) {
       this.actions = actions = new Actions(actions);
@@ -67,7 +68,6 @@ export default class Store {
       checkPropType(key, value);
       stateUpdates[key] = value;
     };
-
 
     const getPreservedValue = key => getValue(key, true);
 
@@ -173,8 +173,17 @@ export default class Store {
     this.get = get;
     this.reset = reset;
 
-    this._stateProto = {set, get, reset, actions};
-    this._preserverProto = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
+    const defaultStateHelpers = {set, get, reset, actions};
+    const defaultPreserverHelpers = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
+
+    const stateHelpers = utils.extend(helpers, defaultStateHelpers);
+    const preserverHelpers = utils.extend(helpers, defaultPreserverHelpers);
+
+    const customStateHelpers = utils.bindValues(helpers, stateHelpers);
+    const customPreserverHelpers = utils.bindValues(helpers, preserverHelpers);
+
+    this._stateProto = utils.extend(customStateHelpers, defaultStateHelpers);
+    this._preserverProto = utils.extend(customPreserverHelpers, defaultPreserverHelpers);
 
     return this._getter = new Getter(this);
   }
@@ -253,7 +262,7 @@ export default class Store {
       const preservedState = preserver.getPreservedState();
       const stateChanged = Object.keys(preservedState).length;
       if (stateChanged) state.set(preservedState);
-    }
+    };
 
     const transaction = function(cycleName, body) {
       let result;
@@ -303,11 +312,11 @@ export default class Store {
 
     // Handle the result.
     if (did) {
-      promise = promise.then(onResult => { 
+      promise = promise.then(onResult => {
         if (while_) {
-          transaction('while', function () {
+          transaction('while', function() {
             while_.call(preserver, false);
-          })
+          });
         }
         return transaction('did', function() {
           return did.call(preserver, onResult);
@@ -331,20 +340,22 @@ export default class Store {
 
     promise = promise.catch(error => {
       const start = actionName + '#';
+      let result;
       if (didNot) {
-        transaction('didNot', function() {
+        result = transaction('didNot', function() {
           if (while_) while_.call(preserver, false);
           didNot.call(preserver, error).catch(error => {
             return rejectAction(start + 'didNot', error);
           });
         });
       } else {
-        transaction(lastStep, function() {
+        result = transaction(lastStep, function() {
           if (while_) while_.call(preserver, false);
           return rejectAction(start + lastStep, error);
         });
       }
-      return transaction('was');
+      transaction('was');
+      return result;
     });
 
     return promise;

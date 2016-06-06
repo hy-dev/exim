@@ -646,6 +646,7 @@ var Store = (function () {
     }
 
     this.handlers = args.handlers || utils.getWithoutFields(["actions"], args) || {};
+    var helpers = args.helpers || {};
 
     if (Array.isArray(actions)) {
       this.actions = actions = new Actions(actions);
@@ -798,8 +799,17 @@ var Store = (function () {
     this.get = get;
     this.reset = reset;
 
-    this._stateProto = { set: set, get: get, reset: reset, actions: actions };
-    this._preserverProto = { set: preserve, get: getPreserved, reset: reset, actions: actions, getPreservedState: getPreservedState };
+    var defaultStateHelpers = { set: set, get: get, reset: reset, actions: actions };
+    var defaultPreserverHelpers = { set: preserve, get: getPreserved, reset: reset, actions: actions, getPreservedState: getPreservedState };
+
+    var stateHelpers = utils.extend(helpers, defaultStateHelpers);
+    var preserverHelpers = utils.extend(helpers, defaultPreserverHelpers);
+
+    var customStateHelpers = utils.bindValues(helpers, stateHelpers);
+    var customPreserverHelpers = utils.bindValues(helpers, preserverHelpers);
+
+    this._stateProto = utils.extend(customStateHelpers, defaultStateHelpers);
+    this._preserverProto = utils.extend(customPreserverHelpers, defaultPreserverHelpers);
 
     return this._getter = new Getter(this);
   }
@@ -1108,6 +1118,9 @@ module.exports = getConnectMixin;
 "use strict";
 
 var utils = {};
+var _objectClass = "[object Object]";
+var idFormat = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+var pad = 16;
 
 utils.getWithoutFields = function (outcast, target) {
   if (!target) throw new Error("TypeError: target is not an object.");
@@ -1154,7 +1167,6 @@ utils.mapActionNames = function (object) {
   return list;
 };
 
-var _objectClass = "[object Object]";
 utils.isObject = function (targ) {
   return targ ? targ.toString() === _objectClass : false;
 };
@@ -1165,14 +1177,36 @@ utils.capitalize = function (str) {
   return "" + first + "" + rest;
 };
 
-var idFormat = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-var pad = 16;
 utils.generateId = function () {
   return idFormat.replace(/[xy]/g, function (c) {
     var r = Math.random() * pad | 0;
     var v = c === "x" ? r : r & 3 | pad / 2;
     return v.toString(pad);
   });
+};
+
+utils.extend = function () {
+  for (var _len = arguments.length, objects = Array(_len), _key = 0; _key < _len; _key++) {
+    objects[_key] = arguments[_key];
+  }
+
+  var result = {};
+  objects.forEach(function (object) {
+    var key = undefined;
+    for (key in object) {
+      result[key] = object[key];
+    }
+  });
+  return result;
+};
+
+utils.bindValues = function (object, scope) {
+  var result = {};
+  var key = undefined;
+  for (key in object) {
+    result[key] = object[key].bind(scope);
+  }
+  return result;
 };
 
 module.exports = utils;

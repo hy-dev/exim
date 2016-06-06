@@ -21,6 +21,13 @@
       }
       console.log(name, '+', diff, 'ms');
     };
+
+    var updateData = function(data) {
+      this.set({data: data});
+      this.updateName(data.name);
+      this.updateVersion(data.version);
+    };
+
     window.store = Exim.createStore({
       path: 'store',
       actions: ['fetch'],
@@ -28,13 +35,27 @@
         items: [],
         fetching: false,
         error: null,
-        data: {},
+        data: '',
+        name: '',
+        version: '',
         word: 'Hello'
+      },
+      helpers: {
+        updateData: updateData,
+        updateState: function(state) {
+          this.set('fetching', state);
+        },
+        updateVersion: function(version){
+          this.set('version', version);
+        },
+        updateName: function(name) {
+          this.set({name: name});
+        }
       },
       fetch: {
         while: function(state) {
           // console.log(state, 'while');
-          this.set('fetching', state);
+          this.updateState(state);
         },
         will: function() {
           // console.log('will')
@@ -49,7 +70,7 @@
         },
         did: function(data) {
           // console.log('did')
-          this.set({data: data})
+          this.updateData(data);
         },
         didNot: function (xhr) {
           this.set('error', xhr.message);
@@ -57,24 +78,26 @@
       }
     })
 
-    var Ell = Exim.createView({
+    var Element = Exim.createView({
       render: function () {
         return Exim.DOM.span('WORLD')
       }
     });
 
     var El = Exim.createView({
-      mixins: [store.connect('fetching', 'error', 'data', 'word')],
+      mixins: [store.connect('fetching', 'error', 'data', 'name', 'version', 'word')],
       fetch: function () {
         store.actions.fetch()
       },
       render: function () {
-        var data = this.state.data;
+        var name = this.state.name;
+        var version = this.state.version;
         return Exim.DOM.div({className: 'test-cls'},
           this.state.word,
-          Ell(),
+          Element(),
           Exim.DOM.button({onClick: this.fetch}, this.state.fetching ? 'FETCHING' : 'FETCH'),
-          Exim.DOM.div(this.state.error || data.name || '')
+          Exim.DOM.div(this.state.error || name || ''),
+          Exim.DOM.div(this.state.error || version || '')
         )
       }
     });
