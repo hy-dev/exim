@@ -1192,7 +1192,8 @@ utils.extend = function () {
 
   var result = {};
   objects.forEach(function (object) {
-    for (var key in object) {
+    var key = undefined;
+    for (key in object) {
       result[key] = object[key];
     }
   });
@@ -1201,7 +1202,8 @@ utils.extend = function () {
 
 utils.bindValues = function (object, scope) {
   var result = {};
-  for (var key in object) {
+  var key = undefined;
+  for (key in object) {
     result[key] = object[key].bind(scope);
   }
   return result;

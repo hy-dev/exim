@@ -69,7 +69,8 @@ utils.generateId = function() {
 utils.extend = (...objects) => {
   const result = {};
   objects.forEach((object) => {
-    for (let key in object) {
+    let key;
+    for (key in object) {
       result[key] = object[key];
     }
   });
@@ -78,7 +79,8 @@ utils.extend = (...objects) => {
 
 utils.bindValues = (object, scope) => {
   const result = {};
-  for (let key in object) {
+  let key;
+  for (key in object) {
     result[key] = object[key].bind(scope);
   }
   return result;

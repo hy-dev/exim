@@ -262,7 +262,7 @@ export default class Store {
       const preservedState = preserver.getPreservedState();
       const stateChanged = Object.keys(preservedState).length;
       if (stateChanged) state.set(preservedState);
-    }
+    };
 
     const transaction = function(cycleName, body) {
       let result;
@@ -312,11 +312,11 @@ export default class Store {
 
     // Handle the result.
     if (did) {
-      promise = promise.then(onResult => { 
+      promise = promise.then(onResult => {
         if (while_) {
-          transaction('while', function () {
+          transaction('while', function() {
             while_.call(preserver, false);
-          })
+          });
         }
         return transaction('did', function() {
           return did.call(preserver, onResult);
