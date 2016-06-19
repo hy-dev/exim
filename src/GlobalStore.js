@@ -16,7 +16,7 @@ export default class GlobalStore {
       if (values[bit]) {
         values = values[bit];
       } else {
-        values[bit] = (typeof init !== undefined && bits.length - 1 === i) ? init : {};
+        values[bit] = (init !== undefined && bits.length - 1 === i) ? init : {};
         values = values[bit];
       }
     });
