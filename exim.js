@@ -518,7 +518,7 @@ var GlobalStore = (function () {
           if (values[bit]) {
             values = values[bit];
           } else {
-            values[bit] = typeof init !== undefined && bits.length - 1 === i ? init : {};
+            values[bit] = init !== undefined && bits.length - 1 === i ? init : {};
             values = values[bit];
           }
         });
@@ -988,20 +988,22 @@ var Store = (function () {
 
         promise = promise["catch"](function (error) {
           var start = actionName + "#";
+          var result = undefined;
           if (didNot) {
-            transaction("didNot", function () {
+            result = transaction("didNot", function () {
               if (while_) while_.call(preserver, false);
               didNot.call(preserver, error)["catch"](function (error) {
                 return rejectAction(start + "didNot", error);
               });
             });
           } else {
-            transaction(lastStep, function () {
+            result = transaction(lastStep, function () {
               if (while_) while_.call(preserver, false);
               return rejectAction(start + lastStep, error);
             });
           }
-          return transaction("was");
+          transaction("was");
+          return result;
         });
 
         return promise;
