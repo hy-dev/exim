@@ -37,7 +37,7 @@ const getConnectMixin = function(store, ...key) {
       return getState();
     },
 
-    componentDidMount: function() {
+    componentWillMount: function() {
       store.onChange(changeCallback, this);
     },
 

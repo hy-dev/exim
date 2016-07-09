@@ -1104,7 +1104,7 @@ var getConnectMixin = function getConnectMixin(store) {
       return getState();
     },
 
-    componentDidMount: function componentDidMount() {
+    componentWillMount: function componentWillMount() {
       store.onChange(changeCallback, this);
     },
 
