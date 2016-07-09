@@ -173,8 +173,8 @@ export default class Store {
     this.get = get;
     this.reset = reset;
 
-    const defaultStateHelpers = {set, get, reset, actions};
-    const defaultPreserverHelpers = {set: preserve, get: getPreserved, reset, actions, getPreservedState};
+    const defaultStateHelpers = {set, get, reset, path, actions};
+    const defaultPreserverHelpers = {set: preserve, get: getPreserved, reset, path, actions, getPreservedState};
 
     const stateHelpers = utils.extend(helpers, defaultStateHelpers);
     const preserverHelpers = utils.extend(helpers, defaultPreserverHelpers);

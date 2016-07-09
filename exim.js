@@ -799,8 +799,8 @@ var Store = (function () {
     this.get = get;
     this.reset = reset;
 
-    var defaultStateHelpers = { set: set, get: get, reset: reset, actions: actions };
-    var defaultPreserverHelpers = { set: preserve, get: getPreserved, reset: reset, actions: actions, getPreservedState: getPreservedState };
+    var defaultStateHelpers = { set: set, get: get, reset: reset, path: path, actions: actions };
+    var defaultPreserverHelpers = { set: preserve, get: getPreserved, reset: reset, path: path, actions: actions, getPreservedState: getPreservedState };
 
     var stateHelpers = utils.extend(helpers, defaultStateHelpers);
     var preserverHelpers = utils.extend(helpers, defaultPreserverHelpers);
