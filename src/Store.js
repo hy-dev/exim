@@ -251,8 +251,10 @@ export default class Store {
     let lastStep = 'will';
 
     const rejectAction = function(trace, error) {
-      printTraces(trace, error);
-      if (!error.eximStack) error.eximStack = trace;
+      if (error) {
+        printTraces(trace, error);
+        if (error && !error.eximStack) error.eximStack = trace;
+      }
       return Promise.reject(error);
     };
 
