@@ -28,7 +28,7 @@ const getConnectMixin = function(store, ...key) {
   const changeCallback = function() {
     const prev = this.state;
     const curr = getState();
-    const diff = Object.keys(curr).some(key => prev[key] !== curr[key]);
+    const diff = Object.keys(curr).some(key => Array.isArray(curr[key]) || (prev[key] !== curr[key]));
     if (diff) this.setState(curr);
   };
 
