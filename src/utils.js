@@ -52,6 +52,10 @@ utils.isObject = function(targ) {
   return targ ? targ.toString() === _objectClass : false;
 };
 
+utils.isDate = function (date) {
+  return date ? date.constructor === Date : false;
+};
+
 utils.capitalize = function(str) {
   const first = str.charAt(0).toUpperCase();
   const rest = str.slice(1);
@@ -76,6 +80,20 @@ utils.extend = (...objects) => {
   });
   return result;
 };
+
+utils.copyValue = (value) => {
+  if (!value) {
+    return value;
+  } else if (Array.isArray(value)) {
+    return value.slice();
+  } else if (utils.isObject(value)) {
+    return utils.extend(value);
+  } else if (utils.isDate(value)) {
+    return new Date(value.valueOf());
+  } else {
+    return value;
+  }
+}
 
 utils.bindValues = (object, scope) => {
   const result = {};

@@ -488,9 +488,13 @@ module.exports = Getter;
 },{"./Emitter":4,"./config":8,"./mixins/connect":10}],6:[function(require,module,exports){
 "use strict";
 
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+var utils = _interopRequire(require("./utils"));
 
 var globalStore = undefined,
     stores = undefined;
@@ -547,7 +551,7 @@ var GlobalStore = (function () {
         var values = this.getSubstore(substore);
         if (!name) {
           return values;
-        }return values ? values[name] : {};
+        }return values ? utils.copyValue(values[name]) : {};
       }
     },
     remove: {
@@ -585,7 +589,7 @@ var GlobalStore = (function () {
 
 module.exports = GlobalStore;
 
-},{}],7:[function(require,module,exports){
+},{"./utils":11}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -893,8 +897,10 @@ var Store = (function () {
         var lastStep = "will";
 
         var rejectAction = function rejectAction(trace, error) {
-          printTraces(trace, error);
-          if (!error.eximStack) error.eximStack = trace;
+          if (error) {
+            printTraces(trace, error);
+            if (error && !error.eximStack) error.eximStack = trace;
+          }
           return Promise.reject(error);
         };
 
@@ -1173,6 +1179,10 @@ utils.isObject = function (targ) {
   return targ ? targ.toString() === _objectClass : false;
 };
 
+utils.isDate = function (date) {
+  return date ? date.constructor === Date : false;
+};
+
 utils.capitalize = function (str) {
   var first = str.charAt(0).toUpperCase();
   var rest = str.slice(1);
@@ -1200,6 +1210,20 @@ utils.extend = function () {
     }
   });
   return result;
+};
+
+utils.copyValue = function (value) {
+  if (!value) {
+    return value;
+  } else if (Array.isArray(value)) {
+    return value.slice();
+  } else if (utils.isObject(value)) {
+    return utils.extend(value);
+  } else if (utils.isDate(value)) {
+    return new Date(value.valueOf());
+  } else {
+    return value;
+  }
 };
 
 utils.bindValues = function (object, scope) {
