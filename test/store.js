@@ -261,6 +261,20 @@ describe('Store', () => {
       });
     });
 
+    it('returns copies', () => {
+      let name = 'action';
+      let label = 'items';
+      let val = [];
+      let onHandler = sinon.spy();
+      let handler = {did: function(){this.set(label, val)}, on: onHandler};
+
+      let store = createStore(name, handler);
+
+      return store.actions.action().then(() => {
+        store.get(label).should.not.equal(store.get(label));
+      });
+    });
+
     it('updates initial values in action handler', () => {
       let initial = {testKey: 'abc'};
       let config = {initial};
