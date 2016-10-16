@@ -1,3 +1,5 @@
+import utils from './utils';
+
 let globalStore, stores;
 
 export default class GlobalStore {
@@ -32,7 +34,7 @@ export default class GlobalStore {
   static get(substore, name) {
     const values = this.getSubstore(substore);
     if (!name) return values;
-    return values ? values[name] : {};
+    return values ? utils.copyValue(values[name]) : {};
   }
 
   static remove(substore, key) {
