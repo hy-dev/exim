@@ -82,10 +82,8 @@ utils.extend = (...objects) => {
 };
 
 utils.copyValue = (value) => {
-  if (!value) {
-    return value;
-  } else if (Array.isArray(value)) {
-    return value.slice();
+  if (Array.isArray(value)) {
+    return value.map(utils.copyValue);
   } else if (utils.isObject(value)) {
     return utils.extend(value);
   } else if (utils.isDate(value)) {
