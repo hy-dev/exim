@@ -1180,7 +1180,7 @@ utils.isObject = function (targ) {
 };
 
 utils.isDate = function (date) {
-  return date ? date.constructor === Date : false;
+  return date instanceof Date;
 };
 
 utils.capitalize = function (str) {
@@ -1220,7 +1220,7 @@ utils.copyValue = function (value) {
   } else if (utils.isObject(value)) {
     return utils.extend(value);
   } else if (utils.isDate(value)) {
-    return new Date(value.valueOf());
+    return new Date(value);
   } else {
     return value;
   }

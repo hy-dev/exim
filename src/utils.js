@@ -52,8 +52,8 @@ utils.isObject = function(targ) {
   return targ ? targ.toString() === _objectClass : false;
 };
 
-utils.isDate = function (date) {
-  return date ? date.constructor === Date : false;
+utils.isDate = function(date) {
+  return date instanceof Date;
 };
 
 utils.capitalize = function(str) {
@@ -89,11 +89,11 @@ utils.copyValue = (value) => {
   } else if (utils.isObject(value)) {
     return utils.extend(value);
   } else if (utils.isDate(value)) {
-    return new Date(value.valueOf());
+    return new Date(value);
   } else {
     return value;
   }
-}
+};
 
 utils.bindValues = (object, scope) => {
   const result = {};
