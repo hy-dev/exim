@@ -1110,12 +1110,16 @@ var getConnectMixin = function getConnectMixin(store) {
       return getState();
     },
 
+    _changeCallback: function _changeCallback() {
+      changeCallback.call(this);
+    },
+
     componentWillMount: function componentWillMount() {
-      store.onChange(changeCallback, this);
+      store.onChange(this._changeCallback);
     },
 
     componentWillUnmount: function componentWillUnmount() {
-      store.offChange(changeCallback);
+      store.offChange(this._changeCallback);
     }
   };
 };

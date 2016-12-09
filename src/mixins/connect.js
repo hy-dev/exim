@@ -37,12 +37,16 @@ const getConnectMixin = function(store, ...key) {
       return getState();
     },
 
+    _changeCallback: function() {
+      changeCallback.call(this);
+    },
+
     componentWillMount: function() {
-      store.onChange(changeCallback, this);
+      store.onChange(this._changeCallback);
     },
 
     componentWillUnmount: function() {
-      store.offChange(changeCallback);
+      store.offChange(this._changeCallback);
     }
   };
 };
