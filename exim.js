@@ -1026,7 +1026,7 @@ module.exports = Store;
 "use strict";
 
 module.exports = {
-  allowedGetterProps: ["get", "initial", "actions"]
+  allowedGetterProps: ["get", "initial", "actions", "path"]
 };
 
 },{}],9:[function(require,module,exports){
@@ -1110,16 +1110,13 @@ var getConnectMixin = function getConnectMixin(store) {
       return getState();
     },
 
-    _changeCallback: function _changeCallback() {
-      changeCallback.call(this);
-    },
-
     componentWillMount: function componentWillMount() {
-      store.onChange(this._changeCallback);
+      this["" + store.path + "ChangeCallback"] = changeCallback.bind(this);
+      store.onChange(this["" + store.path + "ChangeCallback"]);
     },
 
     componentWillUnmount: function componentWillUnmount() {
-      store.offChange(this._changeCallback);
+      store.offChange(this["" + store.path + "ChangeCallback"]);
     }
   };
 };
