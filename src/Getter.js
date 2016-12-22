@@ -14,7 +14,7 @@ export default class Getter extends Emitter {
 
     // Connect mixin binded to getter.
     this.connect = function(...args) {
-      return getConnectMixin.apply(null, [this].concat(args));
+      return getConnectMixin(this, ...args);
     };
   }
 }

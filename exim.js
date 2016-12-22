@@ -474,7 +474,7 @@ var Getter = (function (_Emitter) {
         args[_key] = arguments[_key];
       }
 
-      return getConnectMixin.apply(null, [this].concat(args));
+      return getConnectMixin.apply(undefined, [this].concat(args));
     };
   }
 
@@ -738,7 +738,9 @@ var Store = (function () {
         items[_key] = arguments[_key];
       }
 
-      if (items.length === 1) {
+      if (items.length === 0) {
+        return _get();
+      } else if (items.length === 1) {
         return _get(items[0]);
       } else {
         return items.map(_get);

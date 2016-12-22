@@ -112,7 +112,9 @@ export default class Store {
     };
 
     const get = (...items) => {
-      if (items.length === 1) {
+      if (items.length === 0) {
+        return _get();
+      } else if (items.length === 1) {
         return _get(items[0]);
       } else {
         return items.map(_get);
