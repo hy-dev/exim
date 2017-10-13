@@ -26,7 +26,9 @@ const globalOrRequire = (glob, mod) => {
 };
 
 const ReactRouter = globalOrRequire('ReactRouter', 'react-router');
+const ReactDOM = globalOrRequire('ReactDOM', 'react-dom');
 const React = globalOrRequire('React', 'react');
+React.DOM = ReactDOM;
 
 export const getRouter = function() {
   const Router = {};
