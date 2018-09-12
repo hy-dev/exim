@@ -1,5 +1,24 @@
 import utils from './utils';
 import helpers from './helpers';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactRouter from 'react-router';
+import createClass from 'create-react-class';
+
+const TAG_NAMES = [
+  'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'big',
+  'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup',
+  'data', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed',
+  'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head',
+  'header', 'hgroup', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label',
+  'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meta', 'meter', 'nav', 'noscript',
+  'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'picture', 'pre', 'progress', 'q', 'rp',
+  'rt', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong',
+  'style', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead',
+  'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'circle', 'clipPath', 'defs',
+  'ellipse', 'g', 'image', 'line', 'linearGradient', 'mask', 'path', 'pattern', 'polygon', 'polyline',
+  'radialGradient', 'rect', 'stop', 'svg', 'text', 'tspan'
+];
 
 const getFilePath = function(name) {
   const segments = name.split('-');
@@ -15,24 +34,11 @@ const getFilePath = function(name) {
   return filePath;
 };
 
-const globalOrRequire = (glob, mod) => {
-  const g = typeof global !== 'undefined' ? global : window;
-  if (g[glob]) return g[glob];
-  try {
-    return require(mod);
-  } catch (e) {
-    return;
-  }
-};
-
-const ReactRouter = globalOrRequire('ReactRouter', 'react-router');
-const React = globalOrRequire('React', 'react');
-
 export const getRouter = function() {
   const Router = {};
 
   if (typeof ReactRouter !== 'undefined') {
-    let routerComponents, routerMixins, routerFunctions, routerObjects, copiedItems;
+    let routerComponents, routerMixins, routerFunctions, routerObjects;
     const ReactRouter1 = !ReactRouter.DefaultRoute;
 
     if (ReactRouter1) {
@@ -47,7 +53,7 @@ export const getRouter = function() {
       routerObjects = ['HashLocation', 'History', 'HistoryLocation', 'RefreshLocation', 'StaticLocation', 'TestLocation', 'ImitateBrowserBehavior', 'ScrollToTopBehavior'];
     }
 
-    copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
+    const copiedItems = routerMixins.concat(routerFunctions).concat(routerObjects);
 
     routerComponents.forEach(function(name) {
       Router[name] = React.createElement.bind(React, ReactRouter[name]);
@@ -103,7 +109,7 @@ const getDOM = function() {
   const DOMHelpers = {};
 
   if (typeof React !== 'undefined') {
-    const tag = function(name, ...args) {
+    const tag = function(tagName, ...args) {
       let attributes;
       const first = args[0] && args[0].constructor;
       if (first === Object) {
@@ -118,17 +124,16 @@ const getDOM = function() {
       } else {
         attributes = {};
       }
-      return React.DOM[name].apply(React.DOM, [attributes].concat(args));
+
+      return React.createElement(name, attributes, ...args);
     };
 
-    const bindTag = function(tagName) {
-      return DOMHelpers[tagName] = tag.bind(this, tagName);
-    };
-
-    Object.keys(React.DOM).forEach(bindTag);
+    TAG_NAMES.forEach(tagName => {
+      return DOMHelpers[tagName] = tag.bind(null, tagName);
+    });
 
     DOMHelpers.space = function() {
-      return React.DOM.span({
+      return React.createElement('span', {
         dangerouslySetInnerHTML: {
           __html: '&nbsp;'
         }
@@ -153,7 +158,7 @@ export const createView = function(id, classArgs) {
     id = null;
   }
 
-  const ReactClass = React.createClass(classArgs);
+  const ReactClass = createClass(classArgs);
   const ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
   return ReactElement;
