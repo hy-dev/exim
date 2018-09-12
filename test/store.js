@@ -1,15 +1,4 @@
-'use strict';
-
-let chai = require('chai');
-var sinon = require('sinon');
-var sinonChai = require('sinon-chai');
-var chaiAsPromised = require('chai-as-promised');
-
-
-chai.use(sinonChai);
-chai.use(chaiAsPromised);
-chai.should();
-
+import sinon from 'sinon'
 import Store from '../src/Store'
 import { Action, Actions } from '../src/Actions'
 
