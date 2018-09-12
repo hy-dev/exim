@@ -1,6 +1,2 @@
-bower_components/
 node_modules/
-TODO.md
-exim.min.js
-build/
-lib/
+npm-debug.log*

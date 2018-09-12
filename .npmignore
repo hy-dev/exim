@@ -1,10 +1,5 @@
 /examples/
-/src/
 /test/
-/test-old/
 .babelrc
 .eslintrc.json
 .travis.yml
-bower.json
-build.js
-yarn.lock

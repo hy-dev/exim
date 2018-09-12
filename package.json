@@ -2,13 +2,9 @@
   "name": "exim",
   "version": "0.10.1",
   "description": "An architecture for HTML5 apps using Facebook's Flux.js library",
-  "main": "./lib",
+  "main": "src",
   "scripts": {
-    "build": "node ./build && make min",
-    "prepublish": "npm run build && npm run 2es5",
-    "watch": "watchify src/ -o exim.js",
-    "2es5": "node build.js && babel --optional runtime --stage 1 ./src --out-dir ./lib",
-    "test": "eslint src && mocha --compilers js:babel-core/register"
+    "test": "eslint src && mocha --require test-harness.js"
   },
   "devDependencies": {
     "babel": "^6.3.13",
@@ -16,8 +12,6 @@
     "babel-core": "^6.2.1",
     "babel-eslint": "5.0.0-beta9",
     "babel-preset-es2015": "^6.1.18",
-    "babelify": "^5.0.3",
-    "browserify": "^8.1.0",
     "chai": "^3.4.1",
     "chai-as-promised": "^5.1.0",
     "eslint": "^1.10.3",
@@ -25,8 +19,6 @@
     "mocha": "^2.3.4",
     "sinon": "^1.17.2",
     "sinon-chai": "^2.8.0",
-    "uglify-js": "^2.6.1",
-    "watchify": "^3.2.0"
   },
   "repository": {
     "type": "git",
