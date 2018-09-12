@@ -23,7 +23,6 @@
     "eslint": "^1.10.3",
     "eslint-plugin-babel": "^3.0.0",
     "mocha": "^2.3.4",
-    "phantomjs": "~1.9.2",
     "sinon": "^1.17.2",
     "sinon-chai": "^2.8.0",
     "uglify-js": "^2.6.1",
