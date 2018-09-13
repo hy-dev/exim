@@ -74,6 +74,9 @@ The only hard dependency is React.js.
 
 ## Changelog
 
+### Exim 1.0.0 (Sep 14, 2018)
+* Switched to ES6 modules.
+
 ### Exim 0.9.0 (Dec 22, 2015)
 * Stores can now use `propTypes` to specify the exact data types of properties.
 * Massively improved debugging.
