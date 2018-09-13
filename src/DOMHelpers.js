@@ -1,9 +1,18 @@
 import utils from './utils';
 import helpers from './helpers';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactRouter from 'react-router';
-import createClass from 'create-react-class';
+
+let React, ReactRouter;
+try {
+  React = require('react');
+} catch (err) {
+  // ignore
+}
+
+try {
+  ReactRouter = require('react-router');
+} catch (err) {
+  // ignore
+}
 
 const TAG_NAMES = [
   'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'big',
@@ -125,7 +134,7 @@ const getDOM = function() {
         attributes = {};
       }
 
-      return React.createElement(name, attributes, ...args);
+      return React.createElement(tagName, attributes, ...args);
     };
 
     TAG_NAMES.forEach(tagName => {
@@ -158,6 +167,7 @@ export const createView = function(id, classArgs) {
     id = null;
   }
 
+  const createClass = require('create-react-class');
   const ReactClass = createClass(classArgs);
   const ReactElement = React.createElement.bind(React.createElement, ReactClass);
 
