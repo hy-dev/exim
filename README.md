@@ -1,7 +1,5 @@
 # Exim.js [![Build Status](https://travis-ci.org/hellyeahllc/exim.svg)](https://travis-ci.org/hellyeahllc/exim)
 
-[hellyeah.is/exim](http://hellyeah.is/exim/)
-
 An ultra-lightweight Flux-like architecture for HTML5 apps using Facebook's React library.
 
 ## Install
@@ -138,7 +136,7 @@ The MIT License (MIT)
 
 Copyright (c) 2014 Hellyeah LLC http://hellyeah.is
 
-With contributions by several individuals: https://github.com/hellyeahllc/exim/graphs/contributors
+With contributions by several individuals: https://github.com/hy-dev/exim/graphs/contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
